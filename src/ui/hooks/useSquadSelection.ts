@@ -19,9 +19,12 @@ export interface SquadSelectionInit {
   initialKickerId?: string | null
   /** Players ruled OUT / SUSPENDED this game — blocked from the XVII and scrubbed from the pre-fill. */
   ruledOutIds?: ReadonlySet<string>
+  /** Live form delta per player (id -> points, incl. any play-hurt penalty) — folded into auto-fill. */
+  formDeltas?: ReadonlyMap<string, number>
 }
 
 const EMPTY_IDS: ReadonlySet<string> = new Set()
+const EMPTY_DELTAS: ReadonlyMap<string, number> = new Map()
 
 /** Squad ids that actually exist in the current pool — used to drop stale/unknown seeded picks. */
 const SQUAD_IDS = new Set(QLD_SQUAD.map((p) => p.id))
@@ -68,6 +71,7 @@ function isNaturalFit(player: Player, position: Position): boolean {
 
 export function useSquadSelection(init?: SquadSelectionInit) {
   const ruledOut = init?.ruledOutIds ?? EMPTY_IDS
+  const formDeltas = init?.formDeltas ?? EMPTY_DELTAS
   // Seed from a prior game's XVII when re-picking mid-series; stale/unknown/ruled-out ids drop to empty.
   const [lineup, setLineup] = useState<Lineup>(() => sanitizeLineup(init?.initialLineup, ruledOut))
   const [kickerId, setKickerId] = useState<string | null>(() =>
@@ -106,8 +110,11 @@ export function useSquadSelection(init?: SquadSelectionInit) {
   }, [])
 
   const autoFill = useCallback(() => {
-    // Don't auto-pick a ruled-out man.
-    const next = buildAutoLineup(QLD_SQUAD.filter((p) => !ruledOut.has(p.id)))
+    // Skip the ruled-out men, and rank the rest by FORM-adjusted quality (hot rises, slumping/doubtful fall).
+    const next = buildAutoLineup(
+      QLD_SQUAD.filter((p) => !ruledOut.has(p.id)),
+      (id) => formDeltas.get(id) ?? 0,
+    )
     setLineup(next)
     // Kicker must be one of the 19 on the team sheet (not a 20th/21st man).
     const kicker = MATCHDAY_POSITIONS.map((p) => next[p])
@@ -115,7 +122,7 @@ export function useSquadSelection(init?: SquadSelectionInit) {
       .map((id) => playerById.get(id as string)!)
       .sort((a, b) => b.goalKicking - a.goalKicking)[0]
     if (kicker) setKickerId(kicker.id)
-  }, [playerById, ruledOut])
+  }, [playerById, ruledOut, formDeltas])
 
   const validation = useMemo<SelectionValidation>(() => {
     const filled = MATCHDAY_POSITIONS.filter((p) => lineup[p]).length

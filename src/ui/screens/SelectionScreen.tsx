@@ -4,6 +4,7 @@ import { POSITION_META } from '../../data/positions'
 import { QLD_SQUAD } from '../../data/qldSquad'
 import { NSW_LINEUP } from '../../data/nswSquad'
 import type { SelectedTeam } from '../../engine'
+import { conditionFormDelta } from '../../series'
 import type { SeriesState } from '../../series'
 import { PlayerCard } from '../components/PlayerCard'
 import { FieldLineup } from '../components/FieldLineup'
@@ -35,7 +36,12 @@ export function SelectionScreen({
     () => new Set(Object.keys(conditions).filter((id) => conditions[id].injury.kind === 'out' || conditions[id].injury.kind === 'suspended')),
     [conditions],
   )
-  const selection = useSquadSelection({ initialLineup, initialKickerId, ruledOutIds })
+  // Live form deltas (incl. any play-hurt penalty) so auto-fill picks a form-aware side.
+  const formDeltas = useMemo(
+    () => new Map(Object.entries(conditions).map(([id, c]) => [id, conditionFormDelta(c)])),
+    [conditions],
+  )
+  const selection = useSquadSelection({ initialLineup, initialKickerId, ruledOutIds, formDeltas })
   const [activePosition, setActivePosition] = useState<Position | null>(null)
 
   // The unavailable QLD men, for the "team news" banner that explains an emptied pre-fill slot.
