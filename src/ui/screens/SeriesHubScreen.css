@@ -1,0 +1,76 @@
+.hub-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 640px;
+}
+
+.hub-header {
+  text-align: center;
+}
+
+.hub-kicker {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--text-dim);
+}
+
+.hub-title {
+  font-size: 1.9rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  margin-top: 4px;
+}
+
+.hub-title.win {
+  color: var(--gold);
+}
+.hub-title.loss {
+  color: var(--blue);
+}
+
+.hub-mvp {
+  text-align: center;
+  border: 1px solid var(--surface-line);
+  border-radius: var(--radius);
+  padding: 14px;
+  background: var(--surface);
+}
+
+.hub-mvp.qld {
+  border-color: var(--gold);
+}
+.hub-mvp.nsw {
+  border-color: var(--blue);
+}
+
+.hub-mvp-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+}
+
+.hub-mvp-name {
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin-top: 2px;
+}
+
+.hub-mvp-side {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+
+.hub-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+.hub-actions .btn-primary,
+.hub-actions .btn-ghost {
+  min-width: 280px;
+}

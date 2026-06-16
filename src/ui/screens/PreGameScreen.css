@@ -1,0 +1,46 @@
+.pregame-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.pregame-header {
+  text-align: center;
+  padding-top: 8px;
+}
+
+.pregame-kicker {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.74rem;
+  color: var(--text-faint);
+}
+
+.pregame-title {
+  font-family: var(--font-display);
+  font-size: 2.1rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  color: var(--gold);
+  margin-top: 4px;
+}
+
+.pregame-sub {
+  color: var(--text-dim);
+  font-size: 0.92rem;
+  margin-top: 6px;
+}
+
+.pregame-actions {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0 16px;
+}
+
+.pregame-kickoff {
+  font-size: 1.05rem;
+  letter-spacing: 0.08em;
+  padding: 14px 48px;
+}

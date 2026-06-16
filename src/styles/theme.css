@@ -1,0 +1,40 @@
+:root {
+  /* Queensland Maroons identity */
+  --maroon: #6a0f2b;
+  --maroon-bright: #9b1b42;
+  --maroon-deep: #4a0a1e;
+  --gold: #f4c430;
+
+  /* NSW Blues (opposition, intentionally cooler/muted) */
+  --blue: #1e64b4;
+  --blue-deep: #0f3a6b;
+
+  /* Surfaces */
+  --bg: #120308;
+  --surface: #1f0a12;
+  --surface-2: #2a0f1a;
+  --surface-line: #45192a;
+
+  /* Text */
+  --text: #f6e9ee;
+  --text-dim: #c79aa9;
+  --text-faint: #8d6573;
+
+  /* Attribute bars */
+  --bar-track: #3a1320;
+  --bar-attack: #e8743b;
+  --bar-defence: #43b0a0;
+  --bar-speed: #f4c430;
+  --bar-hands: #7d9be0;
+  --bar-composure: #c07bd6;
+
+  --good: #4fbf73;
+  --warn: #e4a534;
+  --bad: #e2533f;
+
+  --radius: 10px;
+  --radius-sm: 6px;
+  --shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+  --font: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-display: 'Inter', 'Segoe UI', system-ui, sans-serif;
+}

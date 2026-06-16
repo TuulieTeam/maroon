@@ -1,0 +1,136 @@
+/*
+ * SCROLLABLE LIVE FEED — the full call log is kept and the view auto-sticks to the bottom as calls
+ * arrive. Scroll up to read history; a "Jump to live" pill (positioned against this wrapper) returns
+ * you to the action. Only this region scrolls when the pointer is over it.
+ */
+.commentary-feed-wrap {
+  position: relative;
+}
+
+.commentary-feed {
+  background: var(--surface);
+  border: 1px solid var(--surface-line);
+  border-radius: var(--radius);
+  padding: 8px 0;
+  display: flex;
+  flex-direction: column;
+  max-height: min(62vh, 580px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.commentary-jump {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 7px 16px;
+  border: 1px solid var(--gold);
+  border-radius: 999px;
+  background: var(--maroon-deep);
+  color: var(--gold);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+}
+
+.commentary-jump:hover {
+  background: var(--maroon);
+}
+
+.commentary-line {
+  padding: 9px 16px;
+  border-bottom: 1px solid rgba(69, 25, 42, 0.4);
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  gap: 12px;
+  align-items: baseline;
+  animation: feed-in 0.25s ease;
+}
+
+@keyframes feed-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.commentary-minute {
+  color: var(--text-faint);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.commentary-text {
+  font-size: 0.95rem;
+}
+
+.commentary-line.try-qld {
+  background: rgba(106, 15, 43, 0.5);
+}
+.commentary-line.try-qld .commentary-text {
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.commentary-line.try-nsw {
+  background: rgba(15, 58, 107, 0.32);
+}
+.commentary-line.try-nsw .commentary-text {
+  color: var(--text-dim);
+  font-weight: 600;
+}
+
+.commentary-line.penalty .commentary-text {
+  color: var(--warn);
+}
+
+.commentary-line.interchange .commentary-text {
+  color: var(--bar-defence);
+  font-style: italic;
+}
+
+.commentary-line.break .commentary-text {
+  font-weight: 600;
+}
+
+.commentary-line.major {
+  border-bottom: 1px solid var(--surface-line);
+}
+.commentary-line.major .commentary-text {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 800;
+  color: var(--text);
+}
+
+/*
+ * COLOR — the analyst's reply, a visually distinct SECOND voice. A gold left-accent border sets it
+ * apart from the caller's play-by-play; the text is italic + dimmed so it reads as a sideline aside.
+ */
+.commentary-line.color {
+  border-left: 3px solid var(--gold);
+  background: rgba(106, 15, 43, 0.16);
+}
+.commentary-line.color .commentary-text {
+  font-style: italic;
+  color: var(--text-dim);
+}
+.commentary-analyst {
+  display: inline;
+  margin-right: 8px;
+  font-style: normal;
+  font-variant: small-caps;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+  color: var(--gold);
+}
+.commentary-analyst::after {
+  content: ':';
+}

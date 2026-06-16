@@ -1,0 +1,61 @@
+.club-report {
+  border: 1px solid var(--surface-line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 12px 14px;
+}
+
+.club-report-title {
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+  margin-bottom: 10px;
+}
+
+.club-report-cols {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 14px;
+}
+
+.club-col-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+.club-col-label.hot {
+  color: var(--good);
+}
+.club-col-label.cold {
+  color: var(--bad);
+}
+.club-col-label.news {
+  color: var(--warn);
+}
+
+.club-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 3px 0;
+  font-size: 0.82rem;
+}
+
+.club-name {
+  color: var(--text);
+}
+
+.club-band,
+.club-injury {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-weight: 800;
+  flex-shrink: 0;
+}

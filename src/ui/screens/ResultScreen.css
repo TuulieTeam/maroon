@@ -1,0 +1,234 @@
+.result-screen {
+  text-align: center;
+}
+
+.result-broadcast {
+  max-width: 640px;
+  margin: 16px auto;
+  text-align: left;
+}
+
+.result-banner {
+  margin: 24px auto 8px;
+  padding: 28px;
+  border-radius: var(--radius);
+  max-width: 620px;
+}
+
+.result-banner.win {
+  background: linear-gradient(180deg, var(--maroon-bright), var(--maroon-deep));
+  border: 1px solid var(--gold);
+  box-shadow: 0 0 40px rgba(244, 196, 48, 0.18);
+}
+
+.result-banner.loss {
+  background: linear-gradient(180deg, var(--blue-deep), var(--surface));
+  border: 1px solid var(--blue-deep);
+}
+
+.result-banner.draw {
+  background: var(--surface-2);
+  border: 1px solid var(--surface-line);
+}
+
+.result-verdict {
+  font-size: 1.9rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.result-banner.win .result-verdict {
+  color: var(--gold);
+}
+
+.result-final-score {
+  font-size: 3.4rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  margin-top: 8px;
+}
+
+.result-fg-note {
+  color: var(--text-dim);
+  margin-top: 4px;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.result-flavour {
+  color: var(--text-dim);
+  margin-top: 8px;
+  font-size: 1rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  max-width: 760px;
+  margin: 20px auto;
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--surface-line);
+  border-radius: var(--radius);
+  padding: 14px;
+}
+
+.stat-title {
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-faint);
+  margin-bottom: 8px;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.95rem;
+  padding: 2px 0;
+}
+
+.stat-row .q {
+  color: var(--gold);
+  font-weight: 700;
+}
+.stat-row .n {
+  color: var(--blue);
+  font-weight: 700;
+}
+
+.channel-callout {
+  max-width: 620px;
+  margin: 16px auto;
+  padding: 14px 18px;
+  background: var(--surface-2);
+  border-left: 3px solid var(--bad);
+  border-radius: var(--radius-sm);
+  text-align: left;
+  color: var(--text-dim);
+  font-size: 0.95rem;
+}
+
+.channel-callout strong {
+  color: var(--text);
+}
+
+.potm-card {
+  max-width: 620px;
+  margin: 16px auto;
+  padding: 18px 22px;
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+.potm-card.qld {
+  background: linear-gradient(180deg, var(--maroon-bright), var(--maroon-deep));
+  border: 1px solid var(--gold);
+}
+
+.potm-card.nsw {
+  background: linear-gradient(180deg, var(--blue-deep), var(--surface));
+  border: 1px solid var(--blue);
+}
+
+.potm-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--gold);
+}
+
+.potm-card.nsw .potm-label {
+  color: var(--blue);
+}
+
+.potm-name {
+  font-size: 1.7rem;
+  font-weight: 800;
+  margin-top: 4px;
+}
+
+.potm-side {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+}
+
+.potm-line {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.player-tables {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 14px;
+  max-width: 880px;
+  margin: 20px auto;
+  text-align: left;
+}
+
+.player-table {
+  background: var(--surface);
+  border: 1px solid var(--surface-line);
+  border-radius: var(--radius);
+  padding: 12px;
+  overflow-x: auto;
+}
+
+.player-table-title {
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+}
+
+.player-table.qld .player-table-title {
+  color: var(--gold);
+}
+
+.player-table.nsw .player-table-title {
+  color: var(--blue);
+}
+
+.player-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.player-table th,
+.player-table td {
+  padding: 3px 6px;
+  text-align: right;
+  font-size: 0.78rem;
+}
+
+.player-table th {
+  color: var(--text-faint);
+  font-weight: 600;
+  border-bottom: 1px solid var(--surface-line);
+}
+
+.player-table th.pn,
+.player-table td.pn {
+  text-align: left;
+  white-space: nowrap;
+}
+
+.player-table tbody tr:nth-child(even) {
+  background: var(--surface-2);
+}
+
+.result-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 24px;
+}

@@ -1,0 +1,238 @@
+.player-card {
+  background: var(--surface);
+  border: 1px solid var(--surface-line);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  text-align: left;
+  width: 100%;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.player-card.selectable {
+  cursor: pointer;
+}
+
+.player-card.selectable:hover {
+  border-color: var(--maroon-bright);
+}
+
+.player-card.used {
+  opacity: 0.4;
+}
+
+.player-card.active {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px var(--gold);
+}
+
+.player-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.player-card-name {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.player-card-meta {
+  color: var(--text-faint);
+  font-size: 0.78rem;
+}
+
+.player-card-tag {
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.tag-veteran {
+  background: rgba(244, 196, 48, 0.15);
+  color: var(--gold);
+}
+.tag-bolter {
+  background: rgba(226, 83, 63, 0.18);
+  color: var(--bad);
+}
+.tag-rookie {
+  background: rgba(125, 155, 224, 0.18);
+  color: var(--bar-hands);
+}
+.tag-workhorse {
+  background: rgba(67, 176, 160, 0.16);
+  color: var(--bar-defence);
+}
+
+.attr-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.76rem;
+}
+
+.attr-label {
+  width: 64px;
+  color: var(--text-dim);
+  flex-shrink: 0;
+}
+
+.attr-track {
+  flex: 1;
+  height: 7px;
+  background: var(--bar-track);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.attr-fill {
+  height: 100%;
+  border-radius: 999px;
+}
+
+.attr-value {
+  width: 24px;
+  text-align: right;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.player-card-fitness {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.72rem;
+  margin-top: 2px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--surface-line);
+}
+
+.player-card-fitness .attr-label {
+  color: var(--bar-speed);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.64rem;
+}
+
+.player-card-fitness .attr-track {
+  height: 5px;
+  opacity: 0.85;
+}
+
+.player-card-positions {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.pos-chip {
+  font-size: 0.66rem;
+  background: var(--surface-2);
+  border: 1px solid var(--surface-line);
+  padding: 1px 6px;
+  border-radius: 4px;
+  color: var(--text-dim);
+}
+
+.player-card-chips {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.player-card-status {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-weight: 800;
+}
+
+.status-injured {
+  background: rgba(226, 83, 63, 0.2);
+  color: var(--bad);
+}
+.status-suspended {
+  background: rgba(228, 165, 52, 0.2);
+  color: var(--warn);
+}
+.status-dropped {
+  background: rgba(141, 101, 115, 0.22);
+  color: var(--text-faint);
+}
+
+.player-card-note {
+  font-size: 0.74rem;
+  line-height: 1.3;
+  color: var(--text-dim);
+  border-left: 2px solid var(--maroon-bright);
+  padding-left: 8px;
+}
+
+/* ---- Live form + injury badges ---- */
+.player-card-form,
+.player-card-injury {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.player-card-form .form-delta {
+  font-weight: 800;
+}
+
+.form-hot {
+  background: rgba(79, 191, 115, 0.22);
+  color: var(--good);
+}
+.form-warm {
+  background: rgba(244, 196, 48, 0.18);
+  color: var(--gold);
+}
+.form-steady {
+  background: var(--surface-2);
+  color: var(--text-dim);
+}
+.form-cool {
+  background: rgba(125, 155, 224, 0.16);
+  color: var(--bar-hands);
+}
+.form-slump {
+  background: rgba(226, 83, 63, 0.18);
+  color: var(--bad);
+}
+
+.injury-out {
+  background: rgba(226, 83, 63, 0.28);
+  color: var(--bad);
+}
+.injury-doubtful {
+  background: rgba(228, 165, 52, 0.22);
+  color: var(--warn);
+}
+.injury-suspended {
+  background: rgba(228, 165, 52, 0.22);
+  color: var(--warn);
+}
+
+/* A player ruled out this game — visibly unpickable. */
+.player-card.ruled-out {
+  opacity: 0.5;
+  filter: grayscale(0.5);
+}
+.player-card.ruled-out.selectable {
+  cursor: not-allowed;
+}

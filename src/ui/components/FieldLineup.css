@@ -1,0 +1,119 @@
+.field-lineup {
+  background: var(--surface);
+  border: 1px solid var(--surface-line);
+  border-radius: var(--radius);
+  padding: 14px;
+}
+
+.field-lineup h3 {
+  font-size: 1.05rem;
+  margin-bottom: 10px;
+}
+
+.lineup-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lineup-section-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-faint);
+  margin: 8px 0 2px;
+}
+
+.lineup-slot {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  background: var(--surface-2);
+}
+
+.lineup-slot.empty {
+  border-style: dashed;
+  border-color: var(--surface-line);
+  background: transparent;
+}
+
+.lineup-slot.active {
+  border-color: var(--gold);
+}
+
+.lineup-slot.warn {
+  border-color: var(--warn);
+}
+
+.lineup-slot button.slot-main {
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  padding: 0;
+  width: 100%;
+}
+
+.slot-jersey {
+  font-weight: 800;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.slot-pos {
+  font-size: 0.72rem;
+  color: var(--text-faint);
+}
+
+.slot-player {
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.slot-empty-text {
+  color: var(--text-faint);
+  font-style: italic;
+  font-size: 0.88rem;
+}
+
+.slot-kicker {
+  font-size: 0.66rem;
+  background: var(--maroon);
+  color: var(--text);
+  border: 1px solid var(--maroon-bright);
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.slot-kicker.is-kicker {
+  background: var(--gold);
+  color: var(--maroon-deep);
+  border-color: var(--gold);
+}
+
+.reserve-note {
+  font-size: 0.72rem;
+  color: var(--text-faint);
+  font-style: italic;
+  margin: -2px 0 4px;
+}
+
+.validation-line {
+  margin-top: 12px;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+
+.validation-warnings {
+  margin-top: 6px;
+  font-size: 0.78rem;
+  color: var(--warn);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}

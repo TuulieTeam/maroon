@@ -1,0 +1,150 @@
+.active-team-panel {
+  background: var(--surface);
+  border: 1px solid var(--surface-line);
+  border-radius: var(--radius);
+  padding: 14px;
+}
+
+.active-team-panel h3 {
+  font-size: 1.05rem;
+  margin-bottom: 10px;
+}
+
+.active-team {
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.active-team.qld {
+  background: linear-gradient(180deg, rgba(155, 27, 66, 0.22), transparent);
+  border: 1px solid var(--maroon-bright);
+}
+
+.active-team.nsw {
+  background: var(--surface-2);
+  border: 1px solid var(--surface-line);
+}
+
+.active-team.compact .onfield-list {
+  opacity: 0.85;
+}
+
+.active-team-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.active-team-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.active-team.qld .active-team-name {
+  color: var(--gold);
+}
+
+.onfield-list {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 2px 12px;
+}
+
+.onfield-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  padding: 1px 0;
+}
+
+.onfield-list li.binned {
+  opacity: 0.55;
+  text-decoration: line-through;
+}
+
+.onfield-list .jersey {
+  font-weight: 800;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+  min-width: 18px;
+  text-align: right;
+}
+
+.active-team.nsw .onfield-list .jersey {
+  color: var(--blue);
+}
+
+.onfield-list .pname {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.active-team-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin-top: 8px;
+  font-size: 0.74rem;
+}
+
+.bench-count {
+  color: var(--text-dim);
+}
+
+.badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.badge.bin {
+  background: var(--warn);
+  color: var(--maroon-deep);
+}
+
+.badge.hia {
+  background: var(--bar-hands);
+  color: var(--maroon-deep);
+}
+
+.badge.out {
+  background: var(--bad);
+  color: var(--text);
+}
+
+.badge.unlock {
+  background: var(--gold);
+  color: var(--maroon-deep);
+}
+
+.subs-log {
+  margin-top: 8px;
+  border-top: 1px dashed var(--surface-line);
+  padding-top: 6px;
+  font-size: 0.76rem;
+  color: var(--text-dim);
+}
+
+.subs-log-row {
+  padding: 1px 0;
+}
+
+.subs-log-row .m {
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.subs-log-row .reason {
+  color: var(--text-faint);
+  font-style: italic;
+}

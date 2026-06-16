@@ -1,0 +1,94 @@
+@import './theme.css';
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(1200px 600px at 50% -10%, var(--maroon-deep), transparent),
+    var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.45;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  border-radius: var(--radius-sm);
+  transition: filter 0.12s ease, transform 0.05s ease;
+}
+
+button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.btn-primary {
+  background: linear-gradient(180deg, var(--maroon-bright), var(--maroon));
+  color: var(--text);
+  font-weight: 700;
+  padding: 14px 28px;
+  font-size: 1.05rem;
+  box-shadow: 0 4px 14px rgba(155, 27, 66, 0.4);
+}
+
+.btn-primary:hover:not(:disabled) {
+  filter: brightness(1.12);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-dim);
+  border: 1px solid var(--surface-line);
+  padding: 10px 18px;
+  font-weight: 600;
+}
+
+.btn-ghost:hover:not(:disabled) {
+  color: var(--text);
+  border-color: var(--maroon-bright);
+}
+
+.app-shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 24px 20px 80px;
+}
+
+.app-title {
+  font-size: 2.1rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, var(--gold), var(--maroon-bright));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.app-sub {
+  color: var(--text-dim);
+  margin-top: 2px;
+  font-size: 0.95rem;
+}

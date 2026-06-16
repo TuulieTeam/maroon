@@ -1,0 +1,79 @@
+.broadcast-panel {
+  background: var(--surface);
+  border: 1px solid var(--surface-line);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.broadcast-title {
+  padding: 10px 16px;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--surface-line);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--gold);
+}
+
+.broadcast-rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.broadcast-row {
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(69, 25, 42, 0.4);
+  animation: feed-in 0.25s ease;
+}
+
+.broadcast-row:last-child {
+  border-bottom: none;
+}
+
+.broadcast-speaker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.broadcast-name {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+.broadcast-role {
+  font-size: 0.64rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--bar-track);
+  color: var(--text-dim);
+}
+
+.broadcast-role.role-host {
+  background: rgba(244, 196, 48, 0.16);
+  color: var(--gold);
+}
+.broadcast-role.role-analyst {
+  background: rgba(125, 155, 224, 0.16);
+  color: var(--bar-hands);
+}
+.broadcast-role.role-sideline {
+  background: rgba(67, 176, 160, 0.16);
+  color: var(--bar-defence);
+}
+.broadcast-role.role-caller {
+  background: rgba(192, 123, 214, 0.16);
+  color: var(--bar-composure);
+}
+
+.broadcast-line {
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: var(--text-dim);
+}

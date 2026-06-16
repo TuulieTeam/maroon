@@ -1,0 +1,68 @@
+.gus-speech {
+  position: relative;
+  border: 1px solid var(--surface-line);
+  border-left: 4px solid var(--gold);
+  border-radius: var(--radius);
+  background:
+    radial-gradient(120% 100% at 0% 0%, rgba(106, 15, 43, 0.55), transparent 60%),
+    linear-gradient(180deg, #15060c, var(--bg));
+  padding: 26px 28px 22px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.gus-eyebrow {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--text-dim);
+}
+
+.gus-title {
+  margin: 6px 0 18px;
+  font-size: 1.9rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: var(--gold);
+  text-shadow: 0 2px 18px rgba(244, 196, 48, 0.18);
+}
+
+.gus-body p {
+  margin: 0 0 0.72em;
+  font-size: 1.12rem;
+  line-height: 1.55;
+  color: var(--text);
+  opacity: 0;
+  transform: translateY(6px);
+  animation: gus-line-in 0.5s ease forwards;
+}
+
+/* The opening line carries the weight — slightly larger, bolder. */
+.gus-body p:first-child {
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.gus-signoff {
+  margin-top: 16px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--maroon-bright);
+}
+
+@keyframes gus-line-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gus-body p {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+}

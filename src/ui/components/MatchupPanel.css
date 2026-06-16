@@ -1,0 +1,180 @@
+.matchup-panel {
+  background: linear-gradient(180deg, var(--surface-2), var(--surface));
+  border: 1px solid var(--maroon);
+  border-radius: var(--radius);
+  padding: 14px;
+}
+
+.matchup-panel h3 {
+  color: var(--gold);
+  font-size: 1.05rem;
+  margin-bottom: 4px;
+}
+
+.matchup-sub {
+  color: var(--text-dim);
+  font-size: 0.82rem;
+  margin-bottom: 12px;
+  line-height: 1.35;
+}
+
+.mu-edges {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mu-edge {
+  border-left: 3px solid var(--surface-line);
+  padding: 8px 0 10px 12px;
+}
+
+.mu-edge.mu-edge-danger {
+  border-left-color: var(--bad);
+}
+
+.mu-edge-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.mu-edge-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.mu-edge-vs {
+  font-size: 0.74rem;
+  color: var(--blue);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.mu-edge-owners {
+  font-size: 0.72rem;
+  color: var(--text-faint);
+  margin-top: 2px;
+  margin-bottom: 8px;
+}
+
+.mu-warning {
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: var(--bad);
+  background: rgba(226, 83, 63, 0.12);
+  border-radius: var(--radius-sm);
+  padding: 6px 8px;
+  margin-bottom: 8px;
+}
+
+.mu-fill-hint {
+  font-size: 0.8rem;
+  color: var(--text-faint);
+  font-style: italic;
+  padding: 4px 0;
+}
+
+.mu-h2h {
+  margin-top: 8px;
+}
+
+.mu-h2h-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.mu-h2h-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+}
+
+.mu-verdict-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.66rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.mu-diff {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+  font-weight: 700;
+}
+
+.verdict-advantage .mu-verdict-chip {
+  background: rgba(79, 191, 115, 0.16);
+  color: var(--good);
+}
+
+.verdict-even .mu-verdict-chip {
+  background: var(--surface-2);
+  color: var(--text-dim);
+  border: 1px solid var(--surface-line);
+}
+
+.verdict-at-risk .mu-verdict-chip {
+  background: rgba(226, 83, 63, 0.18);
+  color: var(--bad);
+}
+
+.mu-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mu-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.74rem;
+}
+
+.mu-bar-who {
+  width: 32px;
+  flex-shrink: 0;
+  color: var(--text-dim);
+}
+
+.mu-bar-track {
+  flex: 1;
+  height: 8px;
+  background: var(--bar-track);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.mu-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+}
+
+.mu-bar-fill.mu-you {
+  background: var(--maroon-bright);
+}
+
+.mu-bar-fill.mu-opp {
+  background: var(--blue);
+}
+
+.mu-bar-val {
+  width: 26px;
+  flex-shrink: 0;
+  text-align: right;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}

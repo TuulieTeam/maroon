@@ -1,0 +1,55 @@
+.opposition-panel {
+  background: linear-gradient(180deg, var(--surface-2), var(--surface));
+  border: 1px solid var(--blue-deep);
+  border-radius: var(--radius);
+  padding: 14px;
+}
+
+.opposition-panel h3 {
+  color: var(--blue);
+  font-size: 1.05rem;
+  margin-bottom: 4px;
+}
+
+.opposition-sub {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  margin-bottom: 12px;
+}
+
+.threat {
+  border-left: 3px solid var(--surface-line);
+  padding: 8px 0 8px 12px;
+  margin-bottom: 12px;
+}
+
+.threat.danger {
+  border-left-color: var(--bad);
+}
+
+.threat-headline {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.threat-detail {
+  color: var(--text-dim);
+  font-size: 0.84rem;
+  margin-top: 3px;
+}
+
+.threat-men {
+  margin-top: 6px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.threat-man {
+  font-size: 0.74rem;
+  background: rgba(30, 100, 180, 0.18);
+  border: 1px solid var(--blue-deep);
+  color: var(--text);
+  padding: 2px 8px;
+  border-radius: 999px;
+}

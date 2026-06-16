@@ -1,0 +1,93 @@
+.live-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.live-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.speed-group {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.speed-group .label {
+  font-size: 0.78rem;
+  color: var(--text-faint);
+}
+
+.speed-btn {
+  background: var(--surface-2);
+  border: 1px solid var(--surface-line);
+  color: var(--text-dim);
+  padding: 6px 12px;
+  font-weight: 700;
+  font-size: 0.82rem;
+}
+
+.speed-btn.active {
+  background: var(--maroon);
+  color: var(--text);
+  border-color: var(--maroon-bright);
+}
+
+.live-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.live-side {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  position: sticky;
+  top: 12px;
+}
+
+@media (max-width: 860px) {
+  .live-main {
+    grid-template-columns: 1fr;
+  }
+  .live-side {
+    position: static;
+  }
+}
+
+.halftime-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(8, 2, 5, 0.78);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: feed-in 0.2s ease;
+}
+
+.halftime-modal {
+  width: 100%;
+  max-width: 640px;
+  max-height: 88vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: var(--shadow);
+}
+
+.halftime-resume {
+  align-self: center;
+  padding: 12px 40px;
+  letter-spacing: 0.06em;
+}
