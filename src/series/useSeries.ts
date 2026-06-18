@@ -7,6 +7,7 @@ import { loadCareer, saveCareer } from './careerPersist'
 import { clearSeries, loadSeries, saveSeries } from './persist'
 import { applyGameResult, concludeSeries, initSeries } from './seriesReducer'
 import type { PlayedGame } from './seriesReducer'
+import type { Difficulty } from './difficulty'
 import type { SeriesState } from './types'
 
 export interface UseSeries {
@@ -19,6 +20,8 @@ export interface UseSeries {
   recordResult: (played: PlayedGame) => void
   /** Close a clinched series early when the player skips the dead rubber. */
   skipDeadRubber: () => void
+  /** Set the challenge level — only takes effect before game 1 kicks off (then the series locks it). */
+  setDifficulty: (difficulty: Difficulty) => void
   /** Archive the just-finished series into the career ledger (if complete), then start a fresh one. */
   newSeries: (seriesMvp?: PlayerOfMatch | null) => void
 }
@@ -49,13 +52,19 @@ export function useSeries(rootSeedFactory: () => number): UseSeries {
     setState((s) => concludeSeries(s))
   }, [])
 
+  // Adjustable only on the game-1 selection screen; once a game is in the books the dial is locked.
+  const setDifficulty = useCallback((difficulty: Difficulty) => {
+    setState((s) => (s.games.length === 0 && s.status === 'in-progress' ? { ...s, difficulty } : s))
+  }, [])
+
   const newSeries = useCallback(
     (seriesMvp: PlayerOfMatch | null = null) => {
       // Archive the finished series before wiping the live save — addCompletedSeries no-ops if the
-      // series isn't complete or was already archived (deduped by rootSeed).
+      // series isn't complete or was already archived (deduped by rootSeed). The fresh series inherits
+      // the just-finished series' difficulty (re-adjustable before its game 1).
       setCareer((c) => addCompletedSeries(c, state, seriesMvp))
       clearSeries()
-      setState(initSeries(rootSeedFactory()))
+      setState(initSeries(rootSeedFactory(), state.difficulty ?? 'origin'))
     },
     [state, rootSeedFactory],
   )
@@ -63,5 +72,5 @@ export function useSeries(rootSeedFactory: () => number): UseSeries {
   const currentContext = useMemo(() => buildSeriesContext(state), [state])
   const careerSummary = useMemo(() => summariseCareer(career), [career])
 
-  return { state, currentContext, careerSummary, recordResult, skipDeadRubber, newSeries }
+  return { state, currentContext, careerSummary, recordResult, skipDeadRubber, setDifficulty, newSeries }
 }

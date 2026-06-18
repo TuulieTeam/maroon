@@ -1,5 +1,6 @@
 import type { Position } from '../data/types'
 import type { Score, Side, VenueId } from '../engine'
+import type { Difficulty } from './difficulty'
 
 /** Re-exported from the engine, where `deriveWrap` lives (the booth needs it at broadcast time). */
 export type { SeriesWrap } from '../engine'
@@ -62,6 +63,12 @@ export interface SeriesState {
    * persisted so a reload faces the same side and so `playerConditions` resolves the right NSW ids.
    */
   opponentId: string
+  /**
+   * The chosen challenge level — a uniform NSW effective-attr nudge applied at kickoff (see
+   * difficulty.ts). Fixed once game 1 is played; recorded so the share card can say "on Hard". Optional
+   * for backward-compatibility: a pre-dial save (or omitted value) reads as `origin` (no nudge).
+   */
+  difficulty?: Difficulty
   currentGame: GameNo
   seriesScore: Score
   games: SeriesGameRecord[]

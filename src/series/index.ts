@@ -18,6 +18,8 @@ export {
 } from './conditions'
 export type { Carryover, AdvanceContext, FormBand } from './conditions'
 export { deriveStakes, gameLabel, GAME_LABELS } from './stakes'
+export { DIFFICULTIES, DIFFICULTY_TUNING, DIFFICULTY_META, nswDifficultyDelta } from './difficulty'
+export type { Difficulty } from './difficulty'
 export { deriveWrap } from './wrap'
 export { initSeries, applyGameResult, concludeSeries } from './seriesReducer'
 export type { PlayedGame } from './seriesReducer'

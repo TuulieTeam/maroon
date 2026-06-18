@@ -97,3 +97,65 @@
   justify-content: center;
   margin-top: 18px;
 }
+
+/* Difficulty dial — a series-start segmented control (Casual / Origin / Hard), shown only before
+   game 1 locks it in. Keycap aesthetic: squared segments; the active one lit gold. */
+.difficulty-dial {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  text-align: center;
+}
+
+.difficulty-label {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--text-dim);
+}
+
+.difficulty-options {
+  display: inline-flex;
+  border: 2px solid var(--surface-line);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.difficulty-option {
+  padding: 8px 20px;
+  background: var(--surface);
+  color: var(--text-dim);
+  border: none;
+  border-right: 2px solid var(--surface-line);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+
+.difficulty-option:last-child {
+  border-right: none;
+}
+
+.difficulty-option:hover {
+  color: var(--text);
+  background: var(--maroon);
+}
+
+.difficulty-option.active {
+  background: var(--gold);
+  color: var(--maroon-deep);
+  text-shadow: none;
+}
+
+.difficulty-blurb {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  max-width: 46ch;
+  min-height: 1.2em;
+}

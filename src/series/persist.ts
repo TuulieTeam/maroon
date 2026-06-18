@@ -1,6 +1,7 @@
 import { QLD_SQUAD } from '../data/qldSquad'
 import { BLUES_IDS } from '../data/bluesVariants'
 import type { Score } from '../engine'
+import { DIFFICULTIES } from './difficulty'
 import type { SeriesGameRecord, SeriesState } from './types'
 
 /** Versioned localStorage key — bump the suffix on any breaking shape change. */
@@ -15,6 +16,7 @@ const OPPONENT_IDS = new Set(BLUES_IDS)
 
 const VENUE_IDS = new Set(['SUNCORP', 'ACCOR_SYD', 'MCG'])
 const INJURY_KINDS = new Set(['fit', 'doubtful', 'out', 'suspended'])
+const DIFFICULTY_VALUES = new Set<string>(DIFFICULTIES)
 
 /**
  * Load a saved series, or null if there is none / it is unreadable. Defensive by design: any parse
@@ -93,6 +95,9 @@ function isValidSeries(v: unknown): v is SeriesState {
   if (s.schemaVersion !== SCHEMA_VERSION) return false
   if (typeof s.rootSeed !== 'number') return false
   if (typeof s.opponentId !== 'string' || !OPPONENT_IDS.has(s.opponentId)) return false
+  // difficulty is optional (pre-dial saves omit it → read as origin); reject only a present-but-bad value.
+  if (s.difficulty !== undefined && (typeof s.difficulty !== 'string' || !DIFFICULTY_VALUES.has(s.difficulty)))
+    return false
   if (s.currentGame !== 1 && s.currentGame !== 2 && s.currentGame !== 3) return false
   if (s.status !== 'in-progress' && s.status !== 'complete') return false
   if (s.seriesWinner !== undefined && s.seriesWinner !== 'QLD' && s.seriesWinner !== 'NSW') return false

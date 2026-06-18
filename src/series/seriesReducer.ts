@@ -4,6 +4,7 @@ import { STARTING_FORM, STARTING_INJURY } from '../data/startingForm'
 import type { Player, Position } from '../data/types'
 import type { MatchEvent, MatchStats, Score, Side } from '../engine'
 import { advanceConditions, extractCarryover, initConditions } from './conditions'
+import type { Difficulty } from './difficulty'
 import { gameSeed } from './seed'
 import type { GameNo, SeriesGameRecord, SeriesState } from './types'
 import { SERIES_SCHEDULE } from './venues'
@@ -28,13 +29,15 @@ export interface PlayedGame {
 }
 
 /** A fresh series, parked on game 1, scoreless, with conditions seeded from the real-world form notes.
- *  The Blues opponent is drawn deterministically from the seed and fixed for the whole series. */
-export function initSeries(rootSeed: number): SeriesState {
+ *  The Blues opponent is drawn deterministically from the seed and fixed for the whole series; the
+ *  difficulty (adjustable until game 1 kicks off) defaults to Origin. */
+export function initSeries(rootSeed: number, difficulty: Difficulty = 'origin'): SeriesState {
   const opponentId = bluesForSeed(rootSeed).id
   return {
     schemaVersion: 3,
     rootSeed: rootSeed >>> 0,
     opponentId,
+    difficulty,
     currentGame: 1,
     seriesScore: { qld: 0, nsw: 0 },
     games: [],

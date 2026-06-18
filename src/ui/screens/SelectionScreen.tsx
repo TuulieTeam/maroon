@@ -4,8 +4,8 @@ import { POSITION_META } from '../../data/positions'
 import { QLD_SQUAD } from '../../data/qldSquad'
 import { bluesById } from '../../data/bluesVariants'
 import type { SelectedTeam } from '../../engine'
-import { conditionFormDelta } from '../../series'
-import type { SeriesState } from '../../series'
+import { conditionFormDelta, DIFFICULTIES, DIFFICULTY_META } from '../../series'
+import type { Difficulty, SeriesState } from '../../series'
 import { PlayerCard } from '../components/PlayerCard'
 import { FieldLineup } from '../components/FieldLineup'
 import { OppositionPanel } from '../components/OppositionPanel'
@@ -21,6 +21,9 @@ interface SelectionScreenProps {
   venueName: string
   stakesLabel: string
   seriesState: SeriesState
+  /** The chosen challenge level (defaults to Origin). Editable only at series start (game 1). */
+  difficulty: Difficulty
+  onSetDifficulty: (difficulty: Difficulty) => void
   /** The prior game's XVII (player ids), pre-filling the picker when re-picking mid-series. */
   initialLineup?: Partial<Record<Position, string>>
   initialKickerId?: string | null
@@ -32,12 +35,16 @@ export function SelectionScreen({
   venueName,
   stakesLabel,
   seriesState,
+  difficulty,
+  onSetDifficulty,
   initialLineup,
   initialKickerId,
 }: SelectionScreenProps) {
   const conditions = seriesState.playerConditions
   // The Blues side drawn for this series — fixed across all three games, revealed in the scouting report.
   const opponent = bluesById(seriesState.opponentId)
+  // The difficulty dial is a series-start choice — adjustable only until game 1 kicks off.
+  const canSetDifficulty = seriesState.games.length === 0
   // Players ruled OUT / SUSPENDED this game — blocked from the XVII.
   const ruledOutIds = useMemo(
     () => new Set(Object.keys(conditions).filter((id) => conditions[id].injury.kind === 'out' || conditions[id].injury.kind === 'suspended')),
@@ -125,6 +132,27 @@ export function SelectionScreen({
         <div className="app-title">MAROON</div>
         <div className="app-sub">{gameLabel} · Pick Queensland&apos;s 19 + 2 reserves, lock in, then watch it unfold.</div>
       </header>
+
+      {canSetDifficulty && (
+        <div className="difficulty-dial" role="group" aria-label="Difficulty">
+          <span className="difficulty-label">Difficulty</span>
+          <div className="difficulty-options">
+            {DIFFICULTIES.map((d) => (
+              <button
+                key={d}
+                type="button"
+                className={`difficulty-option ${difficulty === d ? 'active' : ''}`}
+                aria-pressed={difficulty === d}
+                title={DIFFICULTY_META[d].blurb}
+                onClick={() => onSetDifficulty(d)}
+              >
+                {DIFFICULTY_META[d].label}
+              </button>
+            ))}
+          </div>
+          <p className="difficulty-blurb">{DIFFICULTY_META[difficulty].blurb}</p>
+        </div>
+      )}
 
       <div className="selection-layout">
         <section ref={poolRef}>

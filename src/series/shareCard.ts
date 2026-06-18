@@ -1,4 +1,5 @@
 import type { PlayerOfMatch } from '../engine'
+import { DIFFICULTY_META } from './difficulty'
 import type { SeriesGameRecord, SeriesState } from './types'
 import { VENUES } from './venues'
 
@@ -31,5 +32,9 @@ export function buildShareCard(state: SeriesState, mvp: PlayerOfMatch | null): s
     .join('\n')
   if (games) lines.push(games)
   if (mvp) lines.push(`👑 Player of the Series: ${mvp.name} (${mvp.side})`)
+  // Surface a non-default difficulty for the brag ("won on Hard"); Origin is the baseline, so omit it.
+  if (state.difficulty && state.difficulty !== 'origin') {
+    lines.push(`⚙️ Difficulty: ${DIFFICULTY_META[state.difficulty].label}`)
+  }
   return lines.join('\n')
 }

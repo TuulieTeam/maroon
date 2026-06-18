@@ -3,7 +3,7 @@ import { bluesById } from './data/bluesVariants'
 import type { Position } from './data/types'
 import { originLabel, simulateMatch } from './engine'
 import type { MatchResult, MatchSetup, PlayerOfMatch, SelectedTeam } from './engine'
-import { conditionFormDelta, gameSeed, pickSeriesMvp, reinjuryMult } from './series'
+import { conditionFormDelta, gameSeed, nswDifficultyDelta, pickSeriesMvp, reinjuryMult } from './series'
 import { useSeries } from './series/useSeries'
 import { SelectionScreen } from './ui/screens/SelectionScreen'
 import { PreGameScreen } from './ui/screens/PreGameScreen'
@@ -34,7 +34,7 @@ function lineupIds(team: SelectedTeam): Record<Position, string> {
 
 export default function App() {
   const rootSeedFactory = useCallback(() => Date.now(), [])
-  const { state, currentContext, careerSummary, recordResult, skipDeadRubber, newSeries } =
+  const { state, currentContext, careerSummary, recordResult, skipDeadRubber, setDifficulty, newSeries } =
     useSeries(rootSeedFactory)
 
   // Resume mid-series straight to the hub; a fresh series opens on selecting your Origin I side.
@@ -63,9 +63,16 @@ export default function App() {
         const mult = reinjuryMult(cond)
         if (mult !== 1) reinjury[id] = mult
       }
+      const nsw = nswTeam(state.opponentId)
+      // Difficulty dial: a uniform effective-attr nudge to the drawn Blues side, folded into the form
+      // map (pure arithmetic, no rng — never perturbs the seeded play stream). Origin = 0 = unchanged.
+      const diffDelta = nswDifficultyDelta(state.difficulty)
+      if (diffDelta !== 0) {
+        for (const p of Object.values(nsw.lineup)) form[p.id] = (form[p.id] ?? 0) + diffDelta
+      }
       const setup: MatchSetup = {
         qld: team,
-        nsw: nswTeam(state.opponentId),
+        nsw,
         series: { ...currentContext, usedSpeechTitles },
         form,
         reinjury,
@@ -80,6 +87,7 @@ export default function App() {
       state.currentGame,
       state.rootSeed,
       state.opponentId,
+      state.difficulty,
       state.playerConditions,
       currentContext,
       usedSpeechTitles,
@@ -126,6 +134,8 @@ export default function App() {
         venueName={currentContext.venue.stadium}
         stakesLabel={STAKES_SHORT[currentContext.stakes]}
         seriesState={state}
+        difficulty={state.difficulty ?? 'origin'}
+        onSetDifficulty={setDifficulty}
         initialLineup={prior?.qldLineup}
         initialKickerId={prior?.qldKickerId}
         onKickOff={handleKickOff}
