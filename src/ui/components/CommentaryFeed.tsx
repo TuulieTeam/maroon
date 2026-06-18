@@ -54,24 +54,37 @@ export function CommentaryFeed({ events }: CommentaryFeedProps) {
     setShowJump(false)
   }
 
+  // The single newest call, announced via a tiny isolated live region — NOT the whole scrollable
+  // backlog, which would make a screen reader re-read history on every tick during fast playback.
+  const latest = events[events.length - 1]
+
   return (
     <div className="commentary-feed-wrap">
-      <div className="commentary-feed" ref={scrollRef} onScroll={handleScroll} aria-live="polite">
-        {events.map((event) => (
-          <div className={lineClass(event)} key={event.seq}>
-            <span className="commentary-minute">{event.minute}&apos;</span>
-            <span className="commentary-text">
-              {event.persona && <span className="commentary-analyst">{event.persona}</span>}
-              {event.commentary}
-            </span>
-          </div>
-        ))}
+      <div className="commentary-feed" ref={scrollRef} onScroll={handleScroll}>
+        {events.map((event, i) => {
+          // Name the speaker only when it CHANGES from the line before — reads like a broadcast
+          // transcript (the caller's name on a hand-off, clean otherwise) rather than a per-line tag.
+          const showSpeaker = event.persona && event.persona !== events[i - 1]?.persona
+          const speakerClass = event.personaRole === 'Caller' ? 'commentary-caller' : 'commentary-analyst'
+          return (
+            <div className={lineClass(event)} key={event.seq}>
+              <span className="commentary-minute">{event.minute}&apos;</span>
+              <span className="commentary-text">
+                {showSpeaker && <span className={speakerClass}>{event.persona}</span>}
+                {event.commentary}
+              </span>
+            </div>
+          )
+        })}
       </div>
       {showJump && (
-        <button className="commentary-jump" onClick={jumpToLive}>
+        <button type="button" className="commentary-jump" onClick={jumpToLive}>
           ↓ Jump to live
         </button>
       )}
+      <div className="sr-only" aria-live="polite" aria-atomic="true">
+        {latest ? `${latest.minute}' ${latest.commentary}` : ''}
+      </div>
     </div>
   )
 }

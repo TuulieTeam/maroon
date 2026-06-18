@@ -10,6 +10,7 @@ import { PreGameScreen } from './ui/screens/PreGameScreen'
 import { LiveMatchScreen } from './ui/screens/LiveMatchScreen'
 import { ResultScreen } from './ui/screens/ResultScreen'
 import { SeriesHubScreen } from './ui/screens/SeriesHubScreen'
+import { STAKES_SHORT } from './ui/seriesStakes'
 
 type Phase = 'select' | 'pregame' | 'live' | 'result' | 'hub'
 
@@ -27,7 +28,8 @@ function lineupIds(team: SelectedTeam): Record<Position, string> {
 
 export default function App() {
   const rootSeedFactory = useCallback(() => Date.now(), [])
-  const { state, currentContext, recordResult, skipDeadRubber, newSeries } = useSeries(rootSeedFactory)
+  const { state, currentContext, careerSummary, recordResult, skipDeadRubber, newSeries } =
+    useSeries(rootSeedFactory)
 
   // Resume mid-series straight to the hub; a fresh series opens on selecting your Origin I side.
   const [phase, setPhase] = useState<Phase>(() =>
@@ -90,14 +92,16 @@ export default function App() {
   }, [result, lockedTeam, playingGame, recordResult])
 
   const handleNewSeries = useCallback(() => {
-    newSeries()
+    // Capture this series' MVP (in-memory POTMs) so it lands in the career ledger before the wipe.
+    const seriesMvp = state.status === 'complete' && potms.length > 0 ? pickSeriesMvp(potms) : null
+    newSeries(seriesMvp)
     setLockedTeam(null)
     setResult(null)
     setPotms([])
     setUsedSpeechTitles([])
     recordedGameRef.current = null
     setPhase('select')
-  }, [newSeries])
+  }, [newSeries, state.status, potms])
 
   // The prior game's XVII pre-fills the next selection (survives a reload via the saved series).
   const prior = state.games.at(-1)
@@ -106,6 +110,8 @@ export default function App() {
     return (
       <SelectionScreen
         gameLabel={originLabel(state.currentGame)}
+        venueName={currentContext.venue.stadium}
+        stakesLabel={STAKES_SHORT[currentContext.stakes]}
         seriesState={state}
         initialLineup={prior?.qldLineup}
         initialKickerId={prior?.qldKickerId}
@@ -120,6 +126,7 @@ export default function App() {
         result={result}
         gameLabel={originLabel(playingGame)}
         venueName={currentContext.venue.stadium}
+        stakesLabel={STAKES_SHORT[currentContext.stakes]}
         onKickOff={() => setPhase('live')}
       />
     )
@@ -130,6 +137,9 @@ export default function App() {
       <LiveMatchScreen
         key={playingGame}
         result={result}
+        gameLabel={originLabel(playingGame)}
+        venueName={currentContext.venue.stadium}
+        stakesLabel={STAKES_SHORT[currentContext.stakes]}
         startingLineups={{ QLD: lockedTeam.lineup, NSW: nswTeam().lineup }}
         onComplete={handleMatchComplete}
       />
@@ -151,6 +161,7 @@ export default function App() {
     <SeriesHubScreen
       state={state}
       currentContext={currentContext}
+      careerSummary={careerSummary}
       seriesMvp={state.status === 'complete' && potms.length > 0 ? pickSeriesMvp(potms) : null}
       onPick={() => setPhase('select')}
       onSkipDeadRubber={skipDeadRubber}

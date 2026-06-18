@@ -5,9 +5,11 @@ import { deriveWrap } from '../series'
 import type { MatchResult, Score, SeriesContext, SeriesStakes, Side, Venue } from '../types'
 import { defaultSetup } from './fixtures'
 
-const SUNCORP: Venue = { id: 'SUNCORP', stadium: 'Suncorp Stadium', groundShort: 'Suncorp', city: 'Brisbane', homeSide: 'QLD' }
-const ACCOR: Venue = { id: 'ACCOR_SYD', stadium: 'Accor Stadium', groundShort: 'Accor', city: 'Sydney', homeSide: 'NSW' }
-const MCG: Venue = { id: 'MCG', stadium: 'the MCG', groundShort: 'the MCG', city: 'Melbourne', homeSide: 'NSW' }
+// Venues are pinned to homeAdvantage 0 here so these BOOTH-CONTENT tests stay isolated from the
+// home-ground rating edge — the edge's own behaviour is covered in homeEdge.test.ts.
+const SUNCORP: Venue = { id: 'SUNCORP', stadium: 'Suncorp Stadium', groundShort: 'Suncorp', city: 'Brisbane', homeSide: 'QLD', homeAdvantage: 0 }
+const ACCOR: Venue = { id: 'ACCOR_SYD', stadium: 'Accor Stadium', groundShort: 'Accor', city: 'Sydney', homeSide: 'NSW', homeAdvantage: 0 }
+const MCG: Venue = { id: 'MCG', stadium: 'the MCG', groundShort: 'the MCG', city: 'Melbourne', homeSide: 'NSW', homeAdvantage: 0 }
 
 function series(gameNumber: 1 | 2 | 3, seriesScore: Score, stakes: SeriesStakes, venue: Venue): SeriesContext {
   return { gameNumber, seriesScore, venue, stakes }
@@ -47,8 +49,8 @@ describe('series-aware broadcast — determinism', () => {
   })
 
   it('attaching series context does not perturb the match event stream vs the no-series default', () => {
-    // The booth draws from its own salted rng, so the play-by-play must be identical with or without
-    // a series context for a fixed seed.
+    // The booth draws from its own salted rng, and a neutral venue (homeAdvantage 0) adds no rating
+    // edge, so the play-by-play must be identical with or without a series context for a fixed seed.
     const base = simulateMatch(defaultSetup(), 555)
     const withCtx = simulateMatch(withSeries(series(1, { qld: 0, nsw: 0 }, 'OPENER', SUNCORP)), 555)
     expect(withCtx.events).toEqual(base.events)

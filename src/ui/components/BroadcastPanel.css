@@ -19,6 +19,9 @@
 .broadcast-rows {
   display: flex;
   flex-direction: column;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 .broadcast-row {
@@ -73,7 +76,7 @@
 }
 
 .broadcast-line {
-  font-size: 0.95rem;
-  line-height: 1.45;
-  color: var(--text-dim);
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: var(--text);
 }

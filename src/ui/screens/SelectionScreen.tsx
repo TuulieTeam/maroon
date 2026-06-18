@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Player, Position } from '../../data/types'
 import { POSITION_META } from '../../data/positions'
 import { QLD_SQUAD } from '../../data/qldSquad'
@@ -17,6 +17,9 @@ import './SelectionScreen.css'
 interface SelectionScreenProps {
   onKickOff: (team: SelectedTeam) => void
   gameLabel: string
+  /** Stadium + stakes for the game about to be picked — framed on the scoreboard so selection carries the series tension. */
+  venueName: string
+  stakesLabel: string
   seriesState: SeriesState
   /** The prior game's XVII (player ids), pre-filling the picker when re-picking mid-series. */
   initialLineup?: Partial<Record<Position, string>>
@@ -26,6 +29,8 @@ interface SelectionScreenProps {
 export function SelectionScreen({
   onKickOff,
   gameLabel,
+  venueName,
+  stakesLabel,
   seriesState,
   initialLineup,
   initialKickerId,
@@ -43,6 +48,30 @@ export function SelectionScreen({
   )
   const selection = useSquadSelection({ initialLineup, initialKickerId, ruledOutIds, formDeltas })
   const [activePosition, setActivePosition] = useState<Position | null>(null)
+
+  // A starting slot (XIII) has natural-fit specialists; INT/RES slots take anyone, so no fit-sorting.
+  const activeIsStarting =
+    activePosition != null && !activePosition.startsWith('INT') && !activePosition.startsWith('RES')
+  const poolRef = useRef<HTMLDivElement>(null)
+
+  // When a specialist slot is being filled, float its natural fits to the top of the pool so the eye
+  // doesn't have to scan the whole 32-man list across the column gap; INT/RES keep the squad order.
+  const { orderedPool, fitCount } = useMemo(() => {
+    if (!activeIsStarting || !activePosition) return { orderedPool: QLD_SQUAD, fitCount: 0 }
+    const fits: Player[] = []
+    const rest: Player[] = []
+    for (const p of QLD_SQUAD) {
+      if (p.naturalPositions.includes(activePosition)) fits.push(p)
+      else rest.push(p)
+    }
+    return { orderedPool: [...fits, ...rest], fitCount: fits.length }
+  }, [activeIsStarting, activePosition])
+
+  // Bring the pool back into view when a slot opens (it sits above the lineup on a narrow, stacked
+  // layout). Instant scroll, so it respects prefers-reduced-motion.
+  useEffect(() => {
+    if (activeIsStarting) poolRef.current?.scrollIntoView({ block: 'start', behavior: 'auto' })
+  }, [activePosition, activeIsStarting])
 
   // The unavailable QLD men, for the "team news" banner that explains an emptied pre-fill slot.
   const teamNews = useMemo(
@@ -96,7 +125,7 @@ export function SelectionScreen({
       </header>
 
       <div className="selection-layout">
-        <section>
+        <section ref={poolRef}>
           <div className="pool-header">
             <h2>Your Squad ({QLD_SQUAD.length})</h2>
             <div className="pool-actions">
@@ -110,7 +139,8 @@ export function SelectionScreen({
           </div>
           <div className="pool-active-hint">
             {activePosition
-              ? `Choose a player for #${POSITION_META[activePosition].jersey} ${POSITION_META[activePosition].label}`
+              ? `Choose a player for #${POSITION_META[activePosition].jersey} ${POSITION_META[activePosition].label}` +
+                (activeIsStarting ? ` — ${fitCount} natural ${fitCount === 1 ? 'fit' : 'fits'} up top` : '')
               : 'Tap a lineup slot, then pick a player. Tap the Kicker badge to set your goal kicker.'}
           </div>
           {teamNews.length > 0 && (
@@ -124,24 +154,30 @@ export function SelectionScreen({
             </div>
           )}
           <div className="pool-grid">
-            {QLD_SQUAD.map((player) => (
-              <PlayerCard
-                key={player.id}
-                player={player}
-                used={selection.usedIds.has(player.id)}
-                condition={conditions[player.id]}
-                onClick={
-                  activePosition && !ruledOutIds.has(player.id) ? () => handlePoolClick(player.id) : undefined
-                }
-              />
-            ))}
+            {orderedPool.map((player) => {
+              const isRuledOut = ruledOutIds.has(player.id)
+              const isUsed = selection.usedIds.has(player.id)
+              const isFit = activeIsStarting && activePosition != null && player.naturalPositions.includes(activePosition)
+              return (
+                <PlayerCard
+                  key={player.id}
+                  player={player}
+                  used={isUsed}
+                  fits={isFit}
+                  faded={activeIsStarting && !isFit && !isUsed && !isRuledOut}
+                  condition={conditions[player.id]}
+                  onClick={activePosition && !isRuledOut ? () => handlePoolClick(player.id) : undefined}
+                />
+              )
+            })}
           </div>
         </section>
 
         <aside className="selection-side">
-          <SeriesScoreboard state={seriesState} />
-          <OppositionPanel />
-          <MatchupPanel you={you} opp={NSW_LINEUP} />
+          <SeriesScoreboard
+            state={seriesState}
+            upcoming={{ gameLabel, venueName, stakesLabel }}
+          />
           <FieldLineup
             lineup={selection.lineup}
             playerById={selection.playerById}
@@ -151,12 +187,14 @@ export function SelectionScreen({
             onSelectSlot={handleSlotClick}
             onSetKicker={selection.setKickerId}
           />
+          <OppositionPanel />
+          <MatchupPanel you={you} opp={NSW_LINEUP} />
         </aside>
       </div>
 
       <div className="kickoff-bar">
         <button className="btn-primary" disabled={!selection.validation.valid} onClick={handleKickOff}>
-          LOCK IN 19 · KICK OFF
+          {selection.validation.valid ? 'LOCK IN · KICK OFF' : 'NAME YOUR 19 + 2 RESERVES'}
         </button>
       </div>
     </div>

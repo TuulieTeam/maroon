@@ -19,13 +19,17 @@ describe('commentary integrity', () => {
     }
   })
 
-  it('named events include the relevant player name', () => {
+  it('named events identify the relevant player (by full name or surname)', () => {
+    // Callers reference players by surname in the flow ("Cleary"), so accept either the full name or
+    // the surname (the last whitespace-delimited token) as identifying the player.
+    const surname = (n: string) => n.split(/\s+/).pop() as string
     const result = simulateMatch(defaultSetup(), 4242)
     for (const e of result.events) {
       if (!NAMED_TYPES.has(e.type)) continue
-      const names = [e.attacker?.name, e.defender?.name].filter(Boolean) as string[]
-      const mentioned = names.some((n) => e.commentary.includes(n))
-      expect(mentioned).toBe(true)
+      const players = [e.attacker, e.defender].filter(Boolean) as { name: string }[]
+      const refs = players.flatMap((p) => [p.name, surname(p.name)])
+      const mentioned = refs.some((n) => e.commentary.includes(n))
+      expect(mentioned, `"${e.commentary}"`).toBe(true)
     }
   })
 

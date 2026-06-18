@@ -1,6 +1,6 @@
 # Maroon
 
-Single-player, browser-based, text-based State of Origin game. You pick Queensland's 17 from a squad pool, lock in, then watch Origin I play out as a **live, ticking text commentary feed you can't control** — and live with the result. Unapologetically Maroon. Personal project, runs locally.
+Single-player, browser-based, text-based State of Origin game. You pick Queensland's 19-man team sheet (+ 2 reserves) from a squad pool, lock in, then watch the Origin series play out as a **live, ticking text commentary feed you can't control** — and live with the result. Unapologetically Maroon. Personal project, runs locally.
 
 ## Stack
 
@@ -22,6 +22,6 @@ The causal spine: selection → player attributes → channel matchups (LEFT/MID
 
 ## Scope
 
-**v1 (built):** Origin I — a single match, pure spectator. Bench forwards auto-rotate on fatigue, so all 17 picks matter.
+**v1 (built):** Origin I — a single match, pure spectator. Bench forwards auto-rotate on fatigue, so all 19 on the team sheet matter.
 
 **Deferred (clean seams left in the engine):** Origin II & III + best-of-three series + dead-rubber/series-stakes logic; any in-match player-controlled lever (interchange/tactical call); 8-bit sprites & sound; cross-game fatigue/injury carryover.

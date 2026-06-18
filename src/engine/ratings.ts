@@ -2,7 +2,7 @@ import type { Channel, Player, Position } from '../data/types'
 import { CHANNEL_OWNERS, POSITION_META } from '../data/positions'
 import type { Rng } from './rng'
 import { chance } from './rng'
-import type { KickType } from './types'
+import type { KickType, Side, Venue } from './types'
 
 export const TUNING = {
   /** Plays per match scale: clock advance per play (minutes). ~80/mean total plays. */
@@ -73,6 +73,15 @@ export const TUNING = {
   usableBenchNormal: 4,
 
   /**
+   * Home-ground edge. A uniform, pre-kickoff effective-attr nudge applied to EVERY selected player by
+   * side — the home side up by `home`, the visitor down by `away` — then scaled by the venue's
+   * homeAdvantage (0..1). Points, the same unit as form deltas (which cap at ±12), so a full-strength
+   * fortress is a ~4pt net swing: real, but smaller than an individual's hot/cold form. Folded into the
+   * form map in simulate.ts, so it's pure arithmetic that draws no rng and never shifts the play stream.
+   */
+  homeEdge: { home: 2.5, away: 1.5 },
+
+  /**
    * Drama — HIA & foul play. Deliberately RARE spice: a typical match has 0–1 of each,
    * and reaching the 3-failed-HIA unlock is a genuinely uncommon, memorable event.
    * Per-play probabilities are tiny because there are ~600+ plays in a match.
@@ -116,6 +125,20 @@ const NO_FORM: ReadonlyMap<string, number> = new Map()
  */
 export function effectiveAttr(base: number, fatigue: number, formDelta = 0): number {
   return Math.max(1, Math.min(99, base - fatigue + formDelta))
+}
+
+/**
+ * The home-ground effective-attr edge per side for a venue, in points (signed). The side at home gets
+ * +homeEdge.home, the visitor −homeEdge.away, both scaled by the ground's homeAdvantage (0..1). A
+ * neutral or unset homeAdvantage returns 0 for both sides, so a flavour-only venue applies no edge.
+ * Pure arithmetic — the caller folds these into the form map, so no rng is drawn.
+ */
+export function homeEdgeBySide(venue: Pick<Venue, 'homeSide' | 'homeAdvantage'>): Record<Side, number> {
+  const strength = Math.max(0, Math.min(1, venue.homeAdvantage ?? 0))
+  // `|| 0` collapses a -0 (when strength is 0) to +0 so callers never see negative zero.
+  const home = TUNING.homeEdge.home * strength || 0
+  const away = -TUNING.homeEdge.away * strength || 0
+  return venue.homeSide === 'QLD' ? { QLD: home, NSW: away } : { QLD: away, NSW: home }
 }
 
 export function channelOf(position: Position): Channel | null {

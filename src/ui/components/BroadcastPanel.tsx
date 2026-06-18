@@ -6,8 +6,9 @@ interface BroadcastPanelProps {
   segments: Segment[]
 }
 
+// "From the Desk" for the pre-game slot so it doesn't echo the screen's own "THE BUILD-UP" title.
 const SLOT_TITLE: Record<SegmentSlot, string> = {
-  preGame: 'The Build-Up',
+  preGame: 'From the Desk',
   halfTime: 'Half-Time',
   postGame: 'Full-Time Wrap',
 }
@@ -17,20 +18,25 @@ function roleClass(role: string): string {
 }
 
 export function BroadcastPanel({ slot, segments }: BroadcastPanelProps) {
+  // No takes for this slot → collapse entirely rather than render a hollow header-only shell.
+  if (segments.length === 0) return null
+  const titleId = `broadcast-title-${slot}`
   return (
-    <div className="broadcast-panel">
-      <div className="broadcast-title">{SLOT_TITLE[slot]}</div>
-      <div className="broadcast-rows">
+    <section className="broadcast-panel" aria-labelledby={titleId}>
+      <h2 className="broadcast-title" id={titleId}>
+        {SLOT_TITLE[slot]}
+      </h2>
+      <ul className="broadcast-rows" role="list">
         {segments.map((s, i) => (
-          <div className="broadcast-row" key={`${slot}-${i}`}>
+          <li className="broadcast-row" key={`${slot}-${i}`}>
             <div className="broadcast-speaker">
               <span className="broadcast-name">{s.persona}</span>
               <span className={`broadcast-role ${roleClass(s.role)}`}>{s.role}</span>
             </div>
             <div className="broadcast-line">{s.line}</div>
-          </div>
+          </li>
         ))}
-      </div>
-    </div>
+      </ul>
+    </section>
   )
 }

@@ -1,0 +1,94 @@
+.career {
+  border: 1px solid var(--surface-line);
+  border-radius: var(--radius);
+  padding: 14px;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.career-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+  text-align: center;
+}
+
+.career-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.career-stat {
+  text-align: center;
+  padding: 10px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  border: 1px solid var(--surface-line);
+}
+
+.career-stat-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+.career-stat-value.gold {
+  color: var(--gold);
+}
+
+.career-stat-key {
+  margin-top: 2px;
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+}
+
+.career-hof-label {
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-faint);
+  margin-bottom: 6px;
+}
+
+.career-hof-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.career-hof-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  border-left: 3px solid var(--surface-line);
+}
+
+.career-hof-item.qld {
+  border-left-color: var(--gold);
+}
+
+.career-hof-item.nsw {
+  border-left-color: var(--blue);
+}
+
+.career-hof-name {
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+.career-hof-meta {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+}

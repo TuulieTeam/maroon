@@ -17,17 +17,25 @@
 }
 
 .hub-title {
-  font-size: 1.9rem;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  margin-top: 4px;
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-top: 6px;
+  line-height: 1.1;
+}
+
+/* The decided-shield headline is the emotional climax — give it more presence than the
+   "THE SERIES" interstitial so a result outscales an in-progress hub. (Silkscreen runs wide, so
+   the long winner strings wrap; keep the line-height comfortable for that.) */
+.hub-title.is-final {
+  font-size: 1.85rem;
+  line-height: 1.2;
 }
 
 .hub-title.win {
   color: var(--gold);
 }
 .hub-title.loss {
-  color: var(--blue);
+  color: var(--blue-text);
 }
 
 .hub-mvp {

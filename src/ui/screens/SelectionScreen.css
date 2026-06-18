@@ -28,10 +28,13 @@
 }
 
 .pool-active-hint {
-  font-size: 0.85rem;
+  font-size: 0.95rem;
+  font-weight: 600;
   color: var(--gold);
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   min-height: 1.2em;
+  padding-left: 10px;
+  border-left: 3px solid var(--gold);
 }
 
 .team-news {

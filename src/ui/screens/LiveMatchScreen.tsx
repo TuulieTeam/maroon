@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { Player, Position } from '../../data/types'
 import type { MatchEvent, MatchResult, Side } from '../../engine'
 import { Scoreboard } from '../components/Scoreboard'
@@ -12,6 +12,10 @@ import './LiveMatchScreen.css'
 
 interface LiveMatchScreenProps {
   result: MatchResult
+  /** Match identity + stakes echoed from the hub so the tension carries into the broadcast. */
+  gameLabel: string
+  venueName: string
+  stakesLabel: string
   startingLineups: Record<Side, Record<Position, Player>>
   onComplete: () => void
 }
@@ -38,10 +42,18 @@ function derivePossession(current: MatchEvent | null): 'QLD' | 'NSW' | null {
 
 const SPEEDS: PlaybackSpeed[] = [1, 2, 4]
 
-export function LiveMatchScreen({ result, startingLineups, onComplete }: LiveMatchScreenProps) {
+export function LiveMatchScreen({
+  result,
+  gameLabel,
+  venueName,
+  stakesLabel,
+  startingLineups,
+  onComplete,
+}: LiveMatchScreenProps) {
   const playback = useMatchPlayback(result)
   const [halfTimeShown, setHalfTimeShown] = useState(false)
   const [halfTimeOpen, setHalfTimeOpen] = useState(false)
+  const resumeRef = useRef<HTMLButtonElement>(null)
   const { pause } = playback
 
   // When the feed reaches the half-time siren for the first time, pause and pop the interstitial.
@@ -58,6 +70,18 @@ export function LiveMatchScreen({ result, startingLineups, onComplete }: LiveMat
     playback.resume()
   }
 
+  // Move focus into the half-time dialog on open, and let Escape resume — basic modal hygiene so a
+  // keyboard/AT user isn't stranded in the now-hidden feed behind it.
+  useEffect(() => {
+    if (!halfTimeOpen) return
+    resumeRef.current?.focus()
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') resumeFromHalfTime()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [halfTimeOpen])
+
   useEffect(() => {
     if (playback.done && playback.current?.type === 'FULL_TIME') {
       const t = window.setTimeout(onComplete, 1600)
@@ -68,15 +92,23 @@ export function LiveMatchScreen({ result, startingLineups, onComplete }: LiveMat
   return (
     <div className="app-shell">
       {halfTimeOpen && (
-        <div className="halftime-overlay" role="dialog" aria-modal="true">
+        <div className="halftime-overlay" role="dialog" aria-modal="true" aria-label="Half time">
           <div className="halftime-modal">
             <BroadcastPanel slot="halfTime" segments={result.broadcast.halfTime} />
-            <button className="btn-primary halftime-resume" onClick={resumeFromHalfTime}>
+            <button ref={resumeRef} type="button" className="btn-primary halftime-resume" onClick={resumeFromHalfTime}>
               Back to the match
             </button>
           </div>
         </div>
       )}
+
+      <div className="live-strip">
+        <span className={`live-pill ${playback.done ? 'is-fulltime' : ''}`}>
+          {playback.done ? 'FULL TIME' : 'LIVE'}
+        </span>
+        <span className="live-kicker">{gameLabel} · {venueName}</span>
+        <span className="live-stakes">{stakesLabel}</span>
+      </div>
 
       <Scoreboard
         current={playback.current}
@@ -86,12 +118,14 @@ export function LiveMatchScreen({ result, startingLineups, onComplete }: LiveMat
 
       <div className="live-layout">
         <div className="live-controls">
-          <div className="speed-group">
+          <div className="speed-group" role="group" aria-label="Playback speed">
             <span className="label">Speed</span>
             {SPEEDS.map((s) => (
               <button
                 key={s}
+                type="button"
                 className={`speed-btn ${playback.speed === s ? 'active' : ''}`}
+                aria-pressed={playback.speed === s}
                 onClick={() => playback.setSpeed(s)}
               >
                 {s}×
@@ -99,11 +133,11 @@ export function LiveMatchScreen({ result, startingLineups, onComplete }: LiveMat
             ))}
           </div>
           {playback.done ? (
-            <button className="btn-primary" onClick={onComplete}>
+            <button type="button" className="btn-primary" onClick={onComplete}>
               See the result
             </button>
           ) : (
-            <button className="btn-ghost" onClick={playback.skipToEnd}>
+            <button type="button" className="btn-ghost" onClick={playback.skipToEnd}>
               Skip to full time
             </button>
           )}

@@ -8,6 +8,9 @@
   /* NSW Blues (opposition, intentionally cooler/muted) */
   --blue: #1e64b4;
   --blue-deep: #0f3a6b;
+  /* A lighter blue for TEXT on the dark surfaces — the saturated --blue fails AA as small text,
+     so the opponent's scores/headlines (the painful "live with it" result) get this instead. */
+  --blue-text: #5b9bd8;
 
   /* Surfaces */
   --bg: #120308;
@@ -32,9 +35,21 @@
   --warn: #e4a534;
   --bad: #e2533f;
 
-  --radius: 10px;
-  --radius-sm: 6px;
+  /* 8-bit "cabinet chrome": structural corners are square. Pills (chips, badges, attribute bars)
+     keep their own explicit 999px radius, so only panels/buttons go hard-edged. */
+  --radius: 0;
+  --radius-sm: 0;
+  /* Keyboard focus ring — gold reads clearly on the dark maroon surfaces. */
+  --focus-ring: var(--gold);
   --shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
-  --font: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-  --font-display: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  /* Full 8-bit: VT323 is the single typeface for the WHOLE UI — body, headings, digits alike.
+     One readable terminal/scoreboard bitmap face, so nothing reads as "half pixel, half normal".
+     'Courier New'/monospace is the graceful fallback if the web font fails to load. */
+  --font: 'VT323', 'Courier New', monospace;
+  --font-display: 'VT323', 'Courier New', monospace;
+  --font-pixel: 'VT323', 'Courier New', monospace;
+  --gold-shadow: #b8860b; /* darker gold for the bottom/right pixel bevel on gold elements */
+  --pixel-edge: var(--surface-2); /* hard, un-blurred stepped-shadow colour for cabinet panels */
+  --pixel-bevel-light: rgba(246, 233, 238, 0.1); /* faint top-left inset highlight = raised edge */
+  --pixel-shadow: 4px 4px 0 var(--pixel-edge); /* the signature chunky offset shadow */
 }

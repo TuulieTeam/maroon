@@ -2,6 +2,8 @@
 // Real commentator/legend names are intentional (single-player game). Each persona carries a
 // `lean` (who their heart's with) and a `voice` descriptor that the broadcast template pools honour.
 
+import type { MatchEventType } from './types'
+
 export type PersonaRole = 'Caller' | 'Analyst' | 'Host' | 'Sideline'
 
 export type PersonaId =
@@ -115,3 +117,35 @@ export const PERSONAS: Record<PersonaId, Persona> = {
 export const MAROONS_VOICES: PersonaId[] = ['lockyer', 'thurston', 'smith']
 /** Blues-hearted analysts — the verdict leans on these when NSW win. */
 export const BLUES_VOICES: PersonaId[] = ['fittler', 'johns', 'gould']
+
+/**
+ * The two-caller booth split. The LEAD caller (Thommo — "big on the moment") takes the peaks: scoring,
+ * line breaks, the kicking dividends, and the drama. The co-caller (Petero — "lets the game breathe")
+ * calls the grind: hit-ups, tackles, kicks, errors, the ball-work in between. Mapping an event to its
+ * caller is pure + deterministic (no rng), so it never perturbs the play stream.
+ */
+const LEAD_CALLER_EVENTS = new Set<MatchEventType>([
+  'KICKOFF',
+  'HALF_BREAK',
+  'LINE_BREAK',
+  'TRY',
+  'FORTY_TWENTY',
+  'FIELD_GOAL',
+  'DROP_OUT',
+  'HEAD_KNOCK',
+  'HIA_PASS',
+  'HIA_FAIL',
+  'FOUL_PLAY',
+  'SIN_BIN',
+  'SIN_BIN_RETURN',
+  'SEND_OFF',
+  'INJURY_REPLACEMENT',
+  'RESERVE_ACTIVATED',
+  'HALF_TIME',
+  'FULL_TIME',
+])
+
+/** Which caller's voice carries a given play-by-play event. COLOR (analyst) lines never come here. */
+export function callerFor(type: MatchEventType): Persona {
+  return PERSONAS[LEAD_CALLER_EVENTS.has(type) ? 'thompson' : 'psaltis']
+}

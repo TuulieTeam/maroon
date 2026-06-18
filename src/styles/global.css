@@ -11,6 +11,12 @@ body,
   min-height: 100%;
 }
 
+/* VT323 renders small and light per em, so lift the root size: every rem-based size grows ~19% to
+   compensate, keeping the whole UI legible without touching each component's numbers. */
+html {
+  font-size: 118.75%;
+}
+
 body {
   background:
     radial-gradient(1200px 600px at 50% -10%, var(--maroon-deep), transparent),
@@ -18,14 +24,17 @@ body {
   color: var(--text);
   font-family: var(--font);
   -webkit-font-smoothing: antialiased;
-  line-height: 1.45;
+  /* A touch more leading — bitmap type benefits from extra breathing room. */
+  line-height: 1.5;
 }
 
 h1,
 h2,
 h3 {
   font-family: var(--font-display);
-  letter-spacing: -0.02em;
+  /* VT323 wants no negative tracking — a hair of positive spacing keeps the bitmap glyphs from
+     touching. */
+  letter-spacing: 0.01em;
   margin: 0;
 }
 
@@ -46,13 +55,21 @@ button:disabled {
   opacity: 0.45;
 }
 
+/* A single, theme-wide keyboard focus ring for every focusable control (buttons + the role="button"
+   player cards). Mouse clicks don't trigger :focus-visible, so it only shows for keyboard/AT users. */
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* Buttons read as chunky arcade keycaps: square, with a hard bottom "edge" that compresses on press. */
 .btn-primary {
   background: linear-gradient(180deg, var(--maroon-bright), var(--maroon));
   color: var(--text);
   font-weight: 700;
   padding: 14px 28px;
   font-size: 1.05rem;
-  box-shadow: 0 4px 14px rgba(155, 27, 66, 0.4);
+  box-shadow: 0 4px 0 var(--maroon-deep);
 }
 
 .btn-primary:hover:not(:disabled) {
@@ -62,14 +79,48 @@ button:disabled {
 .btn-ghost {
   background: transparent;
   color: var(--text-dim);
-  border: 1px solid var(--surface-line);
+  border: 2px solid var(--surface-line);
   padding: 10px 18px;
   font-weight: 600;
+  box-shadow: 0 3px 0 var(--surface-2);
 }
 
 .btn-ghost:hover:not(:disabled) {
   color: var(--text);
   border-color: var(--maroon-bright);
+}
+
+/* Keypress: drop into the bottom edge instead of the global 1px nudge. */
+.btn-primary:active:not(:disabled),
+.btn-ghost:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: none;
+}
+
+/* ---- Cabinet chrome: thicken every structural panel's border and give it the chunky stepped
+   shadow + a faint top-left bevel, so the squared corners read as extruded hardware. Chrome only —
+   text, padding and colours inside are untouched. Scoped under .app-shell (on every screen root) so
+   these beat each component's own equal-specificity border/box-shadow, which load after this file. ---- */
+.app-shell .scoreboard,
+.app-shell .series-scoreboard,
+.app-shell .player-card,
+.app-shell .commentary-feed,
+.app-shell .broadcast-panel,
+.app-shell .field-lineup,
+.app-shell .matchup-panel,
+.app-shell .active-team-panel,
+.app-shell .opposition-panel,
+.app-shell .live-stats-panel,
+.app-shell .club-report,
+.app-shell .stat-card,
+.app-shell .potm-card,
+.app-shell .result-banner,
+.app-shell .hub-mvp,
+.app-shell .share-card,
+.app-shell .career,
+.app-shell .gus-speech {
+  border-width: 2px;
+  box-shadow: var(--pixel-shadow), inset 1px 1px 0 var(--pixel-bevel-light);
 }
 
 .app-shell {
@@ -78,17 +129,45 @@ button:disabled {
   padding: 24px 20px 80px;
 }
 
+/* Visually hidden but available to assistive tech — for live-region announcers and table captions. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .app-title {
-  font-size: 2.1rem;
-  font-weight: 800;
-  background: linear-gradient(90deg, var(--gold), var(--maroon-bright));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  font-family: var(--font-pixel);
+  font-size: 2.4rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  /* Solid gold + a hard (un-blurred) offset shadow = a chunky pixel bevel, vs the old gradient clip. */
+  color: var(--gold);
+  text-shadow: 2px 2px 0 var(--maroon-deep);
 }
 
 .app-sub {
   color: var(--text-dim);
   margin-top: 2px;
   font-size: 0.95rem;
+}
+
+/* Respect a reduced-motion preference everywhere in one place: the commentary feed-in, broadcast rows,
+   the half-time interstitial, and button transforms all collapse to (near-)instant. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }

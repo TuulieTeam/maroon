@@ -42,8 +42,18 @@ function Slot({
 
   return (
     <div className={classes.join(' ')}>
-      <span className="slot-jersey">{meta.jersey}</span>
-      <button className="slot-main" onClick={() => onSelectSlot(position)}>
+      <span className="slot-jersey" aria-hidden="true">{meta.jersey}</span>
+      <button
+        type="button"
+        className="slot-main"
+        onClick={() => onSelectSlot(position)}
+        aria-pressed={activePosition === position}
+        aria-label={
+          player
+            ? `${meta.label}, number ${meta.jersey}, ${player.name}. Tap to change.`
+            : `${meta.label}, number ${meta.jersey}, empty. Tap to assign.`
+        }
+      >
         <div className="slot-pos">{meta.label}</div>
         {player ? (
           <div className="slot-player">{player.name}</div>
@@ -53,9 +63,11 @@ function Slot({
       </button>
       {player && (
         <button
+          type="button"
           className={`slot-kicker ${kickerId === player.id ? 'is-kicker' : ''}`}
           onClick={() => onSetKicker(player.id)}
-          title="Designate goal kicker"
+          aria-pressed={kickerId === player.id}
+          aria-label={kickerId === player.id ? `${player.name} is your goal kicker` : `Set ${player.name} as goal kicker`}
         >
           {kickerId === player.id ? '★ Kicker' : 'Kicker'}
         </button>

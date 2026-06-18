@@ -35,10 +35,30 @@
 }
 
 .score-team .team-score {
-  font-size: 2.6rem;
-  font-weight: 800;
+  font-family: var(--font-pixel);
+  font-size: 2.9rem;
   font-variant-numeric: tabular-nums;
   line-height: 1;
+  transition: transform 0.15s ease;
+}
+
+/* A one-shot pop when this side scores. The global prefers-reduced-motion block neutralises the
+   animation duration, so reduced-motion users just see the number change. */
+.score-team .team-score.scored {
+  animation: score-pop 0.7s ease;
+}
+
+.score-team.qld .team-score.scored {
+  color: var(--gold);
+}
+.score-team.nsw .team-score.scored {
+  color: var(--blue-text);
+}
+
+@keyframes score-pop {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.28); text-shadow: 0 0 18px rgba(244, 196, 48, 0.55); }
+  100% { transform: scale(1); text-shadow: none; }
 }
 
 .score-clock {
@@ -46,8 +66,8 @@
 }
 
 .clock-time {
-  font-size: 1.5rem;
-  font-weight: 800;
+  font-family: var(--font-pixel);
+  font-size: 1.7rem;
   font-variant-numeric: tabular-nums;
 }
 

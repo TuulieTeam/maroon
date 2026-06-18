@@ -29,6 +29,7 @@
   grid-template-columns: 28px 1fr auto;
   align-items: center;
   gap: 10px;
+  min-height: 44px;
   padding: 8px 10px;
   border-radius: var(--radius-sm);
   border: 1px solid transparent;
@@ -57,16 +58,26 @@
   width: 100%;
 }
 
+/* The jersey number as an 8-bit gold-on-maroon number-PLATE with a 2-tone hard bevel — the highest
+   ROI retro hit on the team sheet (the player's NAME beside it stays Inter). */
 .slot-jersey {
-  font-weight: 800;
+  font-family: var(--font-pixel);
+  font-size: 0.82rem;
   color: var(--gold);
   font-variant-numeric: tabular-nums;
   text-align: center;
+  align-self: center;
+  min-width: 26px;
+  padding: 5px 0;
+  line-height: 1;
+  background: var(--maroon);
+  border: 1px solid var(--maroon-deep);
+  box-shadow: inset 1px 1px 0 var(--maroon-bright), 2px 2px 0 var(--maroon-deep);
 }
 
 .slot-pos {
   font-size: 0.72rem;
-  color: var(--text-faint);
+  color: var(--text-dim);
 }
 
 .slot-player {
@@ -75,7 +86,7 @@
 }
 
 .slot-empty-text {
-  color: var(--text-faint);
+  color: var(--text-dim);
   font-style: italic;
   font-size: 0.88rem;
 }
@@ -85,7 +96,8 @@
   background: var(--maroon);
   color: var(--text);
   border: 1px solid var(--maroon-bright);
-  padding: 3px 8px;
+  padding: 7px 10px;
+  min-height: 32px;
   border-radius: 999px;
   font-weight: 700;
 }
@@ -98,7 +110,7 @@
 
 .reserve-note {
   font-size: 0.72rem;
-  color: var(--text-faint);
+  color: var(--text-dim);
   font-style: italic;
   margin: -2px 0 4px;
 }

@@ -71,7 +71,7 @@ export interface SelectedTeam {
   kickerId: string
 }
 
-/** The three Origin venues, in series order. Flavour-only for v1 — no rating effect yet. */
+/** The three Origin venues, in series order. */
 export type VenueId = 'SUNCORP' | 'ACCOR_SYD' | 'MCG'
 
 export interface Venue {
@@ -82,8 +82,15 @@ export interface Venue {
   groundShort: string
   /** Host city, e.g. "Brisbane", "Sydney", "Melbourne". */
   city: string
-  /** Which side is at home (flavour-only for v1; a future home-edge would read this). */
+  /** Which side runs out at home. */
   homeSide: Side
+  /**
+   * How much of a fortress this ground is, 0..1 — scales the home-ground edge (TUNING.homeEdge) the
+   * home side enjoys and the visitor concedes. 1 = a true fortress (Suncorp); a neutral interstate
+   * deck like the MCG sits near 0. Optional: an omitted or 0 value applies NO rating edge (the old
+   * flavour-only behaviour), so a venue without it stays byte-identical to a form-free match.
+   */
+  homeAdvantage?: number
 }
 
 /**

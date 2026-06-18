@@ -1,3 +1,65 @@
+/* Broadcast identity strip above the scoreboard — restores the "Origin II · the decider" tension
+   the player carried over from the hub, and flips to FULL TIME when the match ends. */
+.live-strip {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-bottom: 10px;
+}
+
+.live-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold);
+  border: 1px solid var(--gold);
+  border-radius: 999px;
+  padding: 3px 10px;
+}
+
+.live-pill::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--gold);
+  animation: live-pulse 1.6s ease-in-out infinite;
+}
+
+.live-pill.is-fulltime {
+  color: var(--text-dim);
+  border-color: var(--surface-line);
+}
+.live-pill.is-fulltime::before {
+  background: var(--text-dim);
+  animation: none;
+}
+
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+.live-kicker {
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+
+.live-stakes {
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+  color: var(--gold);
+}
+
 .live-layout {
   display: flex;
   flex-direction: column;
@@ -27,7 +89,8 @@
   background: var(--surface-2);
   border: 1px solid var(--surface-line);
   color: var(--text-dim);
-  padding: 6px 12px;
+  padding: 9px 14px;
+  min-height: 36px;
   font-weight: 700;
   font-size: 0.82rem;
 }
@@ -53,7 +116,7 @@
   top: 12px;
 }
 
-@media (max-width: 860px) {
+@media (max-width: 920px) {
   .live-main {
     grid-template-columns: 1fr;
   }

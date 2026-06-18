@@ -17,12 +17,16 @@ interface PlayerCardProps {
   player: Player
   used?: boolean
   active?: boolean
+  /** Highlight as a natural fit for the slot currently being filled. */
+  fits?: boolean
+  /** Dim as a non-fit while a specialist slot is being filled (still pickable, out of position). */
+  faded?: boolean
   /** Live form + injury for this game. When present it drives the form badge + dynamic injury status. */
   condition?: PlayerCondition
   onClick?: () => void
 }
 
-export function PlayerCard({ player, used, active, condition, onClick }: PlayerCardProps) {
+export function PlayerCard({ player, used, active, fits, faded, condition, onClick }: PlayerCardProps) {
   const injuryKind = condition?.injury.kind ?? 'fit'
   const ruledOut = injuryKind === 'out' || injuryKind === 'suspended'
 
@@ -30,14 +34,42 @@ export function PlayerCard({ player, used, active, condition, onClick }: PlayerC
   if (onClick) classes.push('selectable')
   if (used) classes.push('used')
   if (active) classes.push('active')
+  if (fits) classes.push('fits')
+  if (faded) classes.push('faded')
   if (ruledOut) classes.push('ruled-out')
 
   const band = condition ? formBand(condition.form) : null
   const delta = condition ? Math.round(formRatingToDelta(condition.form)) : 0
   const deltaStr = delta > 0 ? `▲${delta}` : delta < 0 ? `▼${Math.abs(delta)}` : ''
 
+  // Ruled-out men are surfaced to assistive tech as a disabled control (rather than a silent dimmed
+  // div) so a keyboard/SR user discovers they're unavailable instead of an inert, unannounced card.
+  const exposeButton = !!onClick || ruledOut
+  const ariaLabel = ruledOut
+    ? `${player.name} — ruled out, unavailable`
+    : onClick
+      ? `Select ${player.name}`
+      : undefined
+
   return (
-    <div className={classes.join(' ')} onClick={onClick} role={onClick ? 'button' : undefined}>
+    <div
+      className={classes.join(' ')}
+      onClick={onClick}
+      onKeyDown={
+        onClick
+          ? (e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                onClick()
+              }
+            }
+          : undefined
+      }
+      role={exposeButton ? 'button' : undefined}
+      tabIndex={exposeButton ? 0 : undefined}
+      aria-disabled={ruledOut || undefined}
+      aria-label={ariaLabel}
+    >
       <div className="player-card-head">
         <div>
           <div className="player-card-name">{player.name}</div>

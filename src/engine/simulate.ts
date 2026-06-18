@@ -28,6 +28,7 @@ import {
   chooseKickType,
   defendingChannelFor,
   effectiveAttr,
+  homeEdgeBySide,
   kickSkill,
   offloadChance,
   pickCarrier,
@@ -49,6 +50,7 @@ import { buildBroadcast } from './broadcast'
 import { originLabel } from './series'
 import { pickColor } from './colorCommentary'
 import type { ColorMoment } from './colorCommentary'
+import { callerFor } from './personas'
 import type { PersonaId } from './personas'
 
 const HALF_MINUTE = 40
@@ -409,6 +411,28 @@ function primaryOwner(
 /** Salt for the independent COLOR rng — ASCII 'lor\0'. Mirrors broadcast.ts's salted-rng pattern. */
 const COLOR_SALT = 0x6c6f7200
 
+/**
+ * The combined per-player effective-attr delta map for a match: each man's pre-set FORM delta with the
+ * venue HOME-GROUND EDGE layered on top (home side up, visitor down, scaled by the ground's
+ * homeAdvantage). Pure — no rng — so it never perturbs the play stream's draw count; player ids are
+ * disjoint across sides, so one global map serves both. A form-free, series-free (or neutral-venue)
+ * setup yields a map byte-identical to the legacy form-free match.
+ */
+function buildFormMap(setup: MatchSetup): ReadonlyMap<string, number> {
+  const map = new Map<string, number>(Object.entries(setup.form ?? {}))
+  const venue = setup.series?.venue
+  if (!venue) return map
+  const edge = homeEdgeBySide(venue)
+  for (const team of [setup.qld, setup.nsw]) {
+    const delta = edge[team.side]
+    if (delta === 0) continue
+    for (const p of Object.values(team.lineup)) {
+      map.set(p.id, (map.get(p.id) ?? 0) + delta)
+    }
+  }
+  return map
+}
+
 export function simulateMatch(setup: MatchSetup, seed: number): MatchResult {
   const rng: Rng = makeRng(seed)
   // Independent, salted rng for COLOR commentary — NEVER the match rng, so it cannot perturb the
@@ -418,11 +442,11 @@ export function simulateMatch(setup: MatchSetup, seed: number): MatchResult {
   const nsw = buildRuntime(setup.nsw)
   const runtimes: Record<Side, TeamRuntime> = { QLD: qld, NSW: nsw }
 
-  // Per-player FORM deltas (id -> signed effective-attr points), read only as pure arithmetic — set
-  // before kickoff, never mid-match, so the play stream's draw count is fixed. Player ids are disjoint
-  // across sides, so one global map serves both. Empty when setup.form is absent => byte-identical to
-  // the legacy form-free match.
-  const formMap: ReadonlyMap<string, number> = new Map(Object.entries(setup.form ?? {}))
+  // Per-player FORM deltas (id -> signed effective-attr points) with the venue HOME-GROUND EDGE layered
+  // on, read only as pure arithmetic — set before kickoff, never mid-match, so the play stream's draw
+  // count is fixed. Empty when setup.form is absent and the venue is neutral/absent => byte-identical to
+  // the legacy form-free match. See buildFormMap.
+  const formMap: ReadonlyMap<string, number> = buildFormMap(setup)
   const fdelta = (id: string): number => formMap.get(id) ?? 0
   // Head-knock re-injury multipliers (id -> mult) for DOUBTFUL/play-hurt men; 1 = no extra risk.
   const reinjuryMap: ReadonlyMap<string, number> = new Map(Object.entries(setup.reinjury ?? {}))
@@ -502,6 +526,9 @@ export function simulateMatch(setup: MatchSetup, seed: number): MatchResult {
     commentaryCtx.phase = bucketPhase(minute)
     commentaryCtx.fieldZone = bucketFieldZone(fieldPosition)
     const commentary = renderCommentary(input, commentaryCtx)
+    // Attribute the call to a named caller (pure, no rng) so the play-by-play has a voice — the lead
+    // takes the moments, the co-caller the grind. COLOR (analyst) events go through emitColor instead.
+    const caller = callerFor(input.type)
     events.push({
       minute: Math.round(minute),
       seq: seq++,
@@ -516,6 +543,8 @@ export function simulateMatch(setup: MatchSetup, seed: number): MatchResult {
       kickType: input.kickType,
       setComplete: input.setComplete,
       reason: input.reason,
+      persona: caller.name,
+      personaRole: caller.role,
       score: { qld: score.qld, nsw: score.nsw },
       commentary,
     })

@@ -5,6 +5,13 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Maroon · State of Origin</title>
+    <!-- VT323: the app's single 8-bit font, used EVERYWHERE (wordmark, scoreboard, headings, the
+         commentary feed, stats). A terminal/scoreboard bitmap face chosen for legibility at a screenful
+         of text — readable where Silkscreen squashed. display=swap → the system mono/sans stack renders
+         first and stays the graceful fallback if the fetch fails. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet" />
   </head>
   <body>
     <div id="root"></div>

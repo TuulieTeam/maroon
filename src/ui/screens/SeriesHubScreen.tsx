@@ -1,13 +1,19 @@
 import { originLabel } from '../../engine'
-import type { PlayerOfMatch, SeriesContext, SeriesStakes } from '../../engine'
-import type { SeriesState } from '../../series'
+import type { PlayerOfMatch, SeriesContext } from '../../engine'
+import { buildShareCard } from '../../series'
+import type { CareerSummary, SeriesState } from '../../series'
 import { SeriesScoreboard } from '../components/SeriesScoreboard'
 import { ClubFormReport } from '../components/ClubFormReport'
+import { ShareCard } from '../components/ShareCard'
+import { CareerLedger } from '../components/CareerLedger'
+import { STAKES_SHORT } from '../seriesStakes'
 import './SeriesHubScreen.css'
 
 interface SeriesHubScreenProps {
   state: SeriesState
   currentContext: SeriesContext
+  /** All-time career totals across finished series. */
+  careerSummary: CareerSummary
   /** The series MVP, available only when the series is complete and the POTMs were seen this session. */
   seriesMvp: PlayerOfMatch | null
   /** Pick the side for the next game (or the dead rubber). */
@@ -16,18 +22,6 @@ interface SeriesHubScreenProps {
   onSkipDeadRubber: () => void
   /** Wipe the series and start fresh. */
   onNewSeries: () => void
-}
-
-/** Short chip copy for the upcoming game's stakes. */
-const STAKES_SHORT: Record<SeriesStakes, string> = {
-  OPENER: 'Series opener',
-  G2_OPEN_AFTER_DRAW: 'Level series',
-  G2_CAN_CLINCH: 'Win to clinch the shield',
-  G2_MUST_WIN: 'Must win to survive',
-  G3_DECIDER: 'The decider — winner takes all',
-  G3_DECIDER_AFTER_DRAW: 'Winner takes the shield',
-  G3_DEAD_RUBBER_QLD_UP: 'Dead rubber — a sweep on offer',
-  G3_DEAD_RUBBER_QLD_DOWN: 'Dead rubber — pride on the line',
 }
 
 function shieldHeadline(state: SeriesState): string {
@@ -40,6 +34,7 @@ function shieldHeadline(state: SeriesState): string {
 export function SeriesHubScreen({
   state,
   currentContext,
+  careerSummary,
   seriesMvp,
   onPick,
   onSkipDeadRubber,
@@ -60,10 +55,12 @@ export function SeriesHubScreen({
   return (
     <div className="app-shell hub-screen">
       <header className="hub-header">
-        <div className="hub-kicker">{complete ? 'Series Complete' : 'State of Origin Series'}</div>
-        <div className={`hub-title ${complete && state.seriesWinner === 'QLD' ? 'win' : complete && state.seriesWinner === 'NSW' ? 'loss' : ''}`}>
+        <p className="hub-kicker">{complete ? 'Series Complete' : 'State of Origin Series'}</p>
+        <h1
+          className={`hub-title ${complete ? 'is-final' : ''} ${complete && state.seriesWinner === 'QLD' ? 'win' : complete && state.seriesWinner === 'NSW' ? 'loss' : ''}`}
+        >
           {complete ? shieldHeadline(state) : 'THE SERIES'}
-        </div>
+        </h1>
       </header>
 
       <SeriesScoreboard state={state} upcoming={upcoming} />
@@ -79,6 +76,7 @@ export function SeriesHubScreen({
               <div className="hub-mvp-side">{seriesMvp.side === 'QLD' ? 'Queensland' : 'New South Wales'}</div>
             </div>
           )}
+          <ShareCard text={buildShareCard(state, seriesMvp)} />
           <div className="hub-actions">
             <button className="btn-primary" onClick={onNewSeries}>
               Start a new series
@@ -101,6 +99,8 @@ export function SeriesHubScreen({
           </button>
         </div>
       )}
+
+      <CareerLedger summary={careerSummary} />
     </div>
   )
 }

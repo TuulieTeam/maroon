@@ -1,11 +1,10 @@
 .result-screen {
-  text-align: center;
+  text-align: left;
 }
 
 .result-broadcast {
   max-width: 640px;
   margin: 16px auto;
-  text-align: left;
 }
 
 .result-banner {
@@ -13,6 +12,7 @@
   padding: 28px;
   border-radius: var(--radius);
   max-width: 620px;
+  text-align: center;
 }
 
 .result-banner.win {
@@ -23,7 +23,7 @@
 
 .result-banner.loss {
   background: linear-gradient(180deg, var(--blue-deep), var(--surface));
-  border: 1px solid var(--blue-deep);
+  border: 1px solid var(--blue);
 }
 
 .result-banner.draw {
@@ -32,9 +32,12 @@
 }
 
 .result-verdict {
-  font-size: 1.9rem;
-  font-weight: 800;
-  letter-spacing: -0.01em;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  /* Keep the verdict's emotional register consistent — a loss shouldn't whisper in sentence case
+     while a win SHOUTS in caps. */
+  text-transform: uppercase;
 }
 
 .result-banner.win .result-verdict {
@@ -42,10 +45,11 @@
 }
 
 .result-final-score {
-  font-size: 3.4rem;
-  font-weight: 800;
+  font-family: var(--font-pixel);
+  font-size: 2.9rem;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
-  margin-top: 8px;
+  margin-top: 10px;
 }
 
 .result-fg-note {
@@ -99,7 +103,7 @@
   font-weight: 700;
 }
 .stat-row .n {
-  color: var(--blue);
+  color: var(--blue-text);
   font-weight: 700;
 }
 
@@ -108,9 +112,8 @@
   margin: 16px auto;
   padding: 14px 18px;
   background: var(--surface-2);
-  border-left: 3px solid var(--bad);
+  border-left: 3px solid var(--warn);
   border-radius: var(--radius-sm);
-  text-align: left;
   color: var(--text-dim);
   font-size: 0.95rem;
 }
@@ -166,6 +169,11 @@
   font-variant-numeric: tabular-nums;
 }
 
+.potm-line strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
 .player-tables {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -194,7 +202,7 @@
 }
 
 .player-table.nsw .player-table-title {
-  color: var(--blue);
+  color: var(--blue-text);
 }
 
 .player-table table {
@@ -226,9 +234,37 @@
   background: var(--surface-2);
 }
 
+.player-table-legend {
+  max-width: 880px;
+  margin: -8px auto 0;
+  font-size: 0.74rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
 .result-actions {
   display: flex;
   gap: 12px;
   justify-content: center;
   margin-top: 24px;
+}
+
+/* The screen had NO responsive rules — below the app's 920px stack point the two player tables went
+   into a cramped double horizontal scroll. Stack them, and ease the big hero type. */
+@media (max-width: 920px) {
+  .player-tables {
+    grid-template-columns: 1fr;
+  }
+  .result-final-score {
+    font-size: 2.6rem;
+  }
+  .result-banner {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 560px) {
+  .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  }
 }

@@ -62,29 +62,33 @@
 }
 
 .commentary-minute {
-  color: var(--text-faint);
-  font-size: 0.78rem;
+  color: var(--text-dim);
+  font-size: 0.85rem;
   font-variant-numeric: tabular-nums;
 }
 
 .commentary-text {
-  font-size: 0.95rem;
+  font-size: 1.05rem;
 }
 
 .commentary-line.try-qld {
-  background: rgba(106, 15, 43, 0.5);
+  background: rgba(106, 15, 43, 0.65);
+  border-left: 4px solid var(--gold);
 }
 .commentary-line.try-qld .commentary-text {
   color: var(--gold);
-  font-weight: 700;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
 .commentary-line.try-nsw {
-  background: rgba(15, 58, 107, 0.32);
+  background: rgba(15, 58, 107, 0.4);
+  border-left: 4px solid var(--blue);
 }
 .commentary-line.try-nsw .commentary-text {
-  color: var(--text-dim);
-  font-weight: 600;
+  color: var(--blue-text);
+  font-weight: 700;
 }
 
 .commentary-line.penalty .commentary-text {
@@ -132,5 +136,22 @@
   color: var(--gold);
 }
 .commentary-analyst::after {
+  content: ':';
+}
+
+/*
+ * The play-by-play caller's name, shown only on a hand-off between the two callers (or back from an
+ * analyst aside). Quieter than the gold analyst accent — a small dim credit, so the call still reads
+ * as the ambient broadcast voice rather than a chat log.
+ */
+.commentary-caller {
+  display: inline;
+  margin-right: 8px;
+  font-variant: small-caps;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+  color: var(--text-faint);
+}
+.commentary-caller::after {
   content: ':';
 }

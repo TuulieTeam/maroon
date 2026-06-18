@@ -32,7 +32,8 @@
   font-size: 0.74rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--text-faint);
+  color: var(--gold);
+  font-weight: 700;
 }
 
 .series-pips {
@@ -47,21 +48,21 @@
   align-items: center;
   gap: 2px;
   padding: 7px 4px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--surface-line);
+  border: 2px solid var(--surface-line);
   background: var(--surface-2);
+  box-shadow: inset 1px 1px 0 var(--pixel-bevel-light);
 }
 
 .series-pip .pip-game {
-  font-size: 0.68rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-faint);
+  font-family: var(--font-pixel);
+  font-size: 0.62rem;
+  letter-spacing: 0;
+  color: var(--text-dim);
 }
 
 .series-pip .pip-score {
-  font-size: 0.95rem;
-  font-weight: 800;
+  font-family: var(--font-pixel);
+  font-size: 0.9rem;
   font-variant-numeric: tabular-nums;
   min-height: 1.1em;
 }
@@ -76,9 +77,11 @@
 
 .series-pip.won-nsw {
   border-color: var(--blue);
+  /* Mirror the maroon plate won-qld gets, so the blue score sits on a darker fill and clears AA. */
+  background: linear-gradient(180deg, var(--blue-deep), var(--surface-2));
 }
 .series-pip.won-nsw .pip-score {
-  color: var(--blue);
+  color: var(--blue-text);
 }
 
 .series-pip.drawn .pip-score {

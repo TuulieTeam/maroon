@@ -36,7 +36,7 @@ function verdict(result: MatchResult, gameLabel: string): { cls: string; text: s
 function continueLabel(state: SeriesState): string {
   if (state.status === 'complete') return 'To the series wrap'
   if (state.seriesWinner != null) return 'Shield decided — to the series hub'
-  return 'To the Series Hub'
+  return 'To the series hub'
 }
 
 /**
@@ -100,18 +100,19 @@ function PlayerTable({ side, lines }: { side: Side; lines: PlayerStatLine[] }) {
     <div className={`player-table ${side.toLowerCase()}`}>
       <div className="player-table-title">{label}</div>
       <table>
+        <caption className="sr-only">{label} player statistics</caption>
         <thead>
           <tr>
-            <th className="pn">Player</th>
-            <th>R</th>
-            <th>M</th>
-            <th>T</th>
-            <th>TB</th>
-            <th>LB</th>
-            <th>Tr</th>
-            <th>Err</th>
-            <th title="Kicks">K</th>
-            <th title="Kick metres">Km</th>
+            <th className="pn" scope="col">Player</th>
+            <th scope="col" title="Runs">R</th>
+            <th scope="col" title="Run metres">M</th>
+            <th scope="col" title="Tackles">T</th>
+            <th scope="col" title="Tackle breaks">TB</th>
+            <th scope="col" title="Line breaks">LB</th>
+            <th scope="col" title="Tries">Tr</th>
+            <th scope="col" title="Errors">Err</th>
+            <th scope="col" title="Kicks">K</th>
+            <th scope="col" title="Kick metres">Km</th>
           </tr>
         </thead>
         <tbody>
@@ -157,7 +158,7 @@ export function ResultScreen({ result, gameLabel, seriesState, onContinue }: Res
   return (
     <div className="app-shell result-screen">
       <div className={`result-banner ${v.cls}`}>
-        <div className="result-verdict">{v.text}</div>
+        <h1 className="result-verdict">{v.text}</h1>
         <div className="result-final-score">
           {result.finalScore.qld} – {result.finalScore.nsw}
         </div>
@@ -167,25 +168,28 @@ export function ResultScreen({ result, gameLabel, seriesState, onContinue }: Res
 
       <SeriesScoreboard state={seriesState} />
 
+      <div className="result-broadcast">
+        <BroadcastPanel slot="postGame" segments={result.broadcast.postGame} />
+      </div>
+
       <div className={`potm-card ${potm.side.toLowerCase()}`}>
         <div className="potm-label">Player of the Match</div>
         <div className="potm-name">{potm.name}</div>
         <div className="potm-side">{potm.side === 'QLD' ? 'Queensland' : 'New South Wales'}</div>
         <div className="potm-line">
-          {potm.line.runMetres} m · {potm.line.tries} tries · {potm.line.lineBreaks} line breaks ·{' '}
-          {potm.line.tackles} tackles · {potm.line.tackleBreaks} tackle breaks
+          <strong>{potm.line.runMetres}</strong> m · <strong>{potm.line.tries}</strong>{' '}
+          {potm.line.tries === 1 ? 'try' : 'tries'} · <strong>{potm.line.lineBreaks}</strong>{' '}
+          {potm.line.lineBreaks === 1 ? 'line break' : 'line breaks'} · <strong>{potm.line.tackles}</strong>{' '}
+          {potm.line.tackles === 1 ? 'tackle' : 'tackles'} · <strong>{potm.line.tackleBreaks}</strong>{' '}
+          {potm.line.tackleBreaks === 1 ? 'tackle break' : 'tackle breaks'}
         </div>
       </div>
 
       {callout && (
         <div className="channel-callout">
-          <strong>Where it was decided:</strong> {callout}
+          <strong>Where the tries came from:</strong> {callout}
         </div>
       )}
-
-      <div className="result-broadcast">
-        <BroadcastPanel slot="postGame" segments={result.broadcast.postGame} />
-      </div>
 
       <div className="stats-grid">
         <StatCard title="Tries" q={stats.tries.QLD} n={stats.tries.NSW} />
@@ -209,6 +213,10 @@ export function ResultScreen({ result, gameLabel, seriesState, onContinue }: Res
         <PlayerTable side="QLD" lines={qldLines} />
         <PlayerTable side="NSW" lines={nswLines} />
       </div>
+      <p className="player-table-legend">
+        R runs · M run metres · T tackles · TB tackle breaks · LB line breaks · Tr tries · Err errors · K
+        kicks · Km kick metres
+      </p>
 
       <div className="result-actions">
         <button className="btn-primary" onClick={onContinue}>

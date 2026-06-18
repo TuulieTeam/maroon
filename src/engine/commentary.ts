@@ -131,6 +131,9 @@ const TEMPLATES: Record<MatchEventType, TaggedTemplate[]> = {
     { tags: ['any'], text: '{attacker} carts it into the {channelPhrase}, made to work by {defender} on the tackle.' },
     { tags: ['any'], text: 'No nonsense from {attacker} — head down, one out off the ruck, and {defender} stops the roll.' },
     { tags: ['any'], text: 'Strong leg drive from {attacker}, {defender} dragged back a metre but the tackle’s made.' },
+    { tags: ['any'], text: '{attacker} props, steps off the right foot and barges into {defender} for the hard metres.' },
+    { tags: ['any'], text: 'Bash and barge from {attacker} — {defender} brings him down but not before the front foot.' },
+    { tags: ['any'], text: 'Quick play-the-ball the aim — {attacker} drives low into {defender} and works to get to his feet.' },
     { tags: ['early'], text: 'Feeling each other out early — {attacker} tests the {channelPhrase} with a hit-up.' },
     { tags: ['early'], text: '{attacker} sets the tone first carry, {defender} meets him square.' },
     { tags: ['tight', 'comeback'], text: 'Every metre matters here — {attacker} grinds it forward, {defender} won’t give an inch.' },
@@ -149,6 +152,9 @@ const TEMPLATES: Record<MatchEventType, TaggedTemplate[]> = {
     { tags: ['any'], text: '{defender} gets under the ball and lifts — {attacker} taken backwards, that’s a dominant tackle.' },
     { tags: ['any'], text: 'Chop tackle from {defender}, {attacker} chopped down at the ankles.' },
     { tags: ['any'], text: '{defender} reads the run perfectly and shuts {attacker} down a metre behind the ruck.' },
+    { tags: ['any'], text: 'Big shot from {defender}! {attacker} stood up in the tackle and held.' },
+    { tags: ['any'], text: '{defender} jams up out of the line and drives {attacker} backwards — dominant.' },
+    { tags: ['any'], text: 'Two in the tackle — {defender} and his mate wrap {attacker} up and milk the seconds.' },
     { tags: ['early'], text: 'Defensive line up fast and proud — {defender} pins {attacker} behind the advantage line.' },
     { tags: ['tight', 'comeback'], text: 'This is desperation defence — {defender} drives {attacker} back, the line holding under siege.' },
     { tags: ['tight', 'comeback'], text: 'It’s {score} and every tackle’s a war — {defender} stands {attacker} up and won’t let him fall forward.' },
@@ -465,10 +471,22 @@ export function scorePhrase(score: { qld: number; nsw: number }): string {
   return `QLD ${score.qld} - ${score.nsw} NSW`
 }
 
+/** A caller's in-play reference: the surname only (e.g. "Nathan Cleary" -> "Cleary"), as you'd hear on
+ *  the call. Single-word fixture ids ("def-CL") are returned unchanged. */
+function surname(name?: string): string {
+  if (!name) return ''
+  const parts = name.split(/\s+/)
+  return parts[parts.length - 1]
+}
+
 function substitute(template: string, input: CommentaryInput, ctx: CommentaryContext): string {
   return template
-    .replace(/\{attacker\}/g, input.attacker?.name ?? '')
-    .replace(/\{defender\}/g, input.defender?.name ?? '')
+    // Full names are reserved for {attackerFull}/{defenderFull}; the everyday {attacker}/{defender}
+    // resolve to the SURNAME so the call reads like a real broadcaster ("Cleary", not "Nathan Cleary").
+    .replace(/\{attackerFull\}/g, input.attacker?.name ?? '')
+    .replace(/\{defenderFull\}/g, input.defender?.name ?? '')
+    .replace(/\{attacker\}/g, surname(input.attacker?.name))
+    .replace(/\{defender\}/g, surname(input.defender?.name))
     .replace(/\{playerOff\}/g, input.playerOff?.name ?? '')
     .replace(/\{playerOn\}/g, input.playerOn?.name ?? input.attacker?.name ?? '')
     .replace(/\{club\}/g, input.attacker?.club ?? '')

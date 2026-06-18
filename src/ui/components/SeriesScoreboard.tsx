@@ -59,10 +59,17 @@ export function SeriesScoreboard({ state, upcoming }: SeriesScoreboardProps) {
             : isCurrent
               ? 'current'
               : 'upcoming'
+          const label = rec
+            ? rec.winner === 'DRAW'
+              ? `Game ${n}: drawn ${rec.finalScore.qld} to ${rec.finalScore.nsw}`
+              : `Game ${n}: ${sideName(rec.winner)} won ${rec.finalScore.qld} to ${rec.finalScore.nsw}`
+            : isCurrent
+              ? `Game ${n}: in progress`
+              : `Game ${n}: upcoming`
           return (
-            <div key={n} className={`series-pip ${mod}`} role="listitem">
-              <span className="pip-game">G{n}</span>
-              <span className="pip-score">
+            <div key={n} className={`series-pip ${mod}`} role="listitem" aria-label={label}>
+              <span className="pip-game" aria-hidden="true">G{n}</span>
+              <span className="pip-score" aria-hidden="true">
                 {rec ? `${rec.finalScore.qld}–${rec.finalScore.nsw}` : isCurrent ? '•' : ''}
               </span>
             </div>
