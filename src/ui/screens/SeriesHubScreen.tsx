@@ -1,5 +1,6 @@
 import { originLabel } from '../../engine'
 import type { PlayerOfMatch, SeriesContext } from '../../engine'
+import { bluesById } from '../../data/bluesVariants'
 import { buildShareCard } from '../../series'
 import type { CareerSummary, SeriesState } from '../../series'
 import { SeriesScoreboard } from '../components/SeriesScoreboard'
@@ -43,6 +44,7 @@ export function SeriesHubScreen({
   const complete = state.status === 'complete'
   const deadRubberPending = !complete && state.seriesWinner != null
   const nextLabel = originLabel(currentContext.gameNumber)
+  const opponent = bluesById(state.opponentId)
 
   const upcoming = complete
     ? undefined
@@ -64,6 +66,12 @@ export function SeriesHubScreen({
       </header>
 
       <SeriesScoreboard state={state} upcoming={upcoming} />
+
+      {!complete && (
+        <p className="hub-opponent">
+          This series, you face <strong>{opponent.name}</strong> — {opponent.blurb}
+        </p>
+      )}
 
       {!complete && <ClubFormReport state={state} />}
 

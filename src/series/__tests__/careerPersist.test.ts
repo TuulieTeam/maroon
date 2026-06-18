@@ -36,8 +36,9 @@ function game(gameNumber: GameNo, venueId: VenueId, winner: Side | 'DRAW', qld: 
 
 function completed(rootSeed: number, score: Score, winner: Side): SeriesState {
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     rootSeed,
+    opponentId: 'classic',
     currentGame: 3,
     seriesScore: score,
     games: [game(1, 'SUNCORP', 'QLD', 20, 10), game(2, 'ACCOR_SYD', 'NSW', 8, 14), game(3, 'MCG', 'QLD', 16, 12)],

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Player, Position } from '../../data/types'
 import { POSITION_META } from '../../data/positions'
 import { QLD_SQUAD } from '../../data/qldSquad'
-import { NSW_LINEUP } from '../../data/nswSquad'
+import { bluesById } from '../../data/bluesVariants'
 import type { SelectedTeam } from '../../engine'
 import { conditionFormDelta } from '../../series'
 import type { SeriesState } from '../../series'
@@ -36,6 +36,8 @@ export function SelectionScreen({
   initialKickerId,
 }: SelectionScreenProps) {
   const conditions = seriesState.playerConditions
+  // The Blues side drawn for this series — fixed across all three games, revealed in the scouting report.
+  const opponent = bluesById(seriesState.opponentId)
   // Players ruled OUT / SUSPENDED this game — blocked from the XVII.
   const ruledOutIds = useMemo(
     () => new Set(Object.keys(conditions).filter((id) => conditions[id].injury.kind === 'out' || conditions[id].injury.kind === 'suspended')),
@@ -187,8 +189,12 @@ export function SelectionScreen({
             onSelectSlot={handleSlotClick}
             onSetKicker={selection.setKickerId}
           />
-          <OppositionPanel />
-          <MatchupPanel you={you} opp={NSW_LINEUP} />
+          <OppositionPanel
+            opponentName={opponent.name}
+            blurb={opponent.blurb}
+            threats={opponent.edgeThreats}
+          />
+          <MatchupPanel you={you} opp={opponent.lineup} />
         </aside>
       </div>
 

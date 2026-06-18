@@ -61,3 +61,16 @@ export interface PositionMeta {
   jersey: number
   label: string
 }
+
+/**
+ * A scouting-report line for an opponent's dangerous channel — the booth's pre-game read of where a
+ * side will hurt you. `channel` is the OPPONENT'S attacking channel (LEFT/MIDDLE/RIGHT); the booth maps
+ * it to the Maroon defensive edge under pressure. Travels on `SelectedTeam.edgeThreats` so the engine
+ * stays opponent-agnostic — different Blues sides ship their own threat geography as plain data.
+ */
+export interface EdgeThreat {
+  channel: Channel
+  headline: string
+  detail: string
+  dangerMen: string[]
+}

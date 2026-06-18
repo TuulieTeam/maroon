@@ -1,4 +1,4 @@
-import type { Channel, Player, Position } from '../data/types'
+import type { Channel, EdgeThreat, Player, Position } from '../data/types'
 
 export type Side = 'QLD' | 'NSW'
 
@@ -69,6 +69,11 @@ export interface SelectedTeam {
   side: Side
   lineup: Record<Position, Player>
   kickerId: string
+  /**
+   * The opponent's scouting profile — where this side will hurt you. Read by the booth's pre-game
+   * facts; absent = no specific threat read (legacy/fixture behaviour falls back to a neutral default).
+   */
+  edgeThreats?: EdgeThreat[]
 }
 
 /** The three Origin venues, in series order. */

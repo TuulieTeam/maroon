@@ -1,4 +1,4 @@
-import type { Channel, Player } from '../data/types'
+import type { Channel, Player, Position } from '../data/types'
 import { NSW_EDGE_THREATS } from '../data/nswSquad'
 import type { EdgeThreat } from '../data/nswSquad'
 import { makeRng, pick } from './rng'
@@ -64,11 +64,13 @@ interface PreGameFacts {
   fullback: string
   /** QLD picks carrying a real-world injured/suspended/dropped flag (the gambles). */
   gambles: Array<{ name: string; note: string }>
-  /** True if the user's LEFT edge (CL/WL/SRL) is soft — NSW's lethal right runs at it. */
-  softLeftEdge: boolean
-  /** Average defence of the left-edge owners, for colour. */
-  leftEdgeDefence: number
-  /** The lethal NSW edge threat (the right edge). */
+  /** The Maroon defensive edge the drawn Blues side will hunt (their RIGHT attack → your 'left', etc.). */
+  pressureEdge: 'left' | 'middle' | 'right'
+  /** True if the owners of the pressured edge are soft (avg defence < 70). */
+  softPressureEdge: boolean
+  /** Average defence of the pressured-edge owners, for colour. */
+  pressureEdgeDefence: number
+  /** This opponent's primary scouting threat (its lethal channel). */
   edgeThreat: EdgeThreat
   dangerMan: string
 }
@@ -109,6 +111,25 @@ function avgDefence(players: Player[]): number {
   return players.reduce((s, p) => s + p.attrs.defence, 0) / players.length
 }
 
+/** QLD positions that own each defensive zone — used to read the strength of the pressured edge. */
+const EDGE_OWNERS: Record<'left' | 'middle' | 'right', Position[]> = {
+  left: ['CL', 'WL', 'SRL'],
+  right: ['CR', 'WR', 'SRR'],
+  middle: ['PR', 'PL', 'HK', 'LK'],
+}
+
+/** The booth's short phrase for where the OPPONENT attacks from, by their threat channel. */
+function threatSourcePhrase(channel: Channel): string {
+  if (channel === 'MIDDLE') return 'the Blues forward pack'
+  return channel === 'RIGHT' ? 'the Blues right edge' : 'the Blues left edge'
+}
+
+/** Surname for inline play-by-play voice ("Nathan Cleary" -> "Cleary"). */
+function surnameOf(fullName: string): string {
+  const parts = fullName.trim().split(/\s+/)
+  return parts[parts.length - 1] || fullName
+}
+
 function derivePreGameFacts(setup: MatchSetup): PreGameFacts {
   const lineup = setup.qld.lineup
   const kickerPlayer =
@@ -121,10 +142,16 @@ function derivePreGameFacts(setup: MatchSetup): PreGameFacts {
     )
     .map((p) => ({ name: p.name, note: p.formNote ?? statusNote(p.status!) }))
 
-  const leftOwners = [lineup.CL, lineup.WL, lineup.SRL].filter(Boolean)
-  const leftEdgeDefence = avgDefence(leftOwners)
-  const edgeThreat = NSW_EDGE_THREATS[0]
-  const dangerMan = edgeThreat.dangerMen[0] ?? 'their right edge'
+  // The drawn Blues side ships its own scouting profile on the team; a fixture/legacy NSW with none
+  // attached falls back to the canonical right-edge threat, keeping that path byte-identical.
+  const edgeThreats =
+    setup.nsw.edgeThreats && setup.nsw.edgeThreats.length > 0 ? setup.nsw.edgeThreats : NSW_EDGE_THREATS
+  const edgeThreat = edgeThreats[0]
+  const dangerMan = edgeThreat.dangerMen[0] ?? 'their danger man'
+  // Map the opponent's attacking channel to the Maroon defensive edge under pressure.
+  const pressureEdge = yourEdgeFor(edgeThreat.channel)
+  const pressuredOwners = EDGE_OWNERS[pressureEdge].map((pos) => lineup[pos]).filter(Boolean)
+  const pressureEdgeDefence = avgDefence(pressuredOwners)
 
   return {
     kicker: kickerPlayer.name,
@@ -132,8 +159,9 @@ function derivePreGameFacts(setup: MatchSetup): PreGameFacts {
     hb: lineup.HB.name,
     fullback: lineup.FB.name,
     gambles,
-    softLeftEdge: leftEdgeDefence < 70,
-    leftEdgeDefence: Math.round(leftEdgeDefence),
+    pressureEdge,
+    softPressureEdge: pressureEdgeDefence < 70,
+    pressureEdgeDefence: Math.round(pressureEdgeDefence),
     edgeThreat,
     dangerMan,
   }
@@ -333,28 +361,28 @@ const PRE_OPEN_BRACEY = [
 
 const PRE_ANALYST: Partial<Record<PersonaId, string[]>> = {
   johns: [
-    "The thing I'll be watching is Queensland's spine. {hb} and {fe} have to control the ruck and get their kicking game right, because if they don't, Cleary will just squeeze the life out of them.",
-    "For me it's all about that left edge. {dangerMan} and the Blues right side will go there early and often — Queensland's left-side defence is the pressure point of this whole match.",
-    "Halves win Origin. {fe} and {hb} need to be on song, manage the back end of sets, and not give Cleary cheap field position. Get that wrong and it's a long night.",
+    "The thing I'll be watching is Queensland's spine. {hb} and {fe} have to control the ruck and get their kicking game right, because if they don't, {theirHalf} will just squeeze the life out of them.",
+    "For me it's all about {yourEdge}. {dangerMan} and {threatPhrase} will go there early and often — that's the pressure point of this whole match.",
+    "Halves win Origin. {fe} and {hb} need to be on song, manage the back end of sets, and not give {theirHalf} cheap field position. Get that wrong and it's a long night.",
   ],
   gould: [
-    "I'll tell you what — everyone's talking about the Maroons forwards, but this game lives and dies on that left edge. {edgeHeadline}. If it leaks, it's over.",
+    "I'll tell you what — everyone's talking about the Maroons forwards, but this game lives and dies on {yourEdge}. {edgeHeadline}. If it leaks, it's over.",
     "I'll tell you what, picking {fe} and {hb} together is a brave call. Origin punishes anyone who can't handle the speed. We'll find out early whether they're up to it.",
     "I'll tell you what — Queensland have rolled the dice with this side. Sometimes that wins you Origin, sometimes it gets exposed in the first twenty. No middle ground here.",
   ],
   smith: [
     "What I want from Queensland is control through the middle. Win the ruck, let {hb} play off the back of it, and the edges look after themselves. Forwards set the platform — always have.",
     "It comes down to game management. Quiet, patient, build pressure. If {fe} and {hb} can do the simple things under fatigue, Queensland are right in this.",
-    "The danger for Queensland is that left edge getting picked apart. {edgeHeadline}. The middle has to dominate so the edge isn't left exposed all night.",
+    "The danger for Queensland is {yourEdge} getting picked apart. {edgeHeadline}. They have to stand up there or it's a long night.",
   ],
   fittler: [
     "I just like the feel of the Queensland spine tonight. {fe}'s got a bit of mongrel about him. It'll be a contest, but they've got blokes who turn up when it's tight.",
-    "Origin's about who wants it more. Queensland have picked for it. The left edge worries me a touch, but they've got the players to cover.",
+    "Origin's about who wants it more. Queensland have picked for it. {yourEdgeCap} worries me a touch, but they've got the players to cover.",
     "Gut feel? This is going to be a brutal, low-margin arm-wrestle. {hb}'s the bloke who has to win the moments for Queensland.",
   ],
   lockyer: [
     "Queensland have picked a side that can play the long game. The key is patience — don't chase it early, let {fe} and {hb} settle, and trust the forwards to lay the platform.",
-    "For me the pressure point is clear — {edgeHeadline}. If Queensland can hold up that left edge for the first half, they'll grow into this.",
+    "For me the pressure point is clear — {edgeHeadline}. If Queensland can hold up {yourEdge} for the first half, they'll grow into this.",
     "It's about composure. {hb} has the keys, and in Origin the side that keeps its head in the tight moments usually walks away with it.",
   ],
   thurston: [
@@ -377,7 +405,7 @@ const PRE_NO_GAMBLE_DANIKA = [
 ]
 
 const PRE_PREDICT_BRACEY = [
-  "So there it is — the danger's the Blues right edge, the key's that Queensland spine. Strap in. KICK OFF moments away.",
+  "So there it is — the danger's {threatPhrase}, the key's that Queensland spine. Strap in. KICK OFF moments away.",
   "Everything points to a tight one decided on the edges. The Maroons faithful are ready. Let's play some Origin football.",
   "The desk is split, the crowd is not. Queensland in Brisbane — here we go. Over to the middle for the kick off.",
 ]
@@ -428,7 +456,7 @@ const PRE_OPEN_BRACEY_SERIES = [
 ]
 
 const PRE_PREDICT_BRACEY_SERIES = [
-  "So there it is — {seriesStakes} The danger's the Blues right edge, the key's that Queensland spine. Strap in. KICK OFF moments away.",
+  "So there it is — {seriesStakes} The danger's {threatPhrase}, the key's that Queensland spine. Strap in. KICK OFF moments away.",
   "Everything points to a tight one decided on the edges. {seriesStakes} The Maroons faithful are ready. Let's play some Origin football.",
   "The desk is split, the crowd is not. {gameLabel} from {stadium} — {seriesStakes} here we go. Over to the middle for the kick off.",
 ]
@@ -493,7 +521,7 @@ const HT_ANALYST_OTHER: Partial<Record<PersonaId, string[]>> = {
   johns: [
     "The ruck speed's been the difference for mine — Queensland need quicker play-the-balls so the halves can actually play.",
     "Be smarter with the footy. {errorLine} You cannot gift possession in an Origin decider.",
-    "Cleary's controlling the tempo. Queensland have to win the kick-chase and stop conceding cheap field position.",
+    "{theirHalf}'s controlling the tempo. Queensland have to win the kick-chase and stop conceding cheap field position.",
   ],
   smith: [
     "It's the simple stuff — complete your sets, hold the ball, build pressure. {errorLine}",
@@ -525,7 +553,7 @@ const HT_ANALYST_OTHER: Partial<Record<PersonaId, string[]>> = {
 const HT_DANIKA = [
   "The message coming out of the Queensland sheds is exactly that — fix the edge, hold the ball, and trust the forwards. Calm in there, but they know the work to do.",
   "Down in the tunnel the Maroons looked focused rather than rattled — the word is 'composure', and they fancy their second-half fitness.",
-  "Queensland staff telling me the plan doesn't change — tighten the left edge, complete their sets, and let the crowd lift them. They're confident the legs will tell late.",
+  "Queensland staff telling me the plan doesn't change — tighten things up, complete their sets, and let the crowd lift them. They're confident the legs will tell late.",
 ]
 
 const HT_DANIKA_DRAMA = [
@@ -674,6 +702,12 @@ export function buildBroadcast(
   const sb = seriesBoothVars(setup, post.winner)
 
   // ---- PRE-GAME ----
+  // Opponent-aware threat tokens: the drawn Blues side decides which Maroon edge is under pressure
+  // ({yourEdge}), where they attack from ({threatPhrase}), and who runs their show ({theirHalf}).
+  const yourEdge = yourEdgePhrase(pre.pressureEdge)
+  const yourEdgeCap = yourEdge.charAt(0).toUpperCase() + yourEdge.slice(1)
+  const theirHalf = surnameOf(setup.nsw.lineup.HB?.name ?? 'their halfback')
+  const threatPhrase = threatSourcePhrase(pre.edgeThreat.channel)
   const preVars: Vars = {
     fe: pre.fe,
     hb: pre.hb,
@@ -681,6 +715,10 @@ export function buildBroadcast(
     kicker: pre.kicker,
     dangerMan: pre.dangerMan,
     edgeHeadline: pre.edgeThreat.headline,
+    yourEdge,
+    yourEdgeCap,
+    theirHalf,
+    threatPhrase,
     ...sb.vars,
   }
 
@@ -728,6 +766,7 @@ export function buildBroadcast(
     errorLine,
     standoutLine,
     htState,
+    theirHalf,
     ...sb.vars,
   }
 

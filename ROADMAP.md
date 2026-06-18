@@ -31,6 +31,15 @@ Recent feature work:
   (lead Thommo = the moments, co Petero = the grind), shown on speaker-change in the feed.
 - **Deepened analyst color** — `colorCommentary.ts` pools doubled to 4-6 in-voice lines per
   persona/moment.
+- **NSW opponent variety** — three zone-varied Blues sides (`src/data/bluesVariants.ts`): the canonical
+  right-edge side, a left-edge side (Latrell/Martin run at your right), and a middle-bashing forward
+  pack. One is drawn deterministically per series from `rootSeed` (`bluesForSeed`), fixed across all
+  three games, revealed in the scouting report — the player never picks the opponent. Each side ships
+  its own `edgeThreats`; the booth pre-game now reads the drawn side's threat zone + playmaker
+  (opponent-aware `derivePreGameFacts` + `{yourEdge}`/`{threatPhrase}`/`{theirHalf}` tokens, no
+  hardcoded "left edge"). Persisted via `SeriesState.opponentId` (schema v2→v3, validated). Built to
+  equal strength / different shape — balance guard in `bluesVariants.test.ts` keeps avg margins within
+  ~one converted try. The engine was already opponent-agnostic, so `simulate.ts` is untouched.
 
 ## Deferred backlog
 
@@ -39,20 +48,20 @@ Paused 2026-06-16 — no committed dates. Roughly highest-leverage first.
 1. **Difficulty dial** (Casual / Origin / Hard) — a scalar on NSW effective-attrs applied at the
    existing kickoff form-delta boundary in `App.tsx`; reuses the home-edge/form machinery, minimal
    engine change. "Won the shield on Hard" feeds the share card. Re-check `calibration.test.ts` for the
-   scaled side.
-2. **NSW opponent variety** — an NSW pool + selection/rotation, or 2-3 pre-authored alternate Blues
-   lineups. NSW is already a plain `SelectedTeam`, so no engine change — data + selection UI. Deepest
-   replayability unlock.
-3. **Break up `simulate.ts`** (~1,350 LOC) — extract the bench-rotation/runtime subsystem and the
+   scaled side. (Now composes with opponent variety — a difficulty scalar layers on top of whichever
+   Blues side is drawn.)
+2. **Break up `simulate.ts`** (~1,350 LOC) — extract the bench-rotation/runtime subsystem and the
    HIA/foul-play drama bookkeeping into pure modules. Safe now that the integration test guards the
    contract.
-4. **Theme-token + spacing/type-scale sweep → alternate skin** — add `--space-*`/`--text-*` tokens,
+3. **Theme-token + spacing/type-scale sweep → alternate skin** — add `--space-*`/`--text-*` tokens,
    replace the ~40 raw `rgba()` literals, then a `data-theme` terminal/8-bit skin to cash in the
    swappable-surface promise.
-5. **Editable-squad / JSON import layer** + a data-consistency test (status/form/injury tables agree).
-   `persist.ts` stores IDs only, so an attribute overlay drops in without save migrations.
-6. **Polish** — expand the 3 "pressure" Gus speeches (`speeches.ts`); replace the stock-Vite
-   `README.md`; optionally flip analyst color lines to surnames (`renderColorLine`) to match the callers.
+4. **Editable-squad / JSON import layer** + a data-consistency test (status/form/injury tables agree).
+   `persist.ts` stores IDs only, so an attribute overlay drops in without save migrations. (Would also
+   make new Blues sides authorable without a redeploy.)
+5. **Polish** — expand the 3 "pressure" Gus speeches (`speeches.ts`); replace the stock-Vite
+   `README.md`; optionally flip analyst color lines to surnames (`renderColorLine`) to match the callers;
+   surface the beaten Blues side on the share card / career ledger ("beat the Big Blue Wall").
 
 ## Invariants to protect
 

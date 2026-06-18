@@ -18,8 +18,9 @@ function game(gameNumber: GameNo, venueId: VenueId, winner: Side | 'DRAW', qld: 
 
 function complete(games: SeriesGameRecord[], score: Score, seriesWinner: Side): SeriesState {
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     rootSeed: 1,
+    opponentId: 'classic',
     currentGame: 3,
     seriesScore: score,
     games,

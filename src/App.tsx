@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from 'react'
-import { NSW_KICKER_ID, NSW_LINEUP } from './data/nswSquad'
+import { bluesById } from './data/bluesVariants'
 import type { Position } from './data/types'
 import { originLabel, simulateMatch } from './engine'
 import type { MatchResult, MatchSetup, PlayerOfMatch, SelectedTeam } from './engine'
@@ -14,8 +14,14 @@ import { STAKES_SHORT } from './ui/seriesStakes'
 
 type Phase = 'select' | 'pregame' | 'live' | 'result' | 'hub'
 
-function nswTeam(): SelectedTeam {
-  return { side: 'NSW', lineup: { ...NSW_LINEUP }, kickerId: NSW_KICKER_ID }
+function nswTeam(opponentId: string): SelectedTeam {
+  const blues = bluesById(opponentId)
+  return {
+    side: 'NSW',
+    lineup: { ...blues.lineup },
+    kickerId: blues.kickerId,
+    edgeThreats: blues.edgeThreats,
+  }
 }
 
 function lineupIds(team: SelectedTeam): Record<Position, string> {
@@ -59,7 +65,7 @@ export default function App() {
       }
       const setup: MatchSetup = {
         qld: team,
-        nsw: nswTeam(),
+        nsw: nswTeam(state.opponentId),
         series: { ...currentContext, usedSpeechTitles },
         form,
         reinjury,
@@ -70,7 +76,14 @@ export default function App() {
       setResult(simulateMatch(setup, gameSeed(state.rootSeed, game)))
       setPhase('pregame')
     },
-    [state.currentGame, state.rootSeed, state.playerConditions, currentContext, usedSpeechTitles],
+    [
+      state.currentGame,
+      state.rootSeed,
+      state.opponentId,
+      state.playerConditions,
+      currentContext,
+      usedSpeechTitles,
+    ],
   )
 
   // Fold the finished game into the series exactly once, then show the result.
@@ -140,7 +153,7 @@ export default function App() {
         gameLabel={originLabel(playingGame)}
         venueName={currentContext.venue.stadium}
         stakesLabel={STAKES_SHORT[currentContext.stakes]}
-        startingLineups={{ QLD: lockedTeam.lineup, NSW: nswTeam().lineup }}
+        startingLineups={{ QLD: lockedTeam.lineup, NSW: nswTeam(state.opponentId).lineup }}
         onComplete={handleMatchComplete}
       />
     )

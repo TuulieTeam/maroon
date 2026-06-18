@@ -5,7 +5,7 @@ import { QLD_SQUAD } from '../../data/qldSquad'
 import { clearSeries, loadSeries, saveSeries } from '../persist'
 import type { SeriesState } from '../types'
 
-const STORAGE_KEY = 'maroon.series.v2'
+const STORAGE_KEY = 'maroon.series.v3'
 const KNOWN_ID = QLD_SQUAD[0].id
 
 function makeStorage() {
@@ -30,8 +30,9 @@ function validLineup(): Record<Position, string> {
 
 function validState(): SeriesState {
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     rootSeed: 12345,
+    opponentId: 'classic',
     currentGame: 2,
     seriesScore: { qld: 1, nsw: 0 },
     games: [
@@ -97,6 +98,18 @@ describe('persist — defensive discard', () => {
     // @ts-expect-error — deliberately corrupting the injury kind for the test
     bad2.playerConditions[KNOWN_ID].injury.kind = 'sprained'
     localStorage.setItem(STORAGE_KEY, JSON.stringify(bad2))
+    expect(loadSeries()).toBeNull()
+  })
+
+  it('discards an unknown or missing opponent id', () => {
+    const drifted = validState()
+    drifted.opponentId = 'ghost-blues' // a string, but no variant resolves to it
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(drifted))
+    expect(loadSeries()).toBeNull()
+    const missing = validState()
+    // @ts-expect-error — deliberately dropping opponentId to simulate a pre-v3 shape
+    delete missing.opponentId
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(missing))
     expect(loadSeries()).toBeNull()
   })
 

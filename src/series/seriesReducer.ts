@@ -1,7 +1,7 @@
 import { QLD_SQUAD } from '../data/qldSquad'
-import { NSW_LINEUP } from '../data/nswSquad'
+import { bluesById, bluesForSeed } from '../data/bluesVariants'
 import { STARTING_FORM, STARTING_INJURY } from '../data/startingForm'
-import type { Position } from '../data/types'
+import type { Player, Position } from '../data/types'
 import type { MatchEvent, MatchStats, Score, Side } from '../engine'
 import { advanceConditions, extractCarryover, initConditions } from './conditions'
 import { gameSeed } from './seed'
@@ -10,8 +10,10 @@ import { SERIES_SCHEDULE } from './venues'
 
 type Winner = Side | 'DRAW'
 
-/** Every player whose condition the series tracks — the QLD pool plus the fixed NSW 21. */
-const ALL_PLAYERS = [...QLD_SQUAD, ...Object.values(NSW_LINEUP)]
+/** Every player whose condition a series tracks — the QLD pool plus the drawn NSW side's 21. */
+function allPlayersFor(opponentId: string): Player[] {
+  return [...QLD_SQUAD, ...Object.values(bluesById(opponentId).lineup)]
+}
 
 /** A finished game's inputs, ready to fold into the series. Lineup is player IDs, not Player objects. */
 export interface PlayedGame {
@@ -25,16 +27,19 @@ export interface PlayedGame {
   stats: MatchStats
 }
 
-/** A fresh series, parked on game 1, scoreless, with conditions seeded from the real-world form notes. */
+/** A fresh series, parked on game 1, scoreless, with conditions seeded from the real-world form notes.
+ *  The Blues opponent is drawn deterministically from the seed and fixed for the whole series. */
 export function initSeries(rootSeed: number): SeriesState {
+  const opponentId = bluesForSeed(rootSeed).id
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     rootSeed: rootSeed >>> 0,
+    opponentId,
     currentGame: 1,
     seriesScore: { qld: 0, nsw: 0 },
     games: [],
     status: 'in-progress',
-    playerConditions: initConditions(ALL_PLAYERS, STARTING_FORM, STARTING_INJURY),
+    playerConditions: initConditions(allPlayersFor(opponentId), STARTING_FORM, STARTING_INJURY),
   }
 }
 
@@ -68,7 +73,7 @@ export function applyGameResult(state: SeriesState, played: PlayedGame): SeriesS
     : advanceConditions(state.playerConditions, {
         rootSeed: state.rootSeed,
         nextGameNumber: nextGame,
-        players: ALL_PLAYERS,
+        players: allPlayersFor(state.opponentId),
         lines: played.stats.players,
         carryover: extractCarryover(played.events),
       })

@@ -38,6 +38,21 @@
   color: var(--blue-text);
 }
 
+/* Who the drawn Blues side is this series — a muted caption with the enemy named in Blues colour. */
+.hub-opponent {
+  text-align: center;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: var(--text-dim);
+  max-width: 52ch;
+  margin: -4px auto 0;
+}
+
+.hub-opponent strong {
+  color: var(--blue-text);
+  font-weight: 700;
+}
+
 .hub-mvp {
   text-align: center;
   border: 1px solid var(--surface-line);

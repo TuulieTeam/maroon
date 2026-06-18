@@ -1,13 +1,17 @@
 import { QLD_SQUAD } from '../data/qldSquad'
+import { BLUES_IDS } from '../data/bluesVariants'
 import type { Score } from '../engine'
 import type { SeriesGameRecord, SeriesState } from './types'
 
 /** Versioned localStorage key — bump the suffix on any breaking shape change. */
-const STORAGE_KEY = 'maroon.series.v2'
-const SCHEMA_VERSION = 2
+const STORAGE_KEY = 'maroon.series.v3'
+const SCHEMA_VERSION = 3
 
 /** Player ids that exist in the current squad — a stored lineup referencing anything else is stale. */
 const SQUAD_IDS = new Set(QLD_SQUAD.map((p) => p.id))
+
+/** Valid Blues opponent ids — a stored opponentId outside this set is stale and discards the save. */
+const OPPONENT_IDS = new Set(BLUES_IDS)
 
 const VENUE_IDS = new Set(['SUNCORP', 'ACCOR_SYD', 'MCG'])
 const INJURY_KINDS = new Set(['fit', 'doubtful', 'out', 'suspended'])
@@ -88,6 +92,7 @@ function isValidSeries(v: unknown): v is SeriesState {
   const s = v as Record<string, unknown>
   if (s.schemaVersion !== SCHEMA_VERSION) return false
   if (typeof s.rootSeed !== 'number') return false
+  if (typeof s.opponentId !== 'string' || !OPPONENT_IDS.has(s.opponentId)) return false
   if (s.currentGame !== 1 && s.currentGame !== 2 && s.currentGame !== 3) return false
   if (s.status !== 'in-progress' && s.status !== 'complete') return false
   if (s.seriesWinner !== undefined && s.seriesWinner !== 'QLD' && s.seriesWinner !== 'NSW') return false

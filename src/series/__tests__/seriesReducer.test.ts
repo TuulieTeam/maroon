@@ -25,8 +25,9 @@ describe('initSeries', () => {
   it('starts scoreless on game 1, in progress, no shield', () => {
     const s = initSeries(999)
     expect(s).toMatchObject({
-      schemaVersion: 2,
+      schemaVersion: 3,
       rootSeed: 999,
+      opponentId: 'classic', // 999 % 3 === 0 → the canonical Blues
       currentGame: 1,
       seriesScore: { qld: 0, nsw: 0 },
       games: [],

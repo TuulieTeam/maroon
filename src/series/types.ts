@@ -54,14 +54,20 @@ export interface SeriesGameRecord {
  * reaches two wins; on a drawn series (no side on two after three games) QLD retains as holder.
  */
 export interface SeriesState {
-  schemaVersion: 2
+  schemaVersion: 3
   rootSeed: number
+  /**
+   * Which Blues side this series faces — a `BluesTeamSheet.id`, drawn deterministically from `rootSeed`
+   * at series start and fixed for all three games. The opponent is never picked by the player; it is
+   * persisted so a reload faces the same side and so `playerConditions` resolves the right NSW ids.
+   */
+  opponentId: string
   currentGame: GameNo
   seriesScore: Score
   games: SeriesGameRecord[]
   status: 'in-progress' | 'complete'
   seriesWinner?: Side
-  /** Per-player form + injury (QLD pool + NSW), evolved each club round and persisted. */
+  /** Per-player form + injury (QLD pool + the drawn NSW side), evolved each club round and persisted. */
   playerConditions: ConditionMap
 }
 

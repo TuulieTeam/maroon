@@ -1,4 +1,6 @@
-import type { Player, Position } from './types'
+import type { EdgeThreat, Player, Position } from './types'
+
+export type { EdgeThreat } from './types'
 
 // NSW is the fixed opponent the user does NOT pick — the real 2026 Blues, settled after the
 // Moses calf + McLean quad injuries (Luai in at 6, Koula to left centre, Nawaqanitawase debuts
@@ -216,13 +218,6 @@ export const NSW_LINEUP: Record<Position, Player> = {
     stamina: 78,
     tag: 'rookie',
   },
-}
-
-export interface EdgeThreat {
-  channel: 'LEFT' | 'RIGHT'
-  headline: string
-  detail: string
-  dangerMen: string[]
 }
 
 export const NSW_EDGE_THREATS: EdgeThreat[] = [
