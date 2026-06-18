@@ -1,8 +1,9 @@
 # Maroon — Roadmap & Backlog
 
 Living plan for the game. Origin of this doc: a multi-agent assessment (2026-06-16) that mapped what's
-actually shipped vs the README, then a run of focused features. Pick up any **Deferred** item below —
-each has a why and a starting point.
+actually shipped vs the README, then a run of focused features. Pick up any **Deferred** (near-term
+hygiene + features) or **Vision** (the elite, keep-the-magic-alive bets) item below — each has a why and
+a starting point.
 
 ## Shipped
 
@@ -64,6 +65,42 @@ Paused 2026-06-16 — no committed dates. Roughly highest-leverage first.
 4. **Polish** — expand the 3 "pressure" Gus speeches (`speeches.ts`); replace the stock-Vite
    `README.md`; optionally flip analyst color lines to surnames (`renderColorLine`) to match the callers;
    surface the beaten Blues side + difficulty on the career ledger ("beat the Big Blue Wall on Hard").
+
+## Vision — making it elite (keeping the magic alive year-round)
+
+Added 2026-06-18. The game is an elite *single series*; these are the bets that make it one you can't put
+down between real Origin campaigns. The gap is two things: **cadence** (a reason to come back tomorrow)
+and **the long arc** (a reason a run matters beyond its own shield). These are product bets, not the
+hygiene in the backlog above. Recommended sequence: ship the **Daily** first (small, reuses what's
+built), then commit to the **Dynasty** as the flagship, with the **chase layer** threaded through both.
+
+1. **The Dynasty (north star).** Don't "start a new series" — start the *next year*. Players age, peak,
+   decline, and retire; bolters debut; past results harden into history. You chase your own era — the
+   8-in-a-row is Queensland's holy grail. Turns "I won a shield" into "I'm four years in, Munster just
+   retired, rebuild the spine around a 21-year-old." The deepest retention well; the biggest build.
+   *Fit:* the engine is squad-agnostic and `persist.ts` stores IDs + tallies only, so a per-year
+   age/attribute overlay drops in without save migrations — the **editable-squad seam (deferred #3)
+   evolved into progression**. New state: a multi-season ledger (years, rosters, retirements, your
+   record), generated rookies, and aging curves on the data layer — never frozen into the live save.
+2. **The Daily Origin (off-season ritual + the fast win).** Wordle for Origin: the date seeds the Blues
+   side + venue + an optional twist ("depleted spine", "win from 0–1"); one attempt; a shareable score
+   and a **streak**. *Fit:* reuses the deterministic engine (seed = date) + `bluesForSeed` + the existing
+   `shareCard.ts` almost wholesale — tiny build, high cadence, keeps Origin alive 365 days a year. New
+   state: a daily-result/streak `localStorage` key, a date→seed helper, and a one-shot match (or
+   mini-series) mode alongside the main series.
+3. **The chase layer (texture — threads through both).** What makes a run worth *retelling*:
+   - *Feats* — 3–0 on Hard, win a decider away at Accor, win with no recognised halfback, hold NSW
+     try-less. Derived from results + difficulty + opponent into a persisted badge set; self-imposed
+     reasons to replay differently.
+   - *The iconic moment* — the booth crowns a match's defining play and the career *remembers* it ("the
+     Cobbo try that won the '26 decider"). An engine/broadcast pick + a career field. Cashes in the
+     "iconic moment / cauldron / legacy weight" essence gaps noted in the 2026-06-18 design chat.
+   - *A nemesis* — a Blues danger man who owns you across a series and that you're gunning to shut down
+     next time. Track NSW per-player damage across games.
+4. **Scenarios — "This Day in Origin" (lighter content vein).** Hand-authored historical / what-if
+   challenges with constraints + a win condition ("Wally's Maroons", "the '95 rookies", "down 0–1, win
+   twice"). Plays to the authored-flavour strength and finally cashes in Origin's *history* as content.
+   *Fit:* a scenario is just a pinned setup (seed + roster constraints + goal) the engine already runs.
 
 ## Invariants to protect
 
