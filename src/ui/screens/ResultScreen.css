@@ -3,7 +3,7 @@
 }
 
 .result-broadcast {
-  max-width: 640px;
+  max-width: var(--content-read);
   margin: 16px auto;
 }
 
@@ -11,7 +11,7 @@
   margin: 24px auto 8px;
   padding: 28px;
   border-radius: var(--radius);
-  max-width: 620px;
+  max-width: var(--content-narrow);
   text-align: center;
 }
 
@@ -55,10 +55,8 @@
 .result-fg-note {
   color: var(--text-dim);
   margin-top: 4px;
-  font-size: 0.85rem;
+  font-size: var(--fs-sub);
   font-variant-numeric: tabular-nums;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
   opacity: 0.85;
 }
 
@@ -72,7 +70,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 12px;
-  max-width: 760px;
+  max-width: var(--content-wide);
   margin: 20px auto;
 }
 
@@ -84,9 +82,9 @@
 }
 
 .stat-title {
-  font-size: 0.74rem;
+  font-size: var(--fs-label);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: var(--track-2);
   color: var(--text-faint);
   margin-bottom: 8px;
 }
@@ -108,7 +106,7 @@
 }
 
 .channel-callout {
-  max-width: 620px;
+  max-width: var(--content-narrow);
   margin: 16px auto;
   padding: 14px 18px;
   background: var(--surface-2);
@@ -123,7 +121,7 @@
 }
 
 .potm-card {
-  max-width: 620px;
+  max-width: var(--content-narrow);
   margin: 16px auto;
   padding: 18px 22px;
   border-radius: var(--radius);
@@ -141,9 +139,9 @@
 }
 
 .potm-label {
-  font-size: 0.72rem;
+  font-size: var(--fs-label);
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: var(--track-2);
   color: var(--gold);
 }
 
@@ -159,12 +157,12 @@
 
 .potm-side {
   color: var(--text-dim);
-  font-size: 0.85rem;
+  font-size: var(--fs-sub);
 }
 
 .potm-line {
   margin-top: 8px;
-  font-size: 0.85rem;
+  font-size: var(--fs-sub);
   color: var(--text-dim);
   font-variant-numeric: tabular-nums;
 }
@@ -176,9 +174,10 @@
 
 .player-tables {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  /* 360px floor: cells grew ~15% to the --fs-sub size; overflow-x on .player-table is the net. */
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
   gap: 14px;
-  max-width: 880px;
+  max-width: var(--content-wide);
   margin: 20px auto;
   text-align: left;
 }
@@ -193,7 +192,7 @@
 
 .player-table-title {
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: var(--fs-body);
   margin-bottom: 8px;
 }
 
@@ -213,9 +212,10 @@
 
 .player-table th,
 .player-table td {
-  padding: 3px 6px;
+  padding: 6px 8px;
   text-align: right;
-  font-size: 0.78rem;
+  font-size: var(--fs-sub);
+  line-height: 1.4;
 }
 
 .player-table th {
@@ -235,9 +235,9 @@
 }
 
 .player-table-legend {
-  max-width: 880px;
+  max-width: var(--content-wide);
   margin: -8px auto 0;
-  font-size: 0.74rem;
+  font-size: var(--fs-label);
   color: var(--text-dim);
   line-height: 1.5;
 }

@@ -10,9 +10,9 @@
 }
 
 .share-card-label {
-  font-size: 0.72rem;
+  font-size: var(--fs-label);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: var(--track-2);
   color: var(--text-dim);
 }
 
@@ -26,7 +26,8 @@
   border: 1px solid var(--surface-line);
   color: var(--text);
   font-family: 'SFMono-Regular', 'Consolas', 'Liberation Mono', Menlo, monospace;
-  font-size: 0.86rem;
+  /* Real mono (not VT323) reads fine smaller — but keep it at the fine-print floor. */
+  font-size: var(--fs-fine);
   line-height: 1.5;
   white-space: pre-wrap;
   word-break: break-word;

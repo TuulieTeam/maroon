@@ -18,7 +18,7 @@
 .feat-cabinet-head h2 {
   font-size: 1.05rem;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: var(--track-2);
 }
 
 .feat-cabinet-tally {
@@ -62,16 +62,16 @@
 
 .feat-line {
   margin-top: 3px;
-  font-size: 0.85rem;
+  font-size: var(--fs-sub);
   line-height: 1.4;
   color: var(--text-dim);
 }
 
 .feat-date {
   margin-top: 4px;
-  font-size: 0.72rem;
+  font-size: var(--fs-label);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: var(--track-1);
   color: var(--text-faint);
 }
 
@@ -118,6 +118,6 @@
 
 .feat-toast-body em {
   font-style: normal;
-  font-size: 0.88rem;
+  font-size: var(--fs-sub);
   color: var(--text-dim);
 }
