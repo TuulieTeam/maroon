@@ -166,6 +166,20 @@ Recent feature work:
   Verified live with a seeded archive. Post-launch feat noted in the catalog: **Silenced** (beat a
   returning nemesis while holding him under half his prior damage).
 
+- **The World Ages** (2026-07-06 — Dynasty M3, drop 8) — `src/dynasty/nsw.ts`: NSW identity is
+  **canonical by name** (`nswKey`): a man in multiple Blues sheets ages/retires ONCE, everywhere.
+  Birth years hash each name into its tag band (stable world facts). The off-season runs a
+  fixed-draw NSW pass; retirees are replaced by generated Blues of the same positional shape at
+  92–98% quality (own decorrelated stream, stored verbatim in `overlay.nswReplacements`, chains
+  resolve), so each variant keeps its identity — balance guard: resolved sheets within ±7 of base
+  mean after 12 years. Sheets resolve through the overlay everywhere NSW is read (match setup, live
+  lineups, scouting, matchup, grudge scan, conditions via `NswResolver` on
+  initSeries/applyGameResult/useSeries); scouting danger-man names swap to replacements; the kicker
+  hands over the tee. The nemesis tally now carries **names at fold time** (a generated Blue can be
+  crowned). Sydney's coaching carousel: two straight losses to QLD and their coach walks (off-season
+  "Across the border" section). Year one is byte-identical (replayed in-browser to the exact same
+  match). Old dynasty/coach saves normalise in.
+
 ## Deferred backlog
 
 Paused 2026-06-16 — no committed dates. Roughly highest-leverage first.
