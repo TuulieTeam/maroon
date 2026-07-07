@@ -96,6 +96,28 @@ Recent feature work:
   shape. UI: newsprint-inverted `BackPagePanel` on pre-game + result, `HotSeat` on the hub. All at
   the App boundary; zero engine changes; the Daily stays media-free (arcade).
 
+- **THE DYNASTY, foundation** (2026-07-06 — flagship, drops 3a–3d = plan M0+M1) — `src/dynasty/**` +
+  `src/data/ages.ts` (authored birth years for the QLD 32). **Aging is a resolved roster, not a form
+  delta**: `resolveRoster(base, overlay, year, startYear)` = base minus retirees, attrs = clamp(base
+  + cumulative delta, 30..99), statuses cleared + dynasty notes from year 2 — selection, auto-fill,
+  conditions, storylines, and the engine consume the resolved `Player[]` unchanged (zero engine
+  edits). The overlay (deltas + retired ids) is **stored** under `maroon.dynasty.v1` so history
+  hardens while base-data rebalances still propagate. `runOffseason` is the one deterministic
+  transition (offseasonSeed(dynastySeed, year); fixed 7 draws/player, sorted ids): aging curves
+  (growth ≤25, peak 26–28, decline steepening; speed decays ×1.6, craft grows through 30; bolters
+  burn bright), retirement rising to a hard 100% at 36, **viability-capped in M1** (probabilistic:
+  squad ≥24 + every natural position keeps 2 fits; forced 36+: absolute floor 22 — "goes around one
+  more year" until the M2 rookie class refills the pool). The dynasty ADOPTS the live series as year
+  one (`dynastySeriesSeed(seed, start, start) === seed`), hands each new year its deterministic seed
+  + neutral-start conditions (`initSeries(..., qldPool, neutralStart)`), labels career entries with
+  `year`, and shows the year strip on the hub. `OffseasonScreen`: farewells (authored pools), summer
+  movers, the era line ("Year 2 of the dynasty · 1 shield"). **M0 roster seam**: `squad: Player[]`
+  parameterised through useSquadSelection / SelectionScreen / ClubFormReport /
+  initSeries / applyGameResult / useSeries with behaviour-preserving defaults. The Daily deliberately
+  stays on the base 2026 squad — same challenge for every mate regardless of dynasty year. 310 tests
+  (17 new: determinism twins, aging-shape statistics, no-immortals-above-the-floor, 15-year
+  viability, DCE-retires-first, persist garbage tolerance, roster resolution).
+
 ## Deferred backlog
 
 Paused 2026-06-16 — no committed dates. Roughly highest-leverage first.
