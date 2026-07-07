@@ -85,6 +85,8 @@ button:disabled {
   color: var(--text-dim);
   border: 2px solid var(--surface-line);
   padding: 10px 18px;
+  /* Without an explicit size a button falls back to the UA default (~13px) — below the floor. */
+  font-size: var(--fs-body);
   font-weight: 600;
   box-shadow: 0 3px 0 var(--surface-2);
 }
