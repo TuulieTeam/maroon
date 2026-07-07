@@ -198,6 +198,40 @@ Recent feature work:
   Series), *Silenced* (a returning nemesis who actually ran out, held under half his old damage;
   the resolved sheet's names keep the predicate honest).
 
+- **The Addiction Pass** (2026-07-07 — five drops, post-Legend-Plan retention work from a fresh
+  audit of where freshness runs thin and what blocks the chase loop):
+  1. *Twists 7 → 14* — the MCG exhibition, a QLD gift day, origin-eve chaos, two club call-backs
+     (Dolphins/Cowboys), the four leaders gone, the back five wiped out. Expanding the catalog
+     re-rolls the `% N` twist draw for future dailies and old gauntlet links (accepted — the Daily
+     makes no forward promises, the Gauntlet is ephemeral). `full-deck` reads the catalog length.
+  2. **Scenarios — "This Day in Origin"** (Vision #4, the last unshipped bet) — `src/scenarios/**`:
+     ten hand-authored, PINNED, retryable challenges across four tiers (easy → legendary), each an
+     explicit seed + Blues side + ground + constraint (the twist vocabulary) + a WIN CONDITION
+     beyond winning ("hold NSW under 12", "a rookie scores", "keep them tryless"). Same match every
+     retry — learnable like a puzzle; the only variable is your 19. Conquests persist under
+     `maroon.scenarios.v1` (attempts tick, first conquest write-once). `buildScenarioSetup` is
+     SHARED by App and the tests, and the **winnability guard** proves a reference side passes every
+     pinned seed through the real engine — an unwinnable scenario cannot ship. ScenarioBrowser on
+     the hub, verdict-keyed result screen ("WON — BUT NOT LIKE THAT") with "Run it back", share
+     card, two feats (Off the Script / The Historian).
+  3. *The Chase surface* — `src/feats/nearMiss.ts` scans every judged context for quantifiable
+     almost-theres ("Hamiso: 2 tries — one short of Hat-Trick Hero"); a near-miss REVEALS the locked
+     feat's name (the cabinet silhouette stays ?????). Best-ever approaches persist as an additive
+     `approaches` field on `maroon.feats.v1` (lenient validation, retired on mint). "SO CLOSE" strip
+     on every result screen, THE CHASE hub panel ranks the nearest locked trophies, the cabinet is
+     shelved by category, and once the season is done + today's daily spent the chase surfaces float
+     above the daily panel (`hubSpotlight`) — the hub always names a next deed.
+  4. *The Eight* — `src/dynasty/streak.ts`: the shield streak, with the record book's cruelty (only
+     OUTRIGHT wins extend it; a drawn retain keeps the shield but snaps the run; Casual can't carry
+     a legend — `eraCardLine` and the off-season era line now agree). Hub strip of eight squares
+     filling gold toward the 2006–2013 record. Three retro-mintable long-arc feats close the cabinet
+     at 26: Three-Peat, The Eight, Decade of Origin.
+  5. *Content deepening* — color commentary thin cells to ~20 lines each (JT joins the late drama),
+     pressers 9 → 21 openers + doubled follow-ups, back-page thin kinds to 4 takes, farewells 5 → 12,
+     movers to 6/6, rookie name pools 30×30 → 50×52 and NSW replacements 12×12 → 24×24 (stored
+     classes are verbatim, so shifted draws never rewrite history). Pool floors + no-duplicate
+     guards in `contentPools.test.ts`.
+
 ## Deferred backlog
 
 Paused 2026-06-16 — no committed dates. Roughly highest-leverage first.
@@ -244,10 +278,8 @@ built), then commit to the **Dynasty** as the flagship, with the **chase layer**
      "iconic moment / cauldron / legacy weight" essence gaps noted in the 2026-06-18 design chat.
    - *A nemesis* — a Blues danger man who owns you across a series and that you're gunning to shut down
      next time. Track NSW per-player damage across games.
-4. **Scenarios — "This Day in Origin" (lighter content vein).** Hand-authored historical / what-if
-   challenges with constraints + a win condition ("Wally's Maroons", "the '95 rookies", "down 0–1, win
-   twice"). Plays to the authored-flavour strength and finally cashes in Origin's *history* as content.
-   *Fit:* a scenario is just a pinned setup (seed + roster constraints + goal) the engine already runs.
+4. **Scenarios — "This Day in Origin" — ✅ SHIPPED 2026-07-07** (see the Addiction Pass above).
+   Hand-authored what-if challenges with constraints + a win condition, pinned seeds, retryable.
 
 ## Invariants to protect
 
