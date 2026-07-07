@@ -26,6 +26,10 @@ body {
   -webkit-font-smoothing: antialiased;
   /* A touch more leading — bitmap type benefits from extra breathing room. */
   line-height: 1.5;
+  /* VT323 ships one weight (400): every bolder font-weight was browser-synthesized smear that
+     blurred the bitmap glyphs. Kill weight synthesis only — commentary still relies on synthetic
+     italic and small-caps. Emphasis comes from size steps and colour instead. */
+  font-synthesis-weight: none;
 }
 
 h1,
