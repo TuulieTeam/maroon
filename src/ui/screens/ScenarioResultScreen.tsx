@@ -1,9 +1,10 @@
 import type { MatchResult } from '../../engine'
 import { buildScenarioShareCard } from '../../scenarios'
 import type { ScenarioDef } from '../../scenarios'
-import type { FeatMint } from '../../feats'
+import type { FeatMint, NearMiss } from '../../feats'
 import { BroadcastPanel } from '../components/BroadcastPanel'
 import { FeatToast } from '../components/FeatToast'
+import { NearMissLines } from '../components/NearMissLines'
 import { ShareCard } from '../components/ShareCard'
 import { Wordmark } from '../components/Wordmark'
 import './ResultScreen.css'
@@ -18,6 +19,8 @@ interface ScenarioResultScreenProps {
   /** Completed runs including this one. */
   attempts: number
   featMints?: FeatMint[]
+  /** This run's quantifiable almost-theres — the "so close" tease under the toasts. */
+  nearMisses?: NearMiss[]
   /** Replay the exact same pinned match — the learnable-puzzle loop. */
   onRunBack: () => void
   onContinue: () => void
@@ -35,6 +38,7 @@ export function ScenarioResultScreen({
   detail,
   attempts,
   featMints = [],
+  nearMisses = [],
   onRunBack,
   onContinue,
 }: ScenarioResultScreenProps) {
@@ -67,6 +71,7 @@ export function ScenarioResultScreen({
       </div>
 
       {featMints.length > 0 && <FeatToast mints={featMints} />}
+      <NearMissLines misses={nearMisses} />
 
       {result.iconicMoment && (
         <div className={`iconic-moment ${result.iconicMoment.side.toLowerCase()}`}>

@@ -26,6 +26,29 @@
   font-weight: 800;
 }
 
+.feat-shelf {
+  margin-top: 12px;
+}
+
+.feat-shelf-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.feat-shelf-label {
+  font-size: var(--fs-label);
+  text-transform: uppercase;
+  letter-spacing: var(--track-1);
+  color: var(--text-faint);
+}
+
+.feat-shelf-tally {
+  font-size: var(--fs-label);
+  color: var(--text-dim);
+}
+
 .feat-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));

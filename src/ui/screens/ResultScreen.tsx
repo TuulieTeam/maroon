@@ -2,11 +2,12 @@ import type { Channel } from '../../data/types'
 import type { MatchResult, PlayerStatLine, Side } from '../../engine'
 import { yourEdgeFor, yourEdgePhrase } from '../../engine'
 import type { BackPage, PressExchange } from '../../coach'
-import type { FeatMint } from '../../feats'
+import type { FeatMint, NearMiss } from '../../feats'
 import type { SeriesState } from '../../series'
 import { BackPagePanel, PressConferencePanel } from '../components/BackPagePanel'
 import { BroadcastPanel } from '../components/BroadcastPanel'
 import { FeatToast } from '../components/FeatToast'
+import { NearMissLines } from '../components/NearMissLines'
 import { SeriesScoreboard } from '../components/SeriesScoreboard'
 import { Wordmark } from '../components/Wordmark'
 import './ResultScreen.css'
@@ -18,6 +19,8 @@ interface ResultScreenProps {
   seriesState: SeriesState
   /** Feats earned by this game (and, on a series-ending game, the series) — the toast moment. */
   featMints?: FeatMint[]
+  /** This run's quantifiable almost-theres — the "so close" tease under the toasts. */
+  nearMisses?: NearMiss[]
   /** The morning-after back page — the paper's pre-game position, settled by this result. */
   backPage?: BackPage | null
   /** The coach fronting the press after the game. */
@@ -154,6 +157,7 @@ export function ResultScreen({
   gameLabel,
   seriesState,
   featMints = [],
+  nearMisses = [],
   backPage,
   pressConference = [],
   coachSurname,
@@ -190,6 +194,7 @@ export function ResultScreen({
       </div>
 
       <FeatToast mints={featMints} />
+      <NearMissLines misses={nearMisses} />
 
       <SeriesScoreboard state={seriesState} />
 

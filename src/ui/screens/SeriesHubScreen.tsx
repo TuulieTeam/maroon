@@ -11,6 +11,8 @@ import type { FeatsLedger } from '../../feats'
 import type { ScenarioDef, ScenarioLedger } from '../../scenarios'
 import { DynastyTimeline } from '../components/DynastyTimeline'
 import { ScenarioBrowser } from '../components/ScenarioBrowser'
+import { TheChase } from '../components/TheChase'
+import { hubSpotlight } from '../hubOrder'
 import { SeriesScoreboard } from '../components/SeriesScoreboard'
 import { ClubFormReport } from '../components/ClubFormReport'
 import { ShareCard } from '../components/ShareCard'
@@ -104,6 +106,15 @@ export function SeriesHubScreen({
         stakesLabel: STAKES_SHORT[currentContext.stakes],
       }
 
+  // Once the season is done and today's daily is spent, the chase surfaces lead the hub.
+  const spotlight = hubSpotlight(state.status, daily.todayRecord != null)
+  const chaseBlock = (
+    <>
+      <TheChase ledger={featsLedger} />
+      <ScenarioBrowser ledger={scenarioLedger} onPlay={onPlayScenario} />
+    </>
+  )
+
   return (
     <div className="app-shell hub-screen">
       <Wordmark sub={`${dynasty.currentYear} season`} />
@@ -167,6 +178,8 @@ export function SeriesHubScreen({
         </div>
       )}
 
+      {spotlight === 'chase' && chaseBlock}
+
       <DailyPanel
         challenge={daily.challenge}
         todayRecord={daily.todayRecord}
@@ -179,7 +192,7 @@ export function SeriesHubScreen({
 
       <FeatCabinet ledger={featsLedger} />
 
-      <ScenarioBrowser ledger={scenarioLedger} onPlay={onPlayScenario} />
+      {spotlight === 'campaign' && chaseBlock}
 
       <CareerLedger summary={careerSummary} />
 

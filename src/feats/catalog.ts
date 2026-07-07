@@ -30,6 +30,7 @@ export const FEATS: FeatDef[] = [
   // ---- Series shape ----
   {
     id: 'queenslander',
+    category: 'series',
     name: 'Queenslander',
     flavour: 'Your first shield. They can never take it off you.',
     hint: 'Win a series.',
@@ -39,6 +40,7 @@ export const FEATS: FeatDef[] = [
   },
   {
     id: 'the-sweep',
+    category: 'series',
     name: 'The Sweep',
     flavour: 'Three games, three wins. Not a crumb left for them.',
     hint: 'Win a series 3-0.',
@@ -51,6 +53,7 @@ export const FEATS: FeatDef[] = [
   },
   {
     id: 'decider-football',
+    category: 'series',
     name: 'Decider Football',
     flavour: 'All square, one game for the shield — and your men stood up.',
     hint: 'Win a live game 3 with the series undecided.',
@@ -59,6 +62,7 @@ export const FEATS: FeatDef[] = [
   },
   {
     id: 'road-warrior',
+    category: 'series',
     name: 'Road Warrior',
     flavour: 'Sydney and Melbourne, both silenced in one series.',
     hint: 'Win both away games in a single series.',
@@ -71,6 +75,7 @@ export const FEATS: FeatDef[] = [
   },
   {
     id: 'the-comeback',
+    category: 'series',
     name: 'The Comeback',
     flavour: 'They had the jump. You had the last word.',
     hint: 'Lose game 1, win the series.',
@@ -83,6 +88,7 @@ export const FEATS: FeatDef[] = [
   },
   {
     id: 'held-the-line',
+    category: 'series',
     name: 'Held the Line',
     flavour: 'Nobody won it. Queensland kept it. That is the rule.',
     hint: 'Retain the shield in a drawn series.',
@@ -97,6 +103,7 @@ export const FEATS: FeatDef[] = [
   // ---- The difficulty chase ----
   {
     id: 'hard-yards',
+    category: 'difficulty',
     name: 'Hard Yards',
     flavour: 'The Blues at their most ruthless, and you still took it home.',
     hint: 'Win a series on Hard.',
@@ -106,6 +113,7 @@ export const FEATS: FeatDef[] = [
   },
   {
     id: 'the-immortals',
+    category: 'difficulty',
     name: 'The Immortals',
     flavour: '3-0 on Hard. Frame it.',
     hint: 'Sweep a series 3-0 on Hard.',
@@ -120,6 +128,7 @@ export const FEATS: FeatDef[] = [
   // ---- The Blues variants ----
   {
     id: 'wall-breaker',
+    category: 'blues',
     name: 'Wall Breaker',
     flavour: 'The Big Blue Wall came to grind. You went through it.',
     hint: 'Beat the middle-bashing Blues pack.',
@@ -132,6 +141,7 @@ export const FEATS: FeatDef[] = [
   },
   {
     id: 'seen-em-all',
+    category: 'blues',
     name: "Seen 'Em All",
     flavour: 'Every shape they threw at you, beaten.',
     hint: 'Beat all three Blues sides across your career.',
@@ -152,6 +162,7 @@ export const FEATS: FeatDef[] = [
   // ---- Single-match stat lines (repeatable — the count is the brag) ----
   {
     id: 'tryless',
+    category: 'match',
     name: 'Tryless',
     flavour: 'Eighty minutes, and New South Wales never crossed. Defence wins Origins.',
     hint: 'Win while holding NSW to zero tries.',
@@ -165,6 +176,7 @@ export const FEATS: FeatDef[] = [
   },
   {
     id: 'hat-trick-hero',
+    category: 'match',
     name: 'Hat-Trick Hero',
     flavour: 'Three for one man. The kind of night statues get built for.',
     hint: 'A Queenslander scores a hat-trick.',
@@ -178,6 +190,7 @@ export const FEATS: FeatDef[] = [
   },
   {
     id: 'one-point-in-it',
+    category: 'match',
     name: 'One Point In It',
     flavour: 'A single point, off a boot, with the whole state holding its breath.',
     hint: 'Win by exactly one with a QLD field goal in the game.',
@@ -192,6 +205,7 @@ export const FEATS: FeatDef[] = [
   },
   {
     id: 'demolition',
+    category: 'match',
     name: 'Demolition',
     flavour: 'That was not a football match. That was a statement.',
     hint: 'Win a game by 30 or more.',
@@ -205,6 +219,7 @@ export const FEATS: FeatDef[] = [
   },
   {
     id: 'no-recognised-halfback',
+    category: 'match',
     name: 'No Recognised Halfback',
     flavour: 'No specialist No.7 anywhere in the 19 — and it did not matter.',
     hint: 'Win without a natural halfback on the team sheet.',
@@ -219,6 +234,7 @@ export const FEATS: FeatDef[] = [
   // ---- The coach's chase (live judgements only — these read state the archive never stored) ----
   {
     id: 'survived-the-siege',
+    category: 'coach',
     name: 'Survived the Siege',
     flavour: 'They were writing the succession pieces. You handed the board a shield instead.',
     hint: 'Win a series while the coach is Under Siege.',
@@ -231,6 +247,7 @@ export const FEATS: FeatDef[] = [
   },
   {
     id: 'faith-rewarded',
+    category: 'coach',
     name: 'Faith Rewarded',
     flavour: 'The papers savaged the pick. He answered with a Player of the Series medal.',
     hint: 'A selection the media questioned wins Player of the Series (in a won series).',
@@ -244,6 +261,7 @@ export const FEATS: FeatDef[] = [
   },
   {
     id: 'silenced',
+    category: 'coach',
     name: 'Silenced',
     flavour: 'He owned you last time. This series he barely touched the ball. Grudge settled.',
     hint: 'Beat a returning nemesis while holding him under half his old damage.',
@@ -269,6 +287,7 @@ export const FEATS: FeatDef[] = [
   // ---- The Daily ----
   {
     id: 'magnificent-seven',
+    category: 'daily',
     name: 'Magnificent Seven',
     flavour: 'Seven days, seven wins. The Daily bows to you.',
     hint: 'Build a 7-day Daily win streak.',
@@ -277,6 +296,7 @@ export const FEATS: FeatDef[] = [
   },
   {
     id: 'cauldron-silencer',
+    category: 'daily',
     name: 'Cauldron Silencer',
     flavour: '80,000 of them booing, and you sent every one of them home flat.',
     hint: 'Win a Hostile Cauldron daily.',
@@ -285,6 +305,7 @@ export const FEATS: FeatDef[] = [
   },
   {
     id: 'full-deck',
+    category: 'daily',
     name: 'Full Deck',
     flavour: 'Depleted, hostile, short-turnaround — every twist beaten at least once.',
     hint: 'Win a Daily under every twist.',
@@ -300,6 +321,7 @@ export const FEATS: FeatDef[] = [
   // ---- This Day in Origin ----
   {
     id: 'off-the-script',
+    category: 'scenario',
     name: 'Off the Script',
     flavour: 'History asked its question and you answered it. The first page is yours.',
     hint: 'Conquer your first This Day in Origin scenario.',
@@ -308,6 +330,7 @@ export const FEATS: FeatDef[] = [
   },
   {
     id: 'the-historian',
+    category: 'scenario',
     name: 'The Historian',
     flavour: 'Every day Origin ever asked of Queensland, answered by your teams.',
     hint: 'Conquer every scenario in the library.',

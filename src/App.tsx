@@ -12,7 +12,7 @@ import { useDaily } from './daily/useDaily'
 import { dynastySeriesSeed, eraCardLine } from './dynasty'
 import type { OffseasonReport } from './dynasty'
 import { useDynasty } from './dynasty/useDynasty'
-import type { FeatMint } from './feats'
+import type { FeatMint, NearMiss } from './feats'
 import { useFeats } from './feats/useFeats'
 import { buildScenarioSetup, scenarioChallenge } from './scenarios'
 import type { ScenarioDef } from './scenarios'
@@ -188,6 +188,8 @@ export default function App() {
   // bragged on the share card. Cleared at the next kickoff; a reload clears it too (the cabinet
   // remembers forever; the toast is a moment).
   const [recentMints, setRecentMints] = useState<FeatMint[]>([])
+  // This run's "so close" lines — shown under the toasts, best-ever fold lives in the feats ledger.
+  const [recentNearMisses, setRecentNearMisses] = useState<NearMiss[]>([])
 
   // ---- The Back Page — the media reacts to the coach's calls (series games only; the Daily is
   // arcade, the papers don't cover it). Derived at lock-in, settled at full time. ----
@@ -207,7 +209,7 @@ export default function App() {
   const judgeCompletedSeries = useCallback(
     (completed: SeriesState, mvpId: string | null) => {
       if (completed.status !== 'complete' || !completed.seriesWinner) return
-      const mints = feats.evaluate(
+      const { mints, misses } = feats.judge(
         {
           kind: 'series',
           completed,
@@ -220,6 +222,7 @@ export default function App() {
         todayKey,
       )
       if (mints.length > 0) setRecentMints((prev) => [...prev, ...mints])
+      if (misses.length > 0) setRecentNearMisses((prev) => [...prev, ...misses])
       coach.seriesHeat(completed)
     },
     [feats, todayKey, coach, underFireIds, dynasty],
@@ -256,6 +259,7 @@ export default function App() {
       setPlayingGame(game)
       recordedGameRef.current = null
       setRecentMints([])
+      setRecentNearMisses([])
       // The papers react to the team sheet the moment it drops — the boldest call gets the splash.
       const seed = gameSeed(state.rootSeed, game)
       const derived = deriveStorylines({
@@ -311,11 +315,12 @@ export default function App() {
       setUsedSpeechTitles((prev) => [...prev, result.broadcast.preMatchSpeech.title])
       // Judge the single-match feats while the stats + the locked 19 are in hand, then — because
       // applyGameResult is pure — fold the game locally to see if this one ended the series.
-      const mints = feats.evaluate(
+      const { mints, misses } = feats.judge(
         { kind: 'match', result, team: lockedTeam, difficulty: state.difficulty ?? 'origin' },
         todayKey,
       )
       if (mints.length > 0) setRecentMints((prev) => [...prev, ...mints])
+      if (misses.length > 0) setRecentNearMisses((prev) => [...prev, ...misses])
       // The morning-after verdict: the paper's position, settled by the result — and the hot seat
       // moves with it. Series heat (if this game ended it) lands inside judgeCompletedSeries.
       if (prePage) {
@@ -353,6 +358,7 @@ export default function App() {
       setDailyTeam(team)
       recordedDailyRef.current = null
       setRecentMints([])
+      setRecentNearMisses([])
       setDailyResult(simulateMatch(setup, seed))
       setPhase('daily-pregame')
     },
@@ -375,11 +381,12 @@ export default function App() {
       // Judge the daily feats against the ledger AS IT WILL BE once the record lands (the hook's
       // state update is async, so fold it locally for the judgement).
       const nextLedger = recordDaily(daily.ledger, record)
-      const mints = feats.evaluate(
+      const { mints, misses } = feats.judge(
         { kind: 'daily', record, summary: summariseDaily(nextLedger, todayKey), ledger: nextLedger },
         record.dateKey,
       )
       if (mints.length > 0) setRecentMints((prev) => [...prev, ...mints])
+      if (misses.length > 0) setRecentNearMisses((prev) => [...prev, ...misses])
     }
     setPhase('daily-result')
   }, [dailyResult, daily, feats, todayKey])
@@ -392,6 +399,7 @@ export default function App() {
       setScenarioOutcome(null)
       recordedScenarioRef.current = false
       setRecentMints([])
+      setRecentNearMisses([])
       setScenarioResult(simulateMatch(buildScenarioSetup(activeScenario, team), activeScenario.seed))
       setPhase('scenario-pregame')
     },
@@ -409,11 +417,12 @@ export default function App() {
       // Judge the scenario feats against the ledger AS IT WILL BE once the run lands (the hook's
       // ref makes the fold synchronous — the handleDailyComplete pattern).
       const nextLedger = scenarios.record(activeScenario.id, passed, todayKey, detail)
-      const mints = feats.evaluate(
+      const { mints, misses } = feats.judge(
         { kind: 'scenario', scenarioId: activeScenario.id, passed, ledger: nextLedger },
         todayKey,
       )
       if (mints.length > 0) setRecentMints((prev) => [...prev, ...mints])
+      if (misses.length > 0) setRecentNearMisses((prev) => [...prev, ...misses])
     }
     setPhase('scenario-result')
   }, [activeScenario, scenarioResult, scenarioTeam, scenarios, feats, todayKey])
@@ -586,6 +595,7 @@ export default function App() {
         detail={scenarioOutcome.detail}
         attempts={scenarios.ledger.entries[activeScenario.id]?.attempts ?? 1}
         featMints={recentMints}
+        nearMisses={recentNearMisses}
         onRunBack={handleScenarioRetry}
         onContinue={exitScenario}
       />
@@ -636,6 +646,7 @@ export default function App() {
         record={daily.todayRecord}
         summary={daily.summary}
         featMints={recentMints}
+        nearMisses={recentNearMisses}
         onContinue={() => setPhase('hub')}
       />
     )
@@ -695,6 +706,7 @@ export default function App() {
         gameLabel={originLabel(playingGame)}
         seriesState={state}
         featMints={recentMints}
+        nearMisses={recentNearMisses}
         backPage={postPage}
         pressConference={presser}
         coachSurname={coach.coach.surname}

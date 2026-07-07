@@ -1,4 +1,4 @@
-import type { EarnedFeat, FeatsLedger } from './types'
+import type { EarnedFeat, FeatApproach, FeatsLedger } from './types'
 import { EMPTY_FEATS_LEDGER, FEATS_SCHEMA_VERSION } from './types'
 
 /** Trophy cabinet key — independent of the series/career/daily saves. A career wipe never melts
@@ -11,10 +11,41 @@ export function loadFeats(): FeatsLedger {
     const raw = localStorage.getItem(FEATS_KEY)
     if (!raw) return EMPTY_FEATS_LEDGER
     const parsed: unknown = JSON.parse(raw)
-    return isValidLedger(parsed) ? parsed : EMPTY_FEATS_LEDGER
+    return isValidLedger(parsed) ? sanitizeApproaches(parsed) : EMPTY_FEATS_LEDGER
   } catch {
     return EMPTY_FEATS_LEDGER
   }
+}
+
+/**
+ * The `approaches` field is additive + optional: a malformed one is DROPPED (the trophies stay),
+ * never a reason to melt the whole cabinet. Lenient on purpose — pre-chase builds ignore it too.
+ */
+function sanitizeApproaches(ledger: FeatsLedger): FeatsLedger {
+  const raw = (ledger as { approaches?: unknown }).approaches
+  if (raw === undefined) return ledger
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+    const rest = { ...ledger }
+    delete rest.approaches
+    return rest
+  }
+  const clean: Record<string, FeatApproach> = {}
+  for (const [id, v] of Object.entries(raw as Record<string, unknown>)) {
+    if (isApproach(v)) clean[id] = v
+  }
+  return { ...ledger, approaches: clean }
+}
+
+function isApproach(v: unknown): v is FeatApproach {
+  if (!v || typeof v !== 'object') return false
+  const a = v as Record<string, unknown>
+  return (
+    typeof a.date === 'string' &&
+    typeof a.line === 'string' &&
+    typeof a.closeness === 'number' &&
+    a.closeness >= 0 &&
+    a.closeness <= 1
+  )
 }
 
 export function saveFeats(ledger: FeatsLedger): void {

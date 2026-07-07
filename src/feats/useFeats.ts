@@ -3,12 +3,19 @@ import { loadDaily } from '../daily'
 import { loadCareer } from '../series'
 import { retroMint, evaluateFeats } from './evaluate'
 import { loadFeats, saveFeats } from './featsPersist'
+import { nearMisses } from './nearMiss'
+import type { NearMiss } from './nearMiss'
 import type { FeatContext, FeatMint, FeatsLedger } from './types'
 
 export interface UseFeats {
   ledger: FeatsLedger
   /** Judge a context now; persists any earns and returns the mints for the toast/share line. */
   evaluate: (ctx: FeatContext, dateKey: string) => FeatMint[]
+  /** Fold this run's near-misses into the best-ever approach book (facts only, best per feat). */
+  recordApproaches: (misses: NearMiss[], dateKey: string) => void
+  /** The full judgement: evaluate, then scan the same context for near-misses against the
+   *  POST-MINT ledger (a feat you just earned never teases) and remember the best approaches. */
+  judge: (ctx: FeatContext, dateKey: string) => { mints: FeatMint[]; misses: NearMiss[] }
 }
 
 /**
@@ -38,7 +45,19 @@ export function useFeats(todayKey: string): UseFeats {
   }, [todayKey])
 
   const evaluate = useCallback((ctx: FeatContext, dateKey: string): FeatMint[] => {
-    const r = evaluateFeats(ctx, ledgerRef.current, dateKey)
+    let r = evaluateFeats(ctx, ledgerRef.current, dateKey)
+    // A mint retires its approach entry — the chase is over, the trophy is in the cabinet.
+    if (r.mints.length > 0 && r.ledger.approaches) {
+      const approaches = { ...r.ledger.approaches }
+      let changed = false
+      for (const m of r.mints) {
+        if (approaches[m.def.id]) {
+          delete approaches[m.def.id]
+          changed = true
+        }
+      }
+      if (changed) r = { ...r, ledger: { ...r.ledger, approaches } }
+    }
     if (r.ledger !== ledgerRef.current) {
       ledgerRef.current = r.ledger
       saveFeats(r.ledger)
@@ -47,5 +66,35 @@ export function useFeats(todayKey: string): UseFeats {
     return r.mints
   }, [])
 
-  return { ledger, evaluate }
+  const recordApproaches = useCallback((misses: NearMiss[], dateKey: string) => {
+    if (misses.length === 0) return
+    const prior = ledgerRef.current.approaches ?? {}
+    const approaches = { ...prior }
+    let changed = false
+    for (const m of misses) {
+      if (ledgerRef.current.earned[m.featId]) continue
+      const best = approaches[m.featId]
+      if (!best || m.closeness > best.closeness) {
+        approaches[m.featId] = { date: dateKey, line: m.line, closeness: m.closeness }
+        changed = true
+      }
+    }
+    if (!changed) return
+    const next = { ...ledgerRef.current, approaches }
+    ledgerRef.current = next
+    saveFeats(next)
+    setLedger(next)
+  }, [])
+
+  const judge = useCallback(
+    (ctx: FeatContext, dateKey: string): { mints: FeatMint[]; misses: NearMiss[] } => {
+      const mints = evaluate(ctx, dateKey)
+      const misses = nearMisses(ctx, ledgerRef.current)
+      recordApproaches(misses, dateKey)
+      return { mints, misses }
+    },
+    [evaluate, recordApproaches],
+  )
+
+  return { ledger, evaluate, recordApproaches, judge }
 }

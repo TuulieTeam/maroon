@@ -1,0 +1,52 @@
+/* The Chase — the hub's "what now": the locked trophies you're closest to. */
+
+.the-chase {
+  border: 1px solid var(--gold);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--pixel-shadow);
+  padding: 14px 16px;
+}
+
+.the-chase h2 {
+  font-size: 1.05rem;
+  text-transform: uppercase;
+  letter-spacing: var(--track-2);
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+
+.chase-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chase-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border: 1px solid var(--surface-line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  padding: 8px 12px;
+}
+
+.chase-name {
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  color: var(--gold);
+}
+
+.chase-hint {
+  font-size: var(--fs-sub);
+  color: var(--text-dim);
+}
+
+.chase-closest {
+  font-size: var(--fs-label);
+  color: var(--text-faint);
+}

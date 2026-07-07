@@ -66,6 +66,9 @@ export type FeatContext =
 
 export type FeatScope = FeatContext['kind']
 
+/** Cabinet shelf a feat sits on — pure display metadata, never persisted. */
+export type FeatCategory = 'series' | 'difficulty' | 'blues' | 'match' | 'coach' | 'daily' | 'scenario' | 'dynasty'
+
 export interface FeatDef {
   /** Stable id persisted in the feats ledger. Never reuse or rename a shipped id. */
   id: string
@@ -77,6 +80,8 @@ export interface FeatDef {
   hint: string
   /** Which context this feat is judged in. */
   scope: FeatScope
+  /** Which cabinet shelf it sits on. */
+  category: FeatCategory
   /** Repeatable feats tick a count ("Tryless ×4"); one-shot feats mint once and lock in. */
   repeatable?: boolean
   /**
@@ -96,9 +101,22 @@ export interface EarnedFeat {
 
 export const FEATS_SCHEMA_VERSION = 1
 
+/** The best-ever recorded approach to a still-locked feat — the "so close" the hub can rank. */
+export interface FeatApproach {
+  /** Local date key of the closest run, e.g. "2026-07-06". */
+  date: string
+  /** The rendered near-miss line, e.g. "Won by 26 — Demolition needs 30". */
+  line: string
+  /** 0..1 — how close it came; ranks the chase panel. */
+  closeness: number
+}
+
 export interface FeatsLedger {
   schemaVersion: typeof FEATS_SCHEMA_VERSION
   earned: Record<string, EarnedFeat>
+  /** Best approach per LOCKED feat. Additive + optional — pre-chase saves simply lack it, and an
+   *  entry is deleted the moment its feat finally mints. Facts only, never thresholds. */
+  approaches?: Record<string, FeatApproach>
 }
 
 export const EMPTY_FEATS_LEDGER: FeatsLedger = { schemaVersion: FEATS_SCHEMA_VERSION, earned: {} }

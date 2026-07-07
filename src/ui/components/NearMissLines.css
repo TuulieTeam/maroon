@@ -1,0 +1,22 @@
+/* The "so close" strip — a tease, not a trophy, so it sits quieter than the gold toast. */
+
+.near-miss-block {
+  border: 1px dashed var(--gold);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 10px 14px;
+}
+
+.near-miss-label {
+  font-size: var(--fs-label);
+  text-transform: uppercase;
+  letter-spacing: var(--track-1);
+  color: var(--gold);
+  margin-bottom: 4px;
+}
+
+.near-miss-line {
+  font-size: var(--fs-sub);
+  color: var(--text);
+  line-height: 1.5;
+}

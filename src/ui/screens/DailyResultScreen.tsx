@@ -1,9 +1,10 @@
 import type { MatchResult } from '../../engine'
 import { buildDailyShareCard, buildGauntletShareCard, challengeFromSeed, dailySeed, formatDateKey, twistById } from '../../daily'
 import type { DailyRecord, DailySummary } from '../../daily'
-import type { FeatMint } from '../../feats'
+import type { FeatMint, NearMiss } from '../../feats'
 import { BroadcastPanel } from '../components/BroadcastPanel'
 import { FeatToast } from '../components/FeatToast'
+import { NearMissLines } from '../components/NearMissLines'
 import { ShareCard } from '../components/ShareCard'
 import { Wordmark } from '../components/Wordmark'
 import './ResultScreen.css'
@@ -17,6 +18,8 @@ interface DailyResultScreenProps {
   summary: DailySummary
   /** Feats earned by this daily — the toast moment; first earns also land on the share card. */
   featMints?: FeatMint[]
+  /** This run's quantifiable almost-theres — the "so close" tease under the toasts. */
+  nearMisses?: NearMiss[]
   onContinue: () => void
 }
 
@@ -51,7 +54,7 @@ function streakLine(summary: DailySummary, won: boolean): string {
  * that brings you back: today's verdict, what it did to the streak, the copyable brag, and the door
  * back to the hub (where the countdown to tomorrow's Daily is already running).
  */
-export function DailyResultScreen({ result, record, summary, featMints = [], onContinue }: DailyResultScreenProps) {
+export function DailyResultScreen({ result, record, summary, featMints = [], nearMisses = [], onContinue }: DailyResultScreenProps) {
   const v = verdict(result)
   const twist = twistById(record.twistId)
   const potm = result.playerOfMatch
@@ -82,6 +85,7 @@ export function DailyResultScreen({ result, record, summary, featMints = [], onC
       </div>
 
       <FeatToast mints={featMints} />
+      <NearMissLines misses={nearMisses} />
 
       {result.iconicMoment && (
         <div className={`iconic-moment ${result.iconicMoment.side.toLowerCase()}`}>
