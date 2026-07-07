@@ -19,7 +19,7 @@
 
 .live-stats-head .ls-team {
   font-weight: 800;
-  font-size: 0.8rem;
+  font-size: var(--fs-label);
 }
 
 .live-stats-head .ls-team.q {
@@ -55,7 +55,7 @@
 
 .live-stat-row .ls-title {
   text-align: center;
-  font-size: 0.78rem;
+  font-size: var(--fs-label);
   color: var(--text-dim);
   padding: 0 8px;
 }

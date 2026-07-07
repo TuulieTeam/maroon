@@ -72,9 +72,9 @@
 }
 
 .clock-half {
-  font-size: 0.72rem;
+  font-size: var(--fs-label);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: var(--track-2);
   color: var(--text-dim);
 }
 
@@ -83,7 +83,7 @@
   justify-content: center;
   gap: 16px;
   margin-top: 10px;
-  font-size: 0.8rem;
+  font-size: var(--fs-sub);
   color: var(--text-dim);
 }
 

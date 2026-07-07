@@ -29,7 +29,7 @@
   border-radius: 999px;
   background: var(--maroon-deep);
   color: var(--gold);
-  font-size: 0.8rem;
+  font-size: var(--fs-label);
   font-weight: 700;
   letter-spacing: 0.02em;
   cursor: pointer;
@@ -44,7 +44,7 @@
   padding: 9px 16px;
   border-bottom: 1px solid rgba(69, 25, 42, 0.4);
   display: grid;
-  grid-template-columns: 42px 1fr;
+  grid-template-columns: 46px 1fr;
   gap: 12px;
   align-items: baseline;
   animation: feed-in 0.25s ease;
@@ -63,23 +63,27 @@
 
 .commentary-minute {
   color: var(--text-dim);
-  font-size: 0.85rem;
+  font-size: var(--fs-sub);
   font-variant-numeric: tabular-nums;
 }
 
 .commentary-text {
-  font-size: 1.05rem;
+  /* The core reading surface of the whole game — comfortable long-form size and an honest
+     measure (~60ch) even when the feed column runs wide. */
+  font-size: var(--fs-read);
+  line-height: 1.5;
+  max-width: 60ch;
 }
 
 .commentary-line.try-qld {
   background: rgba(106, 15, 43, 0.65);
   border-left: 4px solid var(--gold);
 }
+/* Tries stay loud via colour + the tinted row — but in sentence case: full uppercase
+   SENTENCES are VT323's hardest rendering mode. */
 .commentary-line.try-qld .commentary-text {
   color: var(--gold);
   font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
 }
 
 .commentary-line.try-nsw {
@@ -108,9 +112,8 @@
   border-bottom: 1px solid var(--surface-line);
 }
 .commentary-line.major .commentary-text {
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-weight: 800;
+  /* Weight synthesis is off (single-weight font) — a size step marks the big moment instead. */
+  font-size: 1.3rem;
   color: var(--text);
 }
 

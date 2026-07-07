@@ -12,9 +12,9 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.72rem;
+  font-size: var(--fs-label);
   font-weight: 800;
-  letter-spacing: 0.08em;
+  letter-spacing: var(--track-2);
   text-transform: uppercase;
   color: var(--gold);
   border: 1px solid var(--gold);
@@ -46,16 +46,16 @@
 }
 
 .live-kicker {
-  font-size: 0.82rem;
+  font-size: var(--fs-sub);
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: var(--track-1);
   color: var(--text);
 }
 
 .live-stakes {
-  font-size: 0.74rem;
+  font-size: var(--fs-label);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: var(--track-1);
   font-weight: 700;
   color: var(--gold);
 }
@@ -81,7 +81,7 @@
 }
 
 .speed-group .label {
-  font-size: 0.78rem;
+  font-size: var(--fs-label);
   color: var(--text-faint);
 }
 
@@ -92,7 +92,7 @@
   padding: 9px 14px;
   min-height: 36px;
   font-weight: 700;
-  font-size: 0.82rem;
+  font-size: var(--fs-sub);
 }
 
 .speed-btn.active {
@@ -140,7 +140,7 @@
 
 .halftime-modal {
   width: 100%;
-  max-width: 640px;
+  max-width: var(--content-read);
   max-height: 88vh;
   overflow-y: auto;
   display: flex;
