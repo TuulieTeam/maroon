@@ -118,6 +118,18 @@ Recent feature work:
   (17 new: determinism twins, aging-shape statistics, no-immortals-above-the-floor, 15-year
   viability, DCE-retires-first, persist garbage tolerance, roster resolution).
 
+- **The Moment** (2026-07-06 — chase layer, drop 4) — `src/engine/iconicMoment.ts`: the plan's ONE
+  deliberate engine touch, a pure **zero-rng post-hoc scan** of the completed events array inside
+  `simulateMatch` (play stream byte-identical, determinism-pinned). Priority ladder: last-ten field
+  goal dagger in a one-score game → the last lead-taking try the winner never trailed after
+  (conversion-led leads crown their try) → the second-half back-breaker in wire-to-wire blowouts →
+  the POTM's best play (draws included). Crowned regardless of side. `result.iconicMoment` + Thommo
+  closes every post-game wrap with the rendered line (seed×minute arithmetic pick; postGame band pin
+  5→6). Result screens show the ⭐ Moment card; the career archives **one frozen line per series** —
+  the shield-deciding game's (`decidingGame()` in `summary.ts`) — onto `LedgerEntry.iconicMoment`,
+  surfaced as epigraphs on the hub's career ledger with year/decider tags. Scarcity is deliberate:
+  one remembered moment per series is what makes it legend.
+
 ## Deferred backlog
 
 Paused 2026-06-16 — no committed dates. Roughly highest-leverage first.
