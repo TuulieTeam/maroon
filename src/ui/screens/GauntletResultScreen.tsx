@@ -3,6 +3,7 @@ import { buildGauntletShareCard } from '../../daily'
 import type { DailyChallenge } from '../../daily'
 import { BroadcastPanel } from '../components/BroadcastPanel'
 import { ShareCard } from '../components/ShareCard'
+import { Wordmark } from '../components/Wordmark'
 import './ResultScreen.css'
 import './DailyScreens.css'
 
@@ -22,6 +23,7 @@ export function GauntletResultScreen({ result, challenge, onContinue }: Gauntlet
   const drew = result.winner === 'DRAW'
   return (
     <div className="app-shell result-screen">
+      <Wordmark sub="The Gauntlet" />
       <div className={`result-banner ${won ? 'win' : drew ? 'draw' : 'loss'}`}>
         <h1 className="result-verdict">{won ? 'GAUNTLET ANSWERED' : drew ? 'HONOURS EVEN' : 'GAUNTLET DROPPED'}</h1>
         <div className="result-final-score">

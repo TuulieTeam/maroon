@@ -1,0 +1,33 @@
+/* Compact persistent wordmark — a single quiet gold line so every screen shares the brand
+   without a hero title stealing vertical space. NOT a cabinet panel (it's type, not hardware),
+   so it is deliberately absent from the .app-shell chrome selector list in global.css. */
+.wordmark {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.wordmark-name {
+  font-size: 1.1rem;
+  color: var(--gold);
+  letter-spacing: var(--track-1);
+  text-shadow: 1px 1px 0 var(--maroon-deep);
+}
+
+.wordmark-sub {
+  font-size: var(--fs-label);
+  color: var(--text-faint);
+}
+
+/* Prefix the sub with a dot separator so it reads as one line: MAROON · Origin II. */
+.wordmark-sub::before {
+  content: '· ';
+}
+
+/* On the Live screen the wordmark shares the .live-strip row with the LIVE pill + kicker, so it
+   carries no bottom margin there — the strip owns the spacing. */
+.live-strip .wordmark {
+  margin-bottom: 0;
+  margin-right: 4px;
+}

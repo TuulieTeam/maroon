@@ -6,6 +6,7 @@ import { CommentaryFeed } from '../components/CommentaryFeed'
 import { ActiveTeamPanel } from '../components/ActiveTeamPanel'
 import { LiveStatsPanel } from '../components/LiveStatsPanel'
 import { BroadcastPanel } from '../components/BroadcastPanel'
+import { Wordmark } from '../components/Wordmark'
 import { useMatchPlayback } from '../hooks/useMatchPlayback'
 import type { PlaybackSpeed } from '../hooks/useMatchPlayback'
 import './LiveMatchScreen.css'
@@ -105,6 +106,7 @@ export function LiveMatchScreen({
       )}
 
       <div className="live-strip">
+        <Wordmark />
         <span className={`live-pill ${playback.done ? 'is-fulltime' : ''}`}>
           {playback.done ? 'FULL TIME' : 'LIVE'}
         </span>

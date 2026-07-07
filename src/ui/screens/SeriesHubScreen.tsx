@@ -16,6 +16,7 @@ import { CareerLedger } from '../components/CareerLedger'
 import { DailyPanel } from '../components/DailyPanel'
 import { FeatCabinet } from '../components/FeatCabinet'
 import { HotSeat } from '../components/HotSeat'
+import { Wordmark } from '../components/Wordmark'
 import { STAKES_SHORT } from '../seriesStakes'
 import './SeriesHubScreen.css'
 
@@ -98,6 +99,7 @@ export function SeriesHubScreen({
 
   return (
     <div className="app-shell hub-screen">
+      <Wordmark sub={`${dynasty.currentYear} season`} />
       <header className="hub-header">
         <p className="hub-kicker">{complete ? 'Series Complete' : 'State of Origin Series'}</p>
         <h1

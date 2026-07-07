@@ -3,6 +3,7 @@ import type { MatchResult } from '../../engine'
 import { BackPagePanel } from '../components/BackPagePanel'
 import { BroadcastPanel } from '../components/BroadcastPanel'
 import { GusSpeech } from '../components/GusSpeech'
+import { Wordmark } from '../components/Wordmark'
 import './PreGameScreen.css'
 
 interface PreGameScreenProps {
@@ -19,6 +20,7 @@ interface PreGameScreenProps {
 export function PreGameScreen({ result, gameLabel, venueName, stakesLabel, backPage, onKickOff }: PreGameScreenProps) {
   return (
     <div className="app-shell pregame-screen">
+      <Wordmark sub={gameLabel} />
       <header className="pregame-header">
         <p className="pregame-kicker">{gameLabel} · {venueName}</p>
         <h1 className="pregame-title">THE BUILD-UP</h1>

@@ -12,6 +12,7 @@ import { FieldLineup } from '../components/FieldLineup'
 import { OppositionPanel } from '../components/OppositionPanel'
 import { MatchupPanel } from '../components/MatchupPanel'
 import { SeriesScoreboard } from '../components/SeriesScoreboard'
+import { Wordmark } from '../components/Wordmark'
 import { useSquadSelection } from '../hooks/useSquadSelection'
 import './SelectionScreen.css'
 
@@ -145,8 +146,7 @@ export function SelectionScreen({
   return (
     <div className="app-shell">
       <header>
-        <div className="app-title">MAROON</div>
-        <div className="app-sub">{gameLabel} · Pick Queensland&apos;s 19 + 2 reserves, lock in, then watch it unfold.</div>
+        <Wordmark hero sub={`${gameLabel} · Pick Queensland's 19 + 2 reserves, lock in, then watch it unfold.`} />
       </header>
 
       {onPlayDaily && (

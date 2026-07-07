@@ -1,5 +1,6 @@
 import type { BoardOutcome } from '../../coach'
 import type { OffseasonReport } from '../../dynasty'
+import { Wordmark } from '../components/Wordmark'
 import './OffseasonScreen.css'
 
 interface OffseasonScreenProps {
@@ -17,6 +18,7 @@ interface OffseasonScreenProps {
 export function OffseasonScreen({ report, board, onContinue }: OffseasonScreenProps) {
   return (
     <div className="app-shell offseason-screen">
+      <Wordmark sub="Off-season" />
       <header className="offseason-header">
         <p className="offseason-kicker">The {report.endedYear} season is in the books</p>
         <h1 className="offseason-title">THE OFF-SEASON</h1>

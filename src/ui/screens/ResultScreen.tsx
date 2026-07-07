@@ -8,6 +8,7 @@ import { BackPagePanel, PressConferencePanel } from '../components/BackPagePanel
 import { BroadcastPanel } from '../components/BroadcastPanel'
 import { FeatToast } from '../components/FeatToast'
 import { SeriesScoreboard } from '../components/SeriesScoreboard'
+import { Wordmark } from '../components/Wordmark'
 import './ResultScreen.css'
 
 interface ResultScreenProps {
@@ -178,6 +179,7 @@ export function ResultScreen({
 
   return (
     <div className="app-shell result-screen">
+      <Wordmark sub={gameLabel} />
       <div className={`result-banner ${v.cls}`}>
         <h1 className="result-verdict">{v.text}</h1>
         <div className="result-final-score">

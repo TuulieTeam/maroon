@@ -5,6 +5,7 @@ import type { FeatMint } from '../../feats'
 import { BroadcastPanel } from '../components/BroadcastPanel'
 import { FeatToast } from '../components/FeatToast'
 import { ShareCard } from '../components/ShareCard'
+import { Wordmark } from '../components/Wordmark'
 import './ResultScreen.css'
 import './DailyScreens.css'
 
@@ -59,6 +60,7 @@ export function DailyResultScreen({ result, record, summary, featMints = [], onC
 
   return (
     <div className="app-shell result-screen">
+      <Wordmark sub="Daily Origin" />
       <div className={`result-banner ${v.cls}`}>
         <h1 className="result-verdict">{v.text}</h1>
         <div className="result-final-score">

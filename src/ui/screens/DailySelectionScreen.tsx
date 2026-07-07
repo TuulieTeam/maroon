@@ -9,6 +9,7 @@ import { PlayerCard } from '../components/PlayerCard'
 import { FieldLineup } from '../components/FieldLineup'
 import { OppositionPanel } from '../components/OppositionPanel'
 import { MatchupPanel } from '../components/MatchupPanel'
+import { Wordmark } from '../components/Wordmark'
 import { useSquadSelection } from '../hooks/useSquadSelection'
 import './SelectionScreen.css'
 import './DailyScreens.css'
@@ -97,12 +98,14 @@ export function DailySelectionScreen({ challenge, summary, onKickOff, onBack, mo
   return (
     <div className="app-shell">
       <header>
-        <div className="app-title">MAROON</div>
-        <div className="app-sub">
-          {isGauntlet
-            ? `The Gauntlet · a mate threw this exact match at you — pick a better 19 than they did.`
-            : `The Daily Origin · ${formatDateKey(challenge.dateKey)} · one match, one attempt — pick it right.`}
-        </div>
+        <Wordmark
+          hero
+          sub={
+            isGauntlet
+              ? `The Gauntlet · a mate threw this exact match at you — pick a better 19 than they did.`
+              : `The Daily Origin · ${formatDateKey(challenge.dateKey)} · one match, one attempt — pick it right.`
+          }
+        />
       </header>
 
       <div className="daily-challenge-card">
