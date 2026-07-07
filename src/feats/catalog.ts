@@ -1,5 +1,7 @@
 import { MATCHDAY_POSITIONS } from '../data/positions'
 import { DAILY_TWISTS } from '../daily'
+import { SCENARIOS } from '../scenarios/catalog'
+import { scenariosDone } from '../scenarios/scenarioLedger'
 import type { FeatContext, FeatDef } from './types'
 
 /**
@@ -293,6 +295,24 @@ export const FEATS: FeatDef[] = [
       if (ctx.record.winner === 'QLD') wonUnder.add(ctx.record.twistId)
       return wonUnder.size >= DAILY_TWISTS.length
     },
+  },
+
+  // ---- This Day in Origin ----
+  {
+    id: 'off-the-script',
+    name: 'Off the Script',
+    flavour: 'History asked its question and you answered it. The first page is yours.',
+    hint: 'Conquer your first This Day in Origin scenario.',
+    scope: 'scenario',
+    test: (ctx) => ctx.kind === 'scenario' && ctx.passed,
+  },
+  {
+    id: 'the-historian',
+    name: 'The Historian',
+    flavour: 'Every day Origin ever asked of Queensland, answered by your teams.',
+    hint: 'Conquer every scenario in the library.',
+    scope: 'scenario',
+    test: (ctx) => ctx.kind === 'scenario' && scenariosDone(ctx.ledger) >= SCENARIOS.length,
   },
 ]
 

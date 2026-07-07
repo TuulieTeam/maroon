@@ -1,0 +1,114 @@
+/* This Day in Origin — the scenario library. Every row is a dare with its condition on display. */
+
+.scenario-browser {
+  border: 1px solid var(--surface-line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--pixel-shadow);
+  padding: 14px 16px;
+}
+
+.scenario-browser-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.scenario-browser-head h2 {
+  font-size: 1.05rem;
+  text-transform: uppercase;
+  letter-spacing: var(--track-2);
+}
+
+.scenario-browser-tally {
+  color: var(--gold);
+  font-weight: 800;
+}
+
+.scenario-browser-sub {
+  margin: 0 0 10px;
+  font-size: var(--fs-sub);
+  color: var(--text-dim);
+}
+
+.scenario-tier {
+  margin-top: 10px;
+}
+
+.scenario-tier-label {
+  font-size: var(--fs-label);
+  text-transform: uppercase;
+  letter-spacing: var(--track-1);
+  color: var(--text-faint);
+  margin-bottom: 6px;
+}
+
+.scenario-tier-label.tier-legendary {
+  color: var(--gold);
+}
+
+.scenario-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.scenario-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid var(--surface-line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  padding: 8px 12px;
+}
+
+.scenario-row.is-done {
+  border-color: var(--gold);
+}
+
+.scenario-row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.scenario-row-title {
+  font-weight: 800;
+  letter-spacing: 0.03em;
+}
+
+.scenario-row.is-done .scenario-row-title {
+  color: var(--gold);
+}
+
+.scenario-row-goal {
+  font-size: var(--fs-sub);
+  color: var(--text-dim);
+}
+
+.scenario-row-record {
+  font-size: var(--fs-label);
+  color: var(--text-faint);
+}
+
+.scenario-row-play {
+  flex-shrink: 0;
+}
+
+@media (max-width: 560px) {
+  .scenario-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .scenario-row-play {
+    align-self: flex-end;
+  }
+}

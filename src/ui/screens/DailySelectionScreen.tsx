@@ -20,8 +20,11 @@ interface DailySelectionScreenProps {
   onKickOff: (team: SelectedTeam) => void
   /** Leave without playing — browsing the challenge never burns the day's one attempt. */
   onBack: () => void
-  /** The Gauntlet reuses this whole picker — same challenge machinery, mate-thrown seed. */
-  mode?: 'daily' | 'gauntlet'
+  /** The Gauntlet and the scenario library reuse this whole picker — same challenge machinery,
+   *  a mate-thrown seed or an author-pinned one. */
+  mode?: 'daily' | 'gauntlet' | 'scenario'
+  /** A scenario's win condition, framed on the challenge card ("🎯 Win and hold NSW under 12"). */
+  winLine?: string
 }
 
 /**
@@ -30,9 +33,10 @@ interface DailySelectionScreenProps {
  * takes away, and the one-shot stakes are framed up top. Kicking off is the moment the day's single
  * attempt is committed; backing out from here costs nothing.
  */
-export function DailySelectionScreen({ challenge, summary, onKickOff, onBack, mode = 'daily' }: DailySelectionScreenProps) {
+export function DailySelectionScreen({ challenge, summary, onKickOff, onBack, mode = 'daily', winLine }: DailySelectionScreenProps) {
   const { twist, opponent, venue } = challenge
   const isGauntlet = mode === 'gauntlet'
+  const isScenario = mode === 'scenario'
 
   // The twist's unavailable men — the daily equivalent of the series' injury table.
   const ruledOutIds = useMemo(() => new Set(twist.ruledOut?.(QLD_SQUAD) ?? []), [twist])
@@ -103,7 +107,9 @@ export function DailySelectionScreen({ challenge, summary, onKickOff, onBack, mo
           sub={
             isGauntlet
               ? `The Gauntlet · a mate threw this exact match at you — pick a better 19 than they did.`
-              : `The Daily Origin · ${formatDateKey(challenge.dateKey)} · one match, one attempt — pick it right.`
+              : isScenario
+                ? `This Day in Origin · a pinned match, retryable — same game every time. Beat the condition.`
+                : `The Daily Origin · ${formatDateKey(challenge.dateKey)} · one match, one attempt — pick it right.`
           }
         />
       </header>
@@ -126,7 +132,12 @@ export function DailySelectionScreen({ challenge, summary, onKickOff, onBack, mo
             ))}
           </div>
         )}
-        {!isGauntlet && summary.streak > 0 && (
+        {winLine && (
+          <p className="daily-challenge-stakes">
+            🎯 <strong>{winLine}</strong>
+          </p>
+        )}
+        {mode === 'daily' && summary.streak > 0 && (
           <p className="daily-challenge-stakes">
             🔥 Your <strong>{summary.streak}-day streak</strong> is on the line.
           </p>
@@ -198,7 +209,9 @@ export function DailySelectionScreen({ challenge, summary, onKickOff, onBack, mo
           {selection.validation.valid
             ? isGauntlet
               ? 'LOCK IN · ANSWER THE GAUNTLET'
-              : 'LOCK IN · PLAY THE DAILY'
+              : isScenario
+                ? 'LOCK IN · RUN THE SCENARIO'
+                : 'LOCK IN · PLAY THE DAILY'
             : 'NAME YOUR 19 + 2 RESERVES'}
         </button>
       </div>

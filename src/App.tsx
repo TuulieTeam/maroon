@@ -14,6 +14,9 @@ import type { OffseasonReport } from './dynasty'
 import { useDynasty } from './dynasty/useDynasty'
 import type { FeatMint } from './feats'
 import { useFeats } from './feats/useFeats'
+import { buildScenarioSetup, scenarioChallenge } from './scenarios'
+import type { ScenarioDef } from './scenarios'
+import { useScenarios } from './scenarios/useScenarios'
 import {
   applyGameResult,
   concludeSeries,
@@ -37,6 +40,7 @@ import { DailySelectionScreen } from './ui/screens/DailySelectionScreen'
 import { DailyResultScreen } from './ui/screens/DailyResultScreen'
 import { OffseasonScreen } from './ui/screens/OffseasonScreen'
 import { GauntletResultScreen } from './ui/screens/GauntletResultScreen'
+import { ScenarioResultScreen } from './ui/screens/ScenarioResultScreen'
 import { STAKES_SHORT } from './ui/seriesStakes'
 
 type Phase =
@@ -54,6 +58,10 @@ type Phase =
   | 'gauntlet-pregame'
   | 'gauntlet-live'
   | 'gauntlet-result'
+  | 'scenario-select'
+  | 'scenario-pregame'
+  | 'scenario-live'
+  | 'scenario-result'
 
 function nswTeamFrom(blues: BluesTeamSheet): SelectedTeam {
   return {
@@ -126,6 +134,33 @@ export default function App() {
     },
     [gauntlet],
   )
+  // ---- This Day in Origin — authored, pinned, retryable scenarios. Nothing drawn, everything
+  // authored; retries replay the IDENTICAL match, so the only variable is the picked 19. ----
+  const scenarios = useScenarios()
+  const [activeScenario, setActiveScenario] = useState<ScenarioDef | null>(null)
+  const [scenarioResult, setScenarioResult] = useState<MatchResult | null>(null)
+  const [scenarioTeam, setScenarioTeam] = useState<SelectedTeam | null>(null)
+  const [scenarioOutcome, setScenarioOutcome] = useState<{ passed: boolean; detail?: string } | null>(null)
+  // Guards against folding the same completed run into the ledger twice (mirror of recordedGameRef);
+  // reset at every kickoff so a retry records again.
+  const recordedScenarioRef = useRef(false)
+
+  const openScenario = useCallback((def: ScenarioDef) => {
+    setActiveScenario(def)
+    setScenarioResult(null)
+    setScenarioTeam(null)
+    setScenarioOutcome(null)
+    setPhase('scenario-select')
+  }, [])
+
+  const exitScenario = useCallback(() => {
+    setActiveScenario(null)
+    setScenarioResult(null)
+    setScenarioTeam(null)
+    setScenarioOutcome(null)
+    setPhase(state.games.length === 0 && state.status === 'in-progress' ? 'select' : 'hub')
+  }, [state.games.length, state.status])
+
   const [lockedTeam, setLockedTeam] = useState<SelectedTeam | null>(null)
   const [result, setResult] = useState<MatchResult | null>(null)
   const [playingGame, setPlayingGame] = useState<1 | 2 | 3>(state.currentGame)
@@ -349,6 +384,48 @@ export default function App() {
     setPhase('daily-result')
   }, [dailyResult, daily, feats, todayKey])
 
+  // Lock in a scenario side — the shared builder guarantees the played match IS the tested match.
+  const handleScenarioKickOff = useCallback(
+    (team: SelectedTeam) => {
+      if (!activeScenario) return
+      setScenarioTeam(team)
+      setScenarioOutcome(null)
+      recordedScenarioRef.current = false
+      setRecentMints([])
+      setScenarioResult(simulateMatch(buildScenarioSetup(activeScenario, team), activeScenario.seed))
+      setPhase('scenario-pregame')
+    },
+    [activeScenario],
+  )
+
+  // Judge the win condition and fold the completed run into the conquest ledger exactly once.
+  const handleScenarioComplete = useCallback(() => {
+    if (activeScenario && scenarioResult && scenarioTeam && !recordedScenarioRef.current) {
+      recordedScenarioRef.current = true
+      const verdict = activeScenario.winCondition(scenarioResult, scenarioTeam)
+      const passed = verdict !== false
+      const detail = typeof verdict === 'string' ? verdict : undefined
+      setScenarioOutcome({ passed, detail })
+      // Judge the scenario feats against the ledger AS IT WILL BE once the run lands (the hook's
+      // ref makes the fold synchronous — the handleDailyComplete pattern).
+      const nextLedger = scenarios.record(activeScenario.id, passed, todayKey, detail)
+      const mints = feats.evaluate(
+        { kind: 'scenario', scenarioId: activeScenario.id, passed, ledger: nextLedger },
+        todayKey,
+      )
+      if (mints.length > 0) setRecentMints((prev) => [...prev, ...mints])
+    }
+    setPhase('scenario-result')
+  }, [activeScenario, scenarioResult, scenarioTeam, scenarios, feats, todayKey])
+
+  // "Run it back" — the same pinned match, a different 19. The learnable-puzzle loop.
+  const handleScenarioRetry = useCallback(() => {
+    setScenarioResult(null)
+    setScenarioTeam(null)
+    setScenarioOutcome(null)
+    setPhase('scenario-select')
+  }, [])
+
   // Skipping the dead rubber concludes the series — judge the concluded state it will become.
   const handleSkipDeadRubber = useCallback(() => {
     judgeCompletedSeries(concludeSeries(state), potms.length > 0 ? pickSeriesMvp(potms).id : null)
@@ -459,6 +536,60 @@ export default function App() {
 
   if (phase === 'gauntlet-result' && gauntlet && gauntletResult) {
     return <GauntletResultScreen result={gauntletResult} challenge={gauntlet} onContinue={exitGauntlet} />
+  }
+
+  if (phase === 'scenario-select' && activeScenario) {
+    return (
+      <DailySelectionScreen
+        challenge={scenarioChallenge(activeScenario)}
+        summary={daily.summary}
+        mode="scenario"
+        winLine={activeScenario.winLabel}
+        onKickOff={handleScenarioKickOff}
+        onBack={exitScenario}
+      />
+    )
+  }
+
+  if (phase === 'scenario-pregame' && activeScenario && scenarioResult) {
+    return (
+      <PreGameScreen
+        result={scenarioResult}
+        gameLabel="This Day in Origin"
+        venueName={scenarioChallenge(activeScenario).venue.stadium}
+        stakesLabel={`🎯 ${activeScenario.winLabel}`}
+        onKickOff={() => setPhase('scenario-live')}
+      />
+    )
+  }
+
+  if (phase === 'scenario-live' && activeScenario && scenarioResult && scenarioTeam) {
+    return (
+      <LiveMatchScreen
+        key={`scenario-${activeScenario.id}-${scenarios.ledger.entries[activeScenario.id]?.attempts ?? 0}`}
+        result={scenarioResult}
+        gameLabel="This Day in Origin"
+        venueName={scenarioChallenge(activeScenario).venue.stadium}
+        stakesLabel={`🎯 ${activeScenario.winLabel}`}
+        startingLineups={{ QLD: scenarioTeam.lineup, NSW: scenarioChallenge(activeScenario).opponent.lineup }}
+        onComplete={handleScenarioComplete}
+      />
+    )
+  }
+
+  if (phase === 'scenario-result' && activeScenario && scenarioResult && scenarioOutcome) {
+    return (
+      <ScenarioResultScreen
+        result={scenarioResult}
+        def={activeScenario}
+        passed={scenarioOutcome.passed}
+        detail={scenarioOutcome.detail}
+        attempts={scenarios.ledger.entries[activeScenario.id]?.attempts ?? 1}
+        featMints={recentMints}
+        onRunBack={handleScenarioRetry}
+        onContinue={exitScenario}
+      />
+    )
   }
 
   if (phase === 'daily-select') {
@@ -586,6 +717,8 @@ export default function App() {
       daily={daily}
       onPlayDaily={() => setPhase('daily-select')}
       featsLedger={feats.ledger}
+      scenarioLedger={scenarios.ledger}
+      onPlayScenario={openScenario}
       newFeatNames={recentMints.filter((m) => m.isFirst).map((m) => m.def.name)}
       coachPressure={coach.state.pressure}
       coachName={coach.coach.name}

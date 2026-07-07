@@ -1,5 +1,6 @@
 import type { MatchResult, Score, SelectedTeam, Side, VenueId } from '../engine'
 import type { DailyLedger, DailyRecord, DailySummary } from '../daily'
+import type { ScenarioLedger } from '../scenarios/types'
 import type { CareerLedger, Difficulty, GameNo } from '../series'
 
 /**
@@ -24,7 +25,7 @@ export interface SeriesFacts {
   nswDamage?: Record<string, { name?: string; tries: number; lineBreaks: number; damage: number }>
 }
 
-/** The three moments a feat can be judged at, with everything each moment actually has in hand. */
+/** The four moments a feat can be judged at, with everything each moment actually has in hand. */
 export type FeatContext =
   | {
       kind: 'match'
@@ -53,6 +54,14 @@ export type FeatContext =
       underFireIds?: string[]
       /** The names on the RESOLVED drawn Blues sheet — Silenced needs to know who actually ran out. */
       nswNames?: string[]
+    }
+  | {
+      kind: 'scenario'
+      scenarioId: string
+      /** Whether THIS run met the win condition. */
+      passed: boolean
+      /** The POST-FOLD conquest history — career-scope feats (The Historian) read across it. */
+      ledger: ScenarioLedger
     }
 
 export type FeatScope = FeatContext['kind']

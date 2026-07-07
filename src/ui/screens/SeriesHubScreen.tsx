@@ -8,7 +8,9 @@ import type { Player } from '../../data/types'
 import type { UseDaily } from '../../daily/useDaily'
 import type { DynastyState } from '../../dynasty'
 import type { FeatsLedger } from '../../feats'
+import type { ScenarioDef, ScenarioLedger } from '../../scenarios'
 import { DynastyTimeline } from '../components/DynastyTimeline'
+import { ScenarioBrowser } from '../components/ScenarioBrowser'
 import { SeriesScoreboard } from '../components/SeriesScoreboard'
 import { ClubFormReport } from '../components/ClubFormReport'
 import { ShareCard } from '../components/ShareCard'
@@ -42,6 +44,9 @@ interface SeriesHubScreenProps {
   onPlayDaily: () => void
   /** The trophy cabinet. */
   featsLedger: FeatsLedger
+  /** This Day in Origin — the scenario library's conquest history. */
+  scenarioLedger: ScenarioLedger
+  onPlayScenario: (def: ScenarioDef) => void
   /** Feats FIRST-earned by the just-finished series — bragged on the share card. */
   newFeatNames: string[]
   /** The coach's hot-seat index (0–100) and whoever currently holds the clipboard. */
@@ -76,6 +81,8 @@ export function SeriesHubScreen({
   daily,
   onPlayDaily,
   featsLedger,
+  scenarioLedger,
+  onPlayScenario,
   newFeatNames,
   coachPressure,
   coachName,
@@ -171,6 +178,8 @@ export function SeriesHubScreen({
       <HotSeat pressure={coachPressure} coachName={coachName} />
 
       <FeatCabinet ledger={featsLedger} />
+
+      <ScenarioBrowser ledger={scenarioLedger} onPlay={onPlayScenario} />
 
       <CareerLedger summary={careerSummary} />
 
