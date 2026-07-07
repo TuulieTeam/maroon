@@ -3,6 +3,10 @@ import { bluesById } from './data/bluesVariants'
 import type { Position } from './data/types'
 import { originLabel, simulateMatch } from './engine'
 import type { MatchResult, MatchSetup, PlayerOfMatch, SelectedTeam } from './engine'
+import { QLD_SQUAD } from './data/qldSquad'
+import { buildPressConference, deriveStorylines, postGameBackPage, preGameBackPage, pressureBand } from './coach'
+import type { BackPage, PressExchange, Storyline } from './coach'
+import { useCoach } from './coach/useCoach'
 import { dailyKey, recordDaily, summariseDaily } from './daily'
 import { useDaily } from './daily/useDaily'
 import type { FeatMint } from './feats'
@@ -91,6 +95,14 @@ export default function App() {
   // remembers forever; the toast is a moment).
   const [recentMints, setRecentMints] = useState<FeatMint[]>([])
 
+  // ---- The Back Page — the media reacts to the coach's calls (series games only; the Daily is
+  // arcade, the papers don't cover it). Derived at lock-in, settled at full time. ----
+  const coach = useCoach()
+  const [stories, setStories] = useState<Storyline[]>([])
+  const [prePage, setPrePage] = useState<BackPage | null>(null)
+  const [postPage, setPostPage] = useState<BackPage | null>(null)
+  const [presser, setPresser] = useState<PressExchange[]>([])
+
   // Judge the series feats against a COMPLETED state. The reducers are pure, so callers compute the
   // post-fold state themselves — no effect, no double-judgement (one-shot feats no-op anyway).
   const judgeCompletedSeries = useCallback(
@@ -98,8 +110,9 @@ export default function App() {
       if (completed.status !== 'complete' || !completed.seriesWinner) return
       const mints = feats.evaluate({ kind: 'series', completed, career: loadCareer() }, todayKey)
       if (mints.length > 0) setRecentMints((prev) => [...prev, ...mints])
+      coach.seriesHeat(completed)
     },
-    [feats, todayKey],
+    [feats, todayKey, coach],
   )
 
   // Lock in the picked XVII and simulate this game — series context drives venue/stakes commentary.
@@ -133,7 +146,19 @@ export default function App() {
       setPlayingGame(game)
       recordedGameRef.current = null
       setRecentMints([])
-      setResult(simulateMatch(setup, gameSeed(state.rootSeed, game)))
+      // The papers react to the team sheet the moment it drops — the boldest call gets the splash.
+      const seed = gameSeed(state.rootSeed, game)
+      const derived = deriveStorylines({
+        team,
+        squad: QLD_SQUAD,
+        conditions: state.playerConditions,
+        priorLineup: state.games.at(-1)?.qldLineup,
+      })
+      setStories(derived)
+      setPrePage(preGameBackPage(derived[0], seed))
+      setPostPage(null)
+      setPresser([])
+      setResult(simulateMatch(setup, seed))
       setPhase('pregame')
     },
     [
@@ -142,6 +167,7 @@ export default function App() {
       state.opponentId,
       state.difficulty,
       state.playerConditions,
+      state.games,
       currentContext,
       usedSpeechTitles,
     ],
@@ -169,10 +195,19 @@ export default function App() {
         todayKey,
       )
       if (mints.length > 0) setRecentMints((prev) => [...prev, ...mints])
+      // The morning-after verdict: the paper's position, settled by the result — and the hot seat
+      // moves with it. Series heat (if this game ended it) lands inside judgeCompletedSeries.
+      if (prePage) {
+        const won = result.winner === 'QLD'
+        const seed = gameSeed(state.rootSeed, playingGame)
+        setPostPage(postGameBackPage(stories[0], prePage.stance, result, seed))
+        setPresser(buildPressConference(result, pressureBand(coach.state.pressure), stories[0], seed))
+        coach.gameHeat(prePage.stance, won)
+      }
       judgeCompletedSeries(applyGameResult(state, played))
     }
     setPhase('result')
-  }, [result, lockedTeam, playingGame, recordResult, feats, state, todayKey, judgeCompletedSeries])
+  }, [result, lockedTeam, playingGame, recordResult, feats, state, todayKey, judgeCompletedSeries, prePage, stories, coach])
 
   // Lock in the daily XVII and simulate — the twist composes at this boundary exactly like the
   // difficulty dial (uniform form-map deltas + a venue), so the engine never learns "daily".
@@ -321,6 +356,7 @@ export default function App() {
         gameLabel={originLabel(playingGame)}
         venueName={currentContext.venue.stadium}
         stakesLabel={STAKES_SHORT[currentContext.stakes]}
+        backPage={prePage}
         onKickOff={() => setPhase('live')}
       />
     )
@@ -347,6 +383,8 @@ export default function App() {
         gameLabel={originLabel(playingGame)}
         seriesState={state}
         featMints={recentMints}
+        backPage={postPage}
+        pressConference={presser}
         onContinue={() => setPhase('hub')}
       />
     )
@@ -365,6 +403,7 @@ export default function App() {
       onPlayDaily={() => setPhase('daily-select')}
       featsLedger={feats.ledger}
       newFeatNames={recentMints.filter((m) => m.isFirst).map((m) => m.def.name)}
+      coachPressure={coach.state.pressure}
     />
   )
 }

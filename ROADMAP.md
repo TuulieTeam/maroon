@@ -66,6 +66,23 @@ Recent feature work:
   across three suites incl. a twist-viability guard (every twist leaves a fillable 19+2) and an
   engine-contract pin (App's composition mirrored in `dailyIntegration.test.ts`).
 
+- **Deployed to GitHub Pages** (2026-07-06) — live at https://tuulieteam.github.io/maroon/
+  (repo `TuulieTeam/maroon`, public, mates-only by obscurity). `.github/workflows/deploy.yml`: push
+  to `main` → pnpm install (pinned via `packageManager`) → typecheck → full test suite (the deploy
+  gate) → build → Pages. `base: '/maroon/'` for builds only; dev stays at `/:3001`. Both share cards
+  end with the game URL (`src/gameUrl.ts`). Work lands on `origin-series`; ship = push to `main`.
+- **The Trophy Cabinet** (2026-07-06 — chase layer, feats v1) — `src/feats/**`: a pure predicate
+  catalog (18 launch feats across series shape / difficulty chase / Blues variants / match stat
+  lines / the Daily) judged at the App boundary at three moments (match result, daily result, series
+  completion — the completion judgement folds the game through the pure reducer at the call site, no
+  effects). Earns persist under `maroon.feats.v1` (facts only: first date + count + detail string).
+  **Career ledger v2** in a single upgrade-not-discard migration: archives `difficulty` +
+  `opponentId`, reserves `iconicMoment`/`nemesis`/`year` slots for the rest of the chase layer.
+  Retro-mint back-fills daily + scoreline-shape feats from existing archives; stat feats stay
+  earn-forward (stats were never archived — the price of IDs-only saves, kept honest). UI: earn
+  toasts on both result screens, hub trophy cabinet (locked feats = silhouettes with hint text),
+  `🏅 First:` share-card line for new mints only.
+
 ## Deferred backlog
 
 Paused 2026-06-16 — no committed dates. Roughly highest-leverage first.

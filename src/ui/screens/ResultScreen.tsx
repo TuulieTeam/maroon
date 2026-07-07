@@ -1,8 +1,10 @@
 import type { Channel } from '../../data/types'
 import type { MatchResult, PlayerStatLine, Side } from '../../engine'
 import { yourEdgeFor, yourEdgePhrase } from '../../engine'
+import type { BackPage, PressExchange } from '../../coach'
 import type { FeatMint } from '../../feats'
 import type { SeriesState } from '../../series'
+import { BackPagePanel, PressConferencePanel } from '../components/BackPagePanel'
 import { BroadcastPanel } from '../components/BroadcastPanel'
 import { FeatToast } from '../components/FeatToast'
 import { SeriesScoreboard } from '../components/SeriesScoreboard'
@@ -15,6 +17,10 @@ interface ResultScreenProps {
   seriesState: SeriesState
   /** Feats earned by this game (and, on a series-ending game, the series) — the toast moment. */
   featMints?: FeatMint[]
+  /** The morning-after back page — the paper's pre-game position, settled by this result. */
+  backPage?: BackPage | null
+  /** Slater fronting the press after the game. */
+  pressConference?: PressExchange[]
   onContinue: () => void
 }
 
@@ -140,7 +146,15 @@ function PlayerTable({ side, lines }: { side: Side; lines: PlayerStatLine[] }) {
   )
 }
 
-export function ResultScreen({ result, gameLabel, seriesState, featMints = [], onContinue }: ResultScreenProps) {
+export function ResultScreen({
+  result,
+  gameLabel,
+  seriesState,
+  featMints = [],
+  backPage,
+  pressConference = [],
+  onContinue,
+}: ResultScreenProps) {
   const v = verdict(result, gameLabel)
   const callout = channelCallout(result)
   const { stats, playerOfMatch: potm } = result
@@ -174,9 +188,13 @@ export function ResultScreen({ result, gameLabel, seriesState, featMints = [], o
 
       <SeriesScoreboard state={seriesState} />
 
+      {backPage && <BackPagePanel page={backPage} />}
+
       <div className="result-broadcast">
         <BroadcastPanel slot="postGame" segments={result.broadcast.postGame} />
       </div>
+
+      <PressConferencePanel exchanges={pressConference} />
 
       <div className={`potm-card ${potm.side.toLowerCase()}`}>
         <div className="potm-label">Player of the Match</div>

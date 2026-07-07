@@ -11,6 +11,7 @@ import { ShareCard } from '../components/ShareCard'
 import { CareerLedger } from '../components/CareerLedger'
 import { DailyPanel } from '../components/DailyPanel'
 import { FeatCabinet } from '../components/FeatCabinet'
+import { HotSeat } from '../components/HotSeat'
 import { STAKES_SHORT } from '../seriesStakes'
 import './SeriesHubScreen.css'
 
@@ -34,6 +35,8 @@ interface SeriesHubScreenProps {
   featsLedger: FeatsLedger
   /** Feats FIRST-earned by the just-finished series — bragged on the share card. */
   newFeatNames: string[]
+  /** The coach's hot-seat index (0–100). */
+  coachPressure: number
 }
 
 function shieldHeadline(state: SeriesState): string {
@@ -55,6 +58,7 @@ export function SeriesHubScreen({
   onPlayDaily,
   featsLedger,
   newFeatNames,
+  coachPressure,
 }: SeriesHubScreenProps) {
   const complete = state.status === 'complete'
   const deadRubberPending = !complete && state.seriesWinner != null
@@ -129,6 +133,8 @@ export function SeriesHubScreen({
         summary={daily.summary}
         onPlay={onPlayDaily}
       />
+
+      <HotSeat pressure={coachPressure} />
 
       <FeatCabinet ledger={featsLedger} />
 
