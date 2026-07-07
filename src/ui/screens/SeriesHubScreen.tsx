@@ -3,10 +3,12 @@ import type { PlayerOfMatch, SeriesContext } from '../../engine'
 import { bluesById } from '../../data/bluesVariants'
 import { buildShareCard } from '../../series'
 import type { CareerSummary, SeriesState } from '../../series'
+import type { UseDaily } from '../../daily/useDaily'
 import { SeriesScoreboard } from '../components/SeriesScoreboard'
 import { ClubFormReport } from '../components/ClubFormReport'
 import { ShareCard } from '../components/ShareCard'
 import { CareerLedger } from '../components/CareerLedger'
+import { DailyPanel } from '../components/DailyPanel'
 import { STAKES_SHORT } from '../seriesStakes'
 import './SeriesHubScreen.css'
 
@@ -23,6 +25,9 @@ interface SeriesHubScreenProps {
   onSkipDeadRubber: () => void
   /** Wipe the series and start fresh. */
   onNewSeries: () => void
+  /** The Daily Origin — today's challenge, today's result (if played), and the streak read. */
+  daily: UseDaily
+  onPlayDaily: () => void
 }
 
 function shieldHeadline(state: SeriesState): string {
@@ -40,6 +45,8 @@ export function SeriesHubScreen({
   onPick,
   onSkipDeadRubber,
   onNewSeries,
+  daily,
+  onPlayDaily,
 }: SeriesHubScreenProps) {
   const complete = state.status === 'complete'
   const deadRubberPending = !complete && state.seriesWinner != null
@@ -107,6 +114,13 @@ export function SeriesHubScreen({
           </button>
         </div>
       )}
+
+      <DailyPanel
+        challenge={daily.challenge}
+        todayRecord={daily.todayRecord}
+        summary={daily.summary}
+        onPlay={onPlayDaily}
+      />
 
       <CareerLedger summary={careerSummary} />
     </div>

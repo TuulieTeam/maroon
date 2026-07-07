@@ -1,0 +1,89 @@
+/* The hub's Daily Origin card — gold-trimmed so the daily ritual pops against the series panels. */
+.daily-panel {
+  border: 1px solid var(--gold);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--pixel-shadow);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.daily-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.daily-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--gold);
+}
+
+.daily-date {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+
+.daily-pitch {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--text-dim);
+}
+
+.daily-pitch strong {
+  color: var(--blue-text);
+}
+
+.daily-pitch em {
+  color: var(--text);
+  font-style: normal;
+  font-weight: 700;
+}
+
+.daily-standing {
+  font-size: 0.9rem;
+  color: var(--text-dim);
+}
+
+.daily-standing strong {
+  color: var(--gold);
+}
+
+/* Today's locked-in result — same win/loss colour language as the result banner. */
+.daily-result {
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.daily-result.win {
+  color: var(--good);
+}
+.daily-result.loss {
+  color: var(--blue-text);
+}
+.daily-result.draw {
+  color: var(--warn);
+}
+
+.daily-countdown {
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-faint);
+}
+
+.daily-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.daily-actions .btn-primary {
+  min-width: 280px;
+}

@@ -73,6 +73,10 @@ describe('difficulty — share card', () => {
     playerConditions: {},
   }
 
+  it('every card ends with the deployed game link', () => {
+    expect(buildShareCard(base, null).trim().endsWith('https://tuulieteam.github.io/maroon/')).toBe(true)
+  })
+
   it('brags a non-default difficulty and stays clean at Origin', () => {
     expect(buildShareCard({ ...base, difficulty: 'hard' }, null)).toContain('Hard')
     expect(buildShareCard({ ...base, difficulty: 'casual' }, null)).toContain('Casual')

@@ -3,6 +3,8 @@ import { bluesById } from './data/bluesVariants'
 import type { Position } from './data/types'
 import { originLabel, simulateMatch } from './engine'
 import type { MatchResult, MatchSetup, PlayerOfMatch, SelectedTeam } from './engine'
+import { dailyKey } from './daily'
+import { useDaily } from './daily/useDaily'
 import { conditionFormDelta, gameSeed, nswDifficultyDelta, pickSeriesMvp, reinjuryMult } from './series'
 import { useSeries } from './series/useSeries'
 import { SelectionScreen } from './ui/screens/SelectionScreen'
@@ -10,9 +12,20 @@ import { PreGameScreen } from './ui/screens/PreGameScreen'
 import { LiveMatchScreen } from './ui/screens/LiveMatchScreen'
 import { ResultScreen } from './ui/screens/ResultScreen'
 import { SeriesHubScreen } from './ui/screens/SeriesHubScreen'
+import { DailySelectionScreen } from './ui/screens/DailySelectionScreen'
+import { DailyResultScreen } from './ui/screens/DailyResultScreen'
 import { STAKES_SHORT } from './ui/seriesStakes'
 
-type Phase = 'select' | 'pregame' | 'live' | 'result' | 'hub'
+type Phase =
+  | 'select'
+  | 'pregame'
+  | 'live'
+  | 'result'
+  | 'hub'
+  | 'daily-select'
+  | 'daily-pregame'
+  | 'daily-live'
+  | 'daily-result'
 
 function nswTeam(opponentId: string): SelectedTeam {
   const blues = bluesById(opponentId)
@@ -49,6 +62,15 @@ export default function App() {
   const [usedSpeechTitles, setUsedSpeechTitles] = useState<string[]>([])
   // Guards against folding the same game into the series twice (e.g. the auto-advance + the button).
   const recordedGameRef = useRef<number | null>(null)
+
+  // ---- The Daily Origin — a one-shot, date-seeded match alongside the series. ----
+  // The key is read per render, so a session left open overnight rolls to the new day's challenge.
+  const todayKey = dailyKey(new Date())
+  const daily = useDaily(todayKey)
+  const [dailyResult, setDailyResult] = useState<MatchResult | null>(null)
+  const [dailyTeam, setDailyTeam] = useState<SelectedTeam | null>(null)
+  // Guards against folding the same daily into the ledger twice (mirror of recordedGameRef).
+  const recordedDailyRef = useRef<string | null>(null)
 
   // Lock in the picked XVII and simulate this game — series context drives venue/stakes commentary.
   const handleKickOff = useCallback(
@@ -112,6 +134,49 @@ export default function App() {
     setPhase('result')
   }, [result, lockedTeam, playingGame, recordResult])
 
+  // Lock in the daily XVII and simulate — the twist composes at this boundary exactly like the
+  // difficulty dial (uniform form-map deltas + a venue), so the engine never learns "daily".
+  const handleDailyKickOff = useCallback(
+    (team: SelectedTeam) => {
+      const { twist, opponent, venue, seed } = daily.challenge
+      const form: Record<string, number> = {}
+      if (twist.nswFormDelta) for (const p of Object.values(opponent.lineup)) form[p.id] = twist.nswFormDelta
+      if (twist.qldFormDelta) for (const p of Object.values(team.lineup)) form[p.id] = twist.qldFormDelta
+      const setup: MatchSetup = {
+        qld: team,
+        nsw: {
+          side: 'NSW',
+          lineup: { ...opponent.lineup },
+          kickerId: opponent.kickerId,
+          edgeThreats: opponent.edgeThreats,
+        },
+        series: { gameNumber: 1, seriesScore: { qld: 0, nsw: 0 }, venue, stakes: 'OPENER' },
+        form,
+      }
+      setDailyTeam(team)
+      recordedDailyRef.current = null
+      setDailyResult(simulateMatch(setup, seed))
+      setPhase('daily-pregame')
+    },
+    [daily.challenge],
+  )
+
+  // Fold the finished daily into the ledger exactly once — this is the moment the attempt is spent.
+  const handleDailyComplete = useCallback(() => {
+    if (dailyResult && recordedDailyRef.current !== daily.challenge.dateKey) {
+      recordedDailyRef.current = daily.challenge.dateKey
+      daily.record({
+        dateKey: daily.challenge.dateKey,
+        twistId: daily.challenge.twist.id,
+        opponentId: daily.challenge.opponent.id,
+        venueId: daily.challenge.venue.id,
+        finalScore: dailyResult.finalScore,
+        winner: dailyResult.winner,
+      })
+    }
+    setPhase('daily-result')
+  }, [dailyResult, daily])
+
   const handleNewSeries = useCallback(() => {
     // Capture this series' MVP (in-memory POTMs) so it lands in the career ledger before the wipe.
     const seriesMvp = state.status === 'complete' && potms.length > 0 ? pickSeriesMvp(potms) : null
@@ -127,6 +192,54 @@ export default function App() {
   // The prior game's XVII pre-fills the next selection (survives a reload via the saved series).
   const prior = state.games.at(-1)
 
+  if (phase === 'daily-select') {
+    return (
+      <DailySelectionScreen
+        challenge={daily.challenge}
+        summary={daily.summary}
+        onKickOff={handleDailyKickOff}
+        onBack={() => setPhase('hub')}
+      />
+    )
+  }
+
+  if (phase === 'daily-pregame' && dailyResult) {
+    return (
+      <PreGameScreen
+        result={dailyResult}
+        gameLabel="The Daily Origin"
+        venueName={daily.challenge.venue.stadium}
+        stakesLabel={`⚡ ${daily.challenge.twist.label} · one attempt`}
+        onKickOff={() => setPhase('daily-live')}
+      />
+    )
+  }
+
+  if (phase === 'daily-live' && dailyResult && dailyTeam) {
+    return (
+      <LiveMatchScreen
+        key={daily.challenge.dateKey}
+        result={dailyResult}
+        gameLabel="The Daily Origin"
+        venueName={daily.challenge.venue.stadium}
+        stakesLabel={`⚡ ${daily.challenge.twist.label}`}
+        startingLineups={{ QLD: dailyTeam.lineup, NSW: daily.challenge.opponent.lineup }}
+        onComplete={handleDailyComplete}
+      />
+    )
+  }
+
+  if (phase === 'daily-result' && dailyResult && daily.todayRecord) {
+    return (
+      <DailyResultScreen
+        result={dailyResult}
+        record={daily.todayRecord}
+        summary={daily.summary}
+        onContinue={() => setPhase('hub')}
+      />
+    )
+  }
+
   if (phase === 'select') {
     return (
       <SelectionScreen
@@ -139,6 +252,7 @@ export default function App() {
         initialLineup={prior?.qldLineup}
         initialKickerId={prior?.qldKickerId}
         onKickOff={handleKickOff}
+        onPlayDaily={daily.todayRecord ? undefined : () => setPhase('daily-select')}
       />
     )
   }
@@ -189,6 +303,8 @@ export default function App() {
       onPick={() => setPhase('select')}
       onSkipDeadRubber={skipDeadRubber}
       onNewSeries={handleNewSeries}
+      daily={daily}
+      onPlayDaily={() => setPhase('daily-select')}
     />
   )
 }

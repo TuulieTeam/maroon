@@ -48,6 +48,23 @@ Recent feature work:
   `SeriesState.difficulty` (no schema bump — a pre-dial save reads as Origin). Composes additively with
   form, the home edge, and the drawn Blues side. Recorded on the share card ("⚙️ Difficulty: Hard").
   Behavioural guard in `difficulty.test.ts` proves it bites monotonically through the engine.
+- **The Daily Origin** (2026-07-06 — Vision bet #2, shipped first as planned) — `src/daily/**`: a
+  date-seeded, one-attempt-per-day one-shot match with a Wordle-style **win streak**. The local date key
+  FNV-hashes to a seed (`dailyChallenge.ts`) that draws the Blues side (`bluesForSeed`), the ground (all
+  three venues rotate — away days included), and a **twist** from a 7-strong catalog (`twists.ts`: The
+  Full 80 / Blues at career best / five-day turnaround / depleted spine / decimated pack / hostile
+  cauldron / blood-the-kids). Twists compose at the App kickoff boundary exactly like the difficulty
+  dial (uniform form-map deltas + a ruled-out set derived from the LIVE squad + an optional forced
+  venue) — the engine never learns "daily". The full pool is fit in the Daily (a what-if — Coates and
+  Dearden are pickable) unless the twist says otherwise. Ledger (`dailyLedger.ts`) stores one immutable
+  result per date key under `maroon.daily.v1` (`dailyPersist.ts`, defensive validation); streak = wins on
+  consecutive days, snapped by a loss/draw/missed day, best preserved (`summariseDaily`). Share card
+  (`dailyShareCard.ts`) brags day + twist + score + fire. UI: gold `DailyPanel` on the hub (unplayed
+  pitch / played lock-in + midnight countdown), a teaser strip on the game-1 selection screen (a fresh
+  save never sees the hub, so the Daily must be discoverable there), `DailySelectionScreen` +
+  `DailyResultScreen` reusing the picker/result kit, pre-game/live screens reused verbatim. 20 tests
+  across three suites incl. a twist-viability guard (every twist leaves a fillable 19+2) and an
+  engine-contract pin (App's composition mirrored in `dailyIntegration.test.ts`).
 
 ## Deferred backlog
 
@@ -82,12 +99,10 @@ built), then commit to the **Dynasty** as the flagship, with the **chase layer**
    age/attribute overlay drops in without save migrations — the **editable-squad seam (deferred #3)
    evolved into progression**. New state: a multi-season ledger (years, rosters, retirements, your
    record), generated rookies, and aging curves on the data layer — never frozen into the live save.
-2. **The Daily Origin (off-season ritual + the fast win).** Wordle for Origin: the date seeds the Blues
-   side + venue + an optional twist ("depleted spine", "win from 0–1"); one attempt; a shareable score
-   and a **streak**. *Fit:* reuses the deterministic engine (seed = date) + `bluesForSeed` + the existing
-   `shareCard.ts` almost wholesale — tiny build, high cadence, keeps Origin alive 365 days a year. New
-   state: a daily-result/streak `localStorage` key, a date→seed helper, and a one-shot match (or
-   mini-series) mode alongside the main series.
+2. **The Daily Origin — ✅ SHIPPED 2026-07-06** (see Shipped above). Wordle for Origin: date-seeded
+   Blues side + venue + twist, one attempt, shareable score + streak. Natural follow-ons now live in
+   the chase layer below: daily-specific feats ("win blood-the-kids at Accor"), a last-7-days square
+   strip on the hub, and folding daily results into the career ledger's story.
 3. **The chase layer (texture — threads through both).** What makes a run worth *retelling*:
    - *Feats* — 3–0 on Hard, win a decider away at Accor, win with no recognised halfback, hold NSW
      try-less. Derived from results + difficulty + opponent into a persisted badge set; self-imposed

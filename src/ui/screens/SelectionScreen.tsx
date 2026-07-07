@@ -27,6 +27,9 @@ interface SelectionScreenProps {
   /** The prior game's XVII (player ids), pre-filling the picker when re-picking mid-series. */
   initialLineup?: Partial<Record<Position, string>>
   initialKickerId?: string | null
+  /** When today's Daily Origin is still unplayed, the teaser row that jumps to it (a fresh save
+   *  starts HERE, not on the hub — without this the Daily would be undiscoverable until game 1). */
+  onPlayDaily?: () => void
 }
 
 export function SelectionScreen({
@@ -39,6 +42,7 @@ export function SelectionScreen({
   onSetDifficulty,
   initialLineup,
   initialKickerId,
+  onPlayDaily,
 }: SelectionScreenProps) {
   const conditions = seriesState.playerConditions
   // The Blues side drawn for this series — fixed across all three games, revealed in the scouting report.
@@ -132,6 +136,15 @@ export function SelectionScreen({
         <div className="app-title">MAROON</div>
         <div className="app-sub">{gameLabel} · Pick Queensland&apos;s 19 + 2 reserves, lock in, then watch it unfold.</div>
       </header>
+
+      {onPlayDaily && (
+        <div className="daily-teaser">
+          <span>⚡ Today&apos;s Daily Origin is live — one match, one attempt.</span>
+          <button className="btn-ghost" onClick={onPlayDaily}>
+            Play the Daily
+          </button>
+        </div>
+      )}
 
       {canSetDifficulty && (
         <div className="difficulty-dial" role="group" aria-label="Difficulty">

@@ -1,0 +1,106 @@
+/* Daily Origin screens — the twist card on selection, the streak banner on the wrap. Shares the
+   selection/result screens' structural classes; only the daily-specific framing lives here. */
+
+.daily-challenge-card {
+  border: 1px solid var(--gold);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--pixel-shadow);
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.daily-challenge-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.daily-challenge-twist {
+  font-size: 1.05rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--gold);
+}
+
+.daily-challenge-where {
+  font-size: 0.9rem;
+  color: var(--blue-text);
+}
+
+.daily-challenge-blurb {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--text-dim);
+}
+
+.daily-challenge-stakes {
+  font-size: 0.9rem;
+  color: var(--text-dim);
+}
+
+.daily-challenge-stakes strong {
+  color: var(--gold);
+}
+
+/* The series selection screen's pointer to an unplayed Daily — a quiet gold strip, not a takeover. */
+.daily-teaser {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border: 1px solid var(--gold);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 8px 12px;
+  margin-bottom: 14px;
+  font-size: 0.9rem;
+  color: var(--text-dim);
+}
+
+/* Post-match: the day + twist strip under the verdict banner. */
+.daily-wrap-meta {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+}
+
+/* The streak reveal — the emotional payoff of the Daily, so it gets banner treatment. */
+.daily-streak-banner {
+  text-align: center;
+  border: 1px solid var(--surface-line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--pixel-shadow);
+  padding: 14px;
+}
+
+.daily-streak-banner.win {
+  border-color: var(--gold);
+}
+
+.daily-streak-line {
+  font-size: 1.35rem;
+  font-weight: 800;
+}
+
+.daily-streak-banner.win .daily-streak-line {
+  color: var(--gold);
+}
+
+.daily-streak-record {
+  margin-top: 4px;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
