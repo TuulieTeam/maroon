@@ -75,7 +75,7 @@
 }
 
 .active-team.nsw .onfield-list .jersey {
-  color: var(--blue);
+  color: var(--blue-text);
 }
 
 .onfield-list .pname {

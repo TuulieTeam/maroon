@@ -21,7 +21,31 @@
   /* Text */
   --text: #f6e9ee;
   --text-dim: #c79aa9;
-  --text-faint: #8d6573;
+  /* Quietest tier — lifted from #8d6573 (3.8:1, failed AA) to 5.5:1 on --surface while staying
+     clearly dimmer than --text-dim (7.8:1), so the three-tier hierarchy survives. */
+  --text-faint: #a97f8f;
+
+  /* ---- Type scale (root is 118.75% ≈ 19px, so 0.85rem ≈ 16.1px) ----
+     POLICY: --fs-label is the HARD FLOOR for anything that carries information. VT323 is a
+     bitmap face — it breaks up below ~16px, and uppercase+tracking at small sizes is its worst
+     case. --fs-fine is allowed ONLY for mixed-case auxiliary text, never uppercase+tracked. */
+  --fs-fine: 0.8rem; /* ~15.2px — mixed-case fine print (pos chips, build stamp) */
+  --fs-label: 0.85rem; /* ~16.1px — floor: badges, kickers, table headers, meta */
+  --fs-sub: 0.9rem; /* ~17.1px — table cells, secondary rows, captions */
+  --fs-body: 1rem; /* ~19px — default */
+  --fs-read: 1.15rem; /* ~21.9px — long-form reading: commentary, broadcast, Gus */
+  --fs-heading: 1.2rem; /* panel h2/h3 */
+  --fs-title: 1.5rem; /* screen titles, result verdict */
+
+  /* Tracking caps — VT323 wants little tracking; nothing exceeds --track-2. */
+  --track-1: 0.04em;
+  --track-2: 0.08em;
+
+  /* Content widths — one app, one set of shells. */
+  --shell-max: 1180px;
+  --content-narrow: 680px; /* hub / offseason / result column */
+  --content-read: 640px; /* long-form measure ≈ 60ch of VT323 at --fs-read */
+  --content-wide: 920px; /* stats grids, player tables */
 
   /* Attribute bars */
   --bar-track: #3a1320;

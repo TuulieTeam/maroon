@@ -28,7 +28,7 @@
 }
 
 .live-stats-head .ls-team.n {
-  color: var(--blue);
+  color: var(--blue-text);
   text-align: right;
 }
 
@@ -50,7 +50,7 @@
 .live-stat-row .ls-n {
   text-align: right;
   font-weight: 700;
-  color: var(--blue);
+  color: var(--blue-text);
 }
 
 .live-stat-row .ls-title {

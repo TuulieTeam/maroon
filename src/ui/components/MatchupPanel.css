@@ -47,7 +47,7 @@
 
 .mu-edge-vs {
   font-size: 0.74rem;
-  color: var(--blue);
+  color: var(--blue-text);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
