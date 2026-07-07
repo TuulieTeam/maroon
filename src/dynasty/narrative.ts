@@ -11,6 +11,13 @@ const FAREWELLS = [
   '{name} retires at {age}. Somewhere in Queensland a kid just taped his number to a bedroom wall.',
   'No farewell tour, no fuss — {name} walks away at {age} the way he played: on his own terms.',
   '{name}, {age}, done. The {pos} rotation will feel his absence before round one.',
+  'The maroon jersey gets folded one last time — {name} bows out at {age} with nothing left owing.',
+  '{name} goes at {age}, and every {pos} who follows will be measured against him for a while yet.',
+  'They say you know when it’s time. {name} knew, and at {age} he beat the whisper by a season.',
+  'One last lap of the shed, one last song — {name} closes the book at {age}.',
+  'Camp won’t sound the same without him. {name} retires at {age} with the respect of every man he played beside.',
+  '{name} at {age}: gone from the team sheet, permanent in the folklore.',
+  'The selectors never had to worry about the {pos} spot while {name} held it. At {age}, that watch ends.',
 ]
 
 export function farewellLine(name: string, age: number, pos: string, rng: Rng): string {
@@ -53,8 +60,22 @@ export function eraCardLine(
 }
 
 /** Riser/fader notes for the movers list. */
-const RISE_NOTES = ['took another step this summer', 'came back leaner and meaner', 'trained the house down']
-const FADE_NOTES = ['the miles are showing', 'lost half a yard over the break', 'battled through a quiet summer']
+const RISE_NOTES = [
+  'took another step this summer',
+  'came back leaner and meaner',
+  'trained the house down',
+  'added a yard nobody expected',
+  'spent the break with a kicking coach and it shows',
+  'club form has him knocking the door down',
+]
+const FADE_NOTES = [
+  'the miles are showing',
+  'lost half a yard over the break',
+  'battled through a quiet summer',
+  'carried a niggle through the off-season',
+  'the young blokes are catching him at training',
+  'form tapered late last season and hasn’t turned',
+]
 
 export function moverNote(rising: boolean, rng: Rng): string {
   const pool = rising ? RISE_NOTES : FADE_NOTES

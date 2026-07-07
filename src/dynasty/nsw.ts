@@ -77,8 +77,14 @@ export function resolveReplacement(key: string, overlay: YearOverlay): Player | 
   return cur
 }
 
-const REPLACEMENT_FIRST = ['Kade', 'Braxton', 'Jett', 'Harlan', 'Cruz', 'Dane', 'Marley', 'Talen', 'Jude', 'Rocco', 'Ashton', 'Miller']
-const REPLACEMENT_SURNAMES = ['Wetherill', 'Croker-Lane', 'Falemaka', 'Danvers', 'Sorrell', 'Tuivasa-Ray', 'Bexley', 'Farrant', 'Mattock', 'Osgood', 'Pemberton', 'Vakalahi']
+const REPLACEMENT_FIRST = [
+  'Kade', 'Braxton', 'Jett', 'Harlan', 'Cruz', 'Dane', 'Marley', 'Talen', 'Jude', 'Rocco', 'Ashton', 'Miller',
+  'Bodhi', 'Chance', 'Dustin', 'Ezra', 'Flynn', 'Grayson', 'Hendrix', 'Knox', 'Lennox', 'Phoenix', 'Slade', 'Zane',
+]
+const REPLACEMENT_SURNAMES = [
+  'Wetherill', 'Croker-Lane', 'Falemaka', 'Danvers', 'Sorrell', 'Tuivasa-Ray', 'Bexley', 'Farrant', 'Mattock', 'Osgood', 'Pemberton', 'Vakalahi',
+  'Abercrombie', 'Balfour', 'Cudgen', 'Draycott', 'Ellendale', 'Fitzhenry', 'Glenrowan', 'Hargraves', 'Illingworth', 'Jamieson-Cole', 'Kembla', 'Loxley',
+]
 const NSW_CLUBS = ['Panthers', 'Roosters', 'Eels', 'Bulldogs', 'Raiders', 'Sea Eagles', 'Knights', 'Wests Tigers']
 
 export const NSW_REPLACEMENT_QUALITY = { min: 0.92, max: 0.98 } as const

@@ -29,14 +29,20 @@ const FIRST_NAMES = [
   'Jack', 'Tom', 'Kai', 'Xavier', 'Hamish', 'Tyrell', 'Beau', 'Lachlan', 'Israel', 'Noah',
   'Levi', 'Jesse', 'Ryder', 'Cooper', 'Malakai', 'Taine', 'Blake', 'Sione', 'Hugo', 'Darcy',
   'Manaia', 'Eli', 'Zac', 'Rory', 'Tevita', 'Callum', 'Brodie', 'Finn', 'Semisi', 'Angus',
+  'Koa', 'Jarrah', 'Banjo', 'Tane', 'Solomone', 'Heath', 'Rhys', 'Otis', 'Micah', 'Fletcher',
+  'Kobe', 'Duke', 'Nixon', 'Talan', 'Iosefa', 'Clancy', 'Reuben', 'Viliami', 'Sonny', 'Arlo',
 ]
 
-/** No overlap with any authored QLD surname (pinned by rookies.test). */
+/** No overlap with any authored QLD surname (pinned by rookies.test) — nor the NSW replacement
+ *  pool, so a generated Maroon can never share a full-name-space with a generated Blue. */
 const SURNAMES = [
   'Kealey', 'Marburg', 'Tanoai', 'Whitford', 'Bellamy-Roy', 'Ferndale', 'Aputangi', 'Corrigan',
   'Delacroix', 'Havili', 'Norwood', 'Tuilagi-Smith', 'Redpath', 'Okafor', 'Brimson-Lee', 'Calloway',
   'Ngata', 'Sherrington', 'Vaikona', 'Ashworth', 'Manu-Green', 'Oxley', 'Palaszczuk', 'Kirwan-Doyle',
   'Teulilo', 'Barlow', 'Hokianga', 'Stratford', 'Vunivalu-Reid', 'McAllister',
+  'Ashcombe', 'Bramleigh', 'Carseldine', 'Deloraine', 'Ellsworth', 'Fanshawe', 'Gillingham', 'Hartwell',
+  'Jephcott', 'Kirkbride', 'Lindqvist', 'Mataafa', 'Naumann', 'Onslow', 'Petherbridge', 'Quilkey',
+  'Rangiwai', 'Solofa-Grey', 'Tuivasa-Brown', 'Wenlock', 'Yarran-Cole', 'Zelinski',
 ]
 
 const CLUBS = ['Broncos', 'Cowboys', 'Dolphins', 'Titans', 'Storm', 'Rabbitohs', 'Dragons', 'Sharks']

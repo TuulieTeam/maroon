@@ -41,6 +41,14 @@ const OPENERS: Record<'win' | 'loss', Record<Temp, PressExchange[]>> = {
         question: 'That quiet the noise for a week, {coachFirst}?',
         answer: 'I don’t coach for the noise. The players won that, they can enjoy it. We go again Monday.',
       },
+      {
+        question: 'Some relief in the coaches’ box tonight?',
+        answer: 'Relief is for people who doubted the group. I never did. Good win, short memory, next job.',
+      },
+      {
+        question: 'Does a win like that buy you some patience upstairs?',
+        answer: 'I don’t count patience, mate, I count performances. That was one. It needs to become three.',
+      },
     ],
     siege: [
       {
@@ -51,6 +59,14 @@ const OPENERS: Record<'win' | 'loss', Record<Temp, PressExchange[]>> = {
         question: 'A response to the critics tonight?',
         answer: 'The only response that matters is on the scoreboard. Seventeen men gave everything. Write that.',
       },
+      {
+        question: 'Did the players win that one for you personally?',
+        answer: 'They won it for the jersey and for each other. If it helps me too, I’ll take it — but it was never about me.',
+      },
+      {
+        question: 'You looked emotional at full time, {coachFirst}.',
+        answer: 'You spend a month getting belted and then watch blokes produce that. Yeah. I’m allowed a moment.',
+      },
     ],
   },
   loss: {
@@ -59,11 +75,27 @@ const OPENERS: Record<'win' | 'loss', Record<Temp, PressExchange[]>> = {
         question: 'Where did that get away, {coachFirst}?',
         answer: 'A couple of moments, and Origin is moments. We’ll own it, review it, and be better for it.',
       },
+      {
+        question: 'Disappointed, or philosophical?',
+        answer: 'Both. Disappointed for the group because the effort was there. Philosophical because the fix is obvious.',
+      },
+      {
+        question: 'Anything in that loss that worries you long-term?',
+        answer: 'No. Beaten in a game of footy, not in effort or attitude. Those are the ones you can work with.',
+      },
     ],
     tense: [
       {
         question: 'The scrutiny is building — fair?',
         answer: 'Scrutiny comes with this jersey. I picked the team, I own the result. The players don’t wear that, I do.',
+      },
+      {
+        question: 'What do you say to fans losing patience, {coachFirst}?',
+        answer: 'That I’m losing patience too. Nobody up here is comfortable. We’ll earn their faith back the only way there is.',
+      },
+      {
+        question: 'Two big calls tonight — both backfired?',
+        answer: 'Results grade decisions, I get that. I’ll wear the grade. But I’d rather make calls and miss than coach scared.',
       },
     ],
     siege: [
@@ -75,6 +107,14 @@ const OPENERS: Record<'win' | 'loss', Record<Temp, PressExchange[]>> = {
         question: 'Is your position untenable after that?',
         answer: 'People have written me off my whole footballing life. I’ll turn up Monday. Next question.',
       },
+      {
+        question: 'Was that performance a group that’s stopped listening?',
+        answer: 'Say that to the blokes with ice on every joint in that shed. They haven’t stopped anything. Neither have I.',
+      },
+      {
+        question: 'How do you walk into that dressing room now, {coachFirst}?',
+        answer: 'Through the front door, same as always. You don’t hide from your own men after a loss. That’s the job.',
+      },
     ],
   },
 }
@@ -84,10 +124,14 @@ const FOLLOW_UPS: Record<'win' | 'loss', string[]> = {
   win: [
     'Q: The {player} call — vindicated? · A: I don’t pick teams to win arguments. {player} did his job, that’s the end of it.',
     'Q: Did {player} repay you tonight? · A: He repaid his teammates. I just wrote the name down.',
+    'Q: Everyone had an opinion on {player} this week. · A: And he answered every one of them without saying a word. That’s footy.',
+    'Q: Was there a point tonight you knew {player} was right? · A: At training last Tuesday. Tonight you all just caught up.',
   ],
   loss: [
     'Q: Do you regret the {player} call? · A: I’d make it again tomorrow. The result doesn’t change what I saw at training.',
     'Q: Was {player} the mistake tonight? · A: If you want a name for the loss, use mine. Not his.',
+    'Q: Does {player} keep his spot after that? · A: Team’s picked on Tuesday, same as every week. He’ll be judged on more than one night.',
+    'Q: Did the {player} gamble cost you the game? · A: One selection doesn’t lose a game of Origin. Seventeen blokes and a coach share that.',
   ],
 }
 

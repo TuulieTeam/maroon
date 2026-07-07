@@ -45,14 +45,20 @@ const PRE_TAKES: Record<Storyline['kind'], Take[]> = {
   'kept-faith': [
     { stance: 'savages', headline: 'LOYALTY OR BLINDNESS?', standfirst: '{player} keeps his jersey off the back of club form that would embarrass a reserve grader. Mates picking mates.' },
     { stance: 'backs', headline: '{COACHFIRST} KEEPS THE FAITH', standfirst: '{player} is short of a gallop, but Origin players win Origin games. {COACH} knows what he has.' },
+    { stance: 'savages', headline: 'PICKED ON MEMORIES', standfirst: 'Somewhere there is a highlights tape of {player} doing this job. It was not filmed this season. {COACH} presses play anyway.' },
+    { stance: 'backs', headline: 'IN {COACHFIRST} WE TRUST', standfirst: 'The stats say drop {player}. The men who have worn the jersey say you never do. {COACH} sided with the jersey.' },
   ],
   'gamble-doubtful': [
     { stance: 'savages', headline: 'WALKING WOUNDED', standfirst: '{player} is one tackle from the casualty ward and {COACH} has named him anyway. If it goes wrong, it is on the coach.' },
     { stance: 'backs', headline: 'PATCHED UP AND PICKED', standfirst: 'A hobbled {player} is still worth more than most men fully fit. Calculated risk from {COACH}.' },
+    { stance: 'savages', headline: 'A PRAYER IN STRAPPING TAPE', standfirst: '{player} could not finish a captain’s run and starts an Origin. {COACH} is gambling with a state’s season.' },
+    { stance: 'backs', headline: '80 MINUTES OF GUTS', standfirst: 'Half-fit {player} in the trenches beats a fit anybody else. {COACH} picked courage. Queensland approves.' },
   ],
   'positional-shock': [
     { stance: 'savages', headline: 'SQUARE PEG SELECTION', standfirst: '{player} at {note}? {COACH} is playing fantasy football with a state’s heart.' },
     { stance: 'backs', headline: 'THE SWITCH', standfirst: '{player} shifts to {note}, and it is the kind of left-field call that wins series — or costs coaches jobs.' },
+    { stance: 'savages', headline: 'POSITION VACANT, APPARENTLY', standfirst: '{player} has barely trained at {note}, let alone played it in a cauldron. {COACH} calls it vision. We call it a punt.' },
+    { stance: 'backs', headline: 'GENIUS OR NOTHING', standfirst: 'Moving {player} to {note} is the sort of call they build statues for when it works. {COACH} has never coached scared.' },
   ],
 }
 
@@ -60,6 +66,8 @@ const PRE_TAKES: Record<Storyline['kind'], Take[]> = {
 const PRE_QUIET: Take[] = [
   { stance: 'backs', headline: 'STEADY AS SHE GOES', standfirst: 'No shocks, no gambles — {COACH} has named the side everyone expected. The footy will have to make the news.' },
   { stance: 'backs', headline: 'NO NOTES, {COACHFIRST}', standfirst: 'A settled Queensland sheet. The papers hate it; the dressing room loves it.' },
+  { stance: 'backs', headline: 'BORING. GOOD.', standfirst: 'The most dangerous team sheet is the one with nothing to argue about. {COACH} has handed in exactly that.' },
+  { stance: 'backs', headline: 'THE QUIET BEFORE', standfirst: 'Seventeen names, zero surprises. If {COACHFIRST} is nervous about anything, it is not his own selections.' },
 ]
 
 /** Post-game resolutions, keyed by stance × whether QLD won. Always about the coach's call. */
@@ -69,28 +77,41 @@ const POST: Record<'backs' | 'savages', Record<'win' | 'loss', string[]>> = {
     win: [
       '{COACHFIRST}’S MASTERSTROKE — this column said the {player} call was madness. Queensland won. We’ll cop that.',
       '{COACH} 1, PRESS BOX 0 — the {player} gamble paid, and somewhere {COACHFIRST} is not even smiling about it.',
+      'FINE. HE WAS RIGHT. — the {player} pick we torched on Tuesday just helped win an Origin. Column stands corrected, briefly.',
+      'HUMBLE PIE, RARE — {COACH} shoved the {player} call down our throats the only way that counts: on the scoreboard.',
     ],
     // The paper attacked the call and QLD lost — the pile-on.
     loss: [
       'TOLD YOU SO — the {player} call blew up exactly as predicted, and {COACH} has nowhere to hide.',
       '{COACHFIRST}’S BLUNDER — you cannot make the {player} call and lose. The coach wears this one alone.',
+      'WE WARNED HIM — this paper begged {COACH} to rethink {player}. The scoreboard just filed the same complaint.',
     ],
   },
   backs: {
     win: [
       'VINDICATED — this paper backed the {player} call, Queensland delivered, and {COACH}’s aura grows.',
       'THE CALL THAT WON IT — {player} was {COACH}’s bet, and the old master still reads the game better than anyone.',
+      'AS WE SAID — {player} delivered, Queensland won, and this column will now take a modest bow.',
     ],
     loss: [
       'RIGHT CALL, WRONG NIGHT — we backed the {player} pick and still do. The other sixteen let {COACHFIRST} down.',
       'NO REGRETS, NO SHIELD — the {player} call was brave. Bravery does not show up on the scoreboard.',
+      'DON’T BLAME THE BOLD BIT — the {player} call was the best thing about a bad night. Look elsewhere for the culprit.',
     ],
   },
 }
 
 const POST_QUIET: Record<'win' | 'loss', string[]> = {
-  win: ['BUSINESS AS USUAL — no drama in selection, none on the field. Queensland win, {COACH} shrugs.'],
-  loss: ['FLAT TRACK, FLAT FOOTY — a safe team sheet and a sorry result. The knives will want a name by Thursday.'],
+  win: [
+    'BUSINESS AS USUAL — no drama in selection, none on the field. Queensland win, {COACH} shrugs.',
+    'QUIET WEEK, LOUD FOOTY — the sheet made no news and the team made all of it. Tidy night for {COACHFIRST}.',
+    'NOTHING TO SEE HERE — except a Queensland win. {COACH} will take boring like this every camp.',
+  ],
+  loss: [
+    'FLAT TRACK, FLAT FOOTY — a safe team sheet and a sorry result. The knives will want a name by Thursday.',
+    'SAFE AND SORRY — {COACH} took no risks at the selection table and got nothing back on the field.',
+    'THE PRICE OF PREDICTABLE — no bold calls, no spark, no shield tonight. Something has to change, {COACHFIRST}.',
+  ],
 }
 
 function render(template: string, story: Storyline | undefined, coach: Coach): string {
