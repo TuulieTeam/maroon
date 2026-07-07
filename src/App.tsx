@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { bluesById } from './data/bluesVariants'
 import type { Position } from './data/types'
 import { originLabel, simulateMatch } from './engine'
@@ -23,6 +23,7 @@ import {
   nswDifficultyDelta,
   pickSeriesMvp,
   reinjuryMult,
+  returningNemesis,
 } from './series'
 import type { GameNo, SeriesState } from './series'
 import { useSeries } from './series/useSeries'
@@ -200,6 +201,7 @@ export default function App() {
         winner: result.winner,
         events: result.events,
         stats: result.stats,
+        iconicMoment: result.iconicMoment,
       }
       recordResult(played)
       setPotms((prev) => [...prev, result.playerOfMatch])
@@ -340,6 +342,13 @@ export default function App() {
   // The prior game's XVII pre-fills the next selection (survives a reload via the saved series).
   const prior = state.games.at(-1)
 
+  // The grudge callback: the most recent archived nemesis returning in this series' drawn Blues
+  // sheet. Recomputed when the opponent (new series) or the career (a fresh archive) changes.
+  const grudgeLine = useMemo(() => {
+    void careerSummary // re-read the ledger when a series is archived
+    return returningNemesis(loadCareer(), Object.values(bluesById(state.opponentId).lineup))?.line ?? null
+  }, [state.opponentId, careerSummary])
+
   if (phase === 'offseason' && offseasonReport) {
     return <OffseasonScreen report={offseasonReport} board={boardOutcome} onContinue={handleBeginYear} />
   }
@@ -407,6 +416,7 @@ export default function App() {
         onKickOff={handleKickOff}
         onPlayDaily={daily.todayRecord ? undefined : () => setPhase('daily-select')}
         squad={dynasty.roster}
+        grudgeLine={grudgeLine}
       />
     )
   }
@@ -470,6 +480,7 @@ export default function App() {
       newFeatNames={recentMints.filter((m) => m.isFirst).map((m) => m.def.name)}
       coachPressure={coach.state.pressure}
       coachName={coach.coach.name}
+      grudgeLine={grudgeLine}
     />
   )
 }

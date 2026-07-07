@@ -17,6 +17,14 @@
   margin-bottom: 12px;
 }
 
+/* The grudge — a returning nemesis called out at the top of the scouting read. */
+.opposition-grudge {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--bad);
+  margin: -6px 0 12px;
+}
+
 .threat {
   border-left: 3px solid var(--surface-line);
   padding: 8px 0 8px 12px;

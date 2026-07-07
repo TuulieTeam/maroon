@@ -26,6 +26,8 @@ export type { PlayedGame } from './seriesReducer'
 export { buildSeriesContext } from './buildContext'
 export { summariseSeries, pickSeriesMvp, decidingGame } from './summary'
 export { buildShareCard } from './shareCard'
+export { NEMESIS_TUNING, foldNswDamage, crownNemesis, returningNemesis } from './nemesis'
+export type { NemesisTally } from './nemesis'
 export { addCompletedSeries, summariseCareer, EMPTY_LEDGER } from './career'
 export type {
   CareerLedger,

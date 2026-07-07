@@ -1,6 +1,8 @@
+import { bluesById } from '../data/bluesVariants'
 import type { PlayerOfMatch } from '../engine'
 import { GAME_URL } from '../gameUrl'
 import { DIFFICULTY_META } from './difficulty'
+import { crownNemesis } from './nemesis'
 import type { SeriesGameRecord, SeriesState } from './types'
 import { VENUES } from './venues'
 
@@ -41,6 +43,15 @@ export function buildShareCard(
   // Surface a non-default difficulty for the brag ("won on Hard"); Origin is the baseline, so omit it.
   if (state.difficulty && state.difficulty !== 'origin') {
     lines.push(`⚙️ Difficulty: ${DIFFICULTY_META[state.difficulty].label}`)
+  }
+  // A named villain makes a better story than a bland loss — the group chat needs someone to hate.
+  const nemesis = crownNemesis(state.nswDamage, Object.values(bluesById(state.opponentId).lineup))
+  if (nemesis) {
+    const bits = [
+      nemesis.tries > 0 ? `${nemesis.tries} ${nemesis.tries === 1 ? 'try' : 'tries'}` : null,
+      nemesis.lineBreaks > 0 ? `${nemesis.lineBreaks} line ${nemesis.lineBreaks === 1 ? 'break' : 'breaks'}` : null,
+    ].filter(Boolean)
+    lines.push(`☠️ Nemesis: ${nemesis.name}${bits.length ? ` — ${bits.join(', ')}` : ''}`)
   }
   if (newFeatNames.length > 0) lines.push(`🏅 First: ${newFeatNames.join(' · ')}`)
   lines.push(GAME_URL)

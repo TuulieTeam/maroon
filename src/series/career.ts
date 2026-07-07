@@ -1,5 +1,7 @@
+import { bluesById } from '../data/bluesVariants'
 import type { PlayerOfMatch, Score, Side, VenueId } from '../engine'
 import type { Difficulty } from './difficulty'
+import { crownNemesis } from './nemesis'
 import type { GameNo, SeriesState } from './types'
 
 /** The series MVP as an archived label — a result, never a squad attribute. */
@@ -117,6 +119,8 @@ export function addCompletedSeries(
 ): CareerLedger {
   if (state.status !== 'complete' || !state.seriesWinner) return ledger
   if (ledger.entries.some((e) => e.rootSeed === state.rootSeed)) return ledger
+  // Crown the series nemesis (if anyone cleared the bar) — the grudge the next scouting report reads.
+  const nemesis = crownNemesis(state.nswDamage, Object.values(bluesById(state.opponentId).lineup))
   const entry: LedgerEntry = {
     rootSeed: state.rootSeed,
     seriesScore: { ...state.seriesScore },
@@ -134,6 +138,7 @@ export function addCompletedSeries(
     opponentId: state.opponentId,
     ...(year !== undefined ? { year } : {}),
     ...(iconicMoment ? { iconicMoment } : {}),
+    ...(nemesis ? { nemesis } : {}),
   }
   return { ...ledger, entries: [...ledger.entries, entry] }
 }

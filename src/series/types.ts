@@ -76,6 +76,11 @@ export interface SeriesState {
   seriesWinner?: Side
   /** Per-player form + injury (QLD pool + the drawn NSW side), evolved each club round and persisted. */
   playerConditions: ConditionMap
+  /**
+   * Running per-NSW-player damage across this series (the nemesis tally — see nemesis.ts). Optional
+   * for backward-compatibility: a pre-drop-7 save simply starts counting from its next game.
+   */
+  nswDamage?: Record<string, { tries: number; lineBreaks: number; damage: number }>
 }
 
 /** Final series summary: scoreline, the shield holder, and when it became a dead rubber (if ever). */

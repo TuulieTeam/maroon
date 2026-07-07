@@ -2,8 +2,9 @@ import { QLD_SQUAD } from '../data/qldSquad'
 import { bluesById, bluesForSeed } from '../data/bluesVariants'
 import { STARTING_FORM, STARTING_INJURY } from '../data/startingForm'
 import type { Player, Position } from '../data/types'
-import type { MatchEvent, MatchStats, Score, Side } from '../engine'
+import type { IconicMoment, MatchEvent, MatchStats, Score, Side } from '../engine'
 import { advanceConditions, extractCarryover, initConditions } from './conditions'
+import { foldNswDamage } from './nemesis'
 import type { Difficulty } from './difficulty'
 import { gameSeed } from './seed'
 import type { GameNo, SeriesGameRecord, SeriesState } from './types'
@@ -28,6 +29,8 @@ export interface PlayedGame {
    *  advance form/injury between games. */
   events: MatchEvent[]
   stats: MatchStats
+  /** The match's crowned play — an NSW-side moment feeds the nemesis tally (+bonus damage). */
+  iconicMoment?: IconicMoment
 }
 
 /** A fresh series, parked on game 1, scoreless, with conditions seeded from the real-world form notes.
@@ -101,6 +104,8 @@ export function applyGameResult(state: SeriesState, played: PlayedGame, qldPool:
     currentGame: nextGame,
     status,
     playerConditions,
+    // The nemesis tally — who is hurting you, accumulating toward the series-end crowning.
+    nswDamage: foldNswDamage(state.nswDamage, played.stats, played.iconicMoment),
     ...(seriesWinner ? { seriesWinner } : {}),
   }
 }

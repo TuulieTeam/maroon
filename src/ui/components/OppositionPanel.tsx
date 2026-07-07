@@ -8,13 +8,16 @@ interface OppositionPanelProps {
   blurb: string
   /** This opponent's threat profile — the primary (first) one is flagged as the danger. */
   threats: EdgeThreat[]
+  /** The grudge callback — a past nemesis returning in this sheet ("He's back."). */
+  grudgeLine?: string | null
 }
 
-export function OppositionPanel({ opponentName, blurb, threats }: OppositionPanelProps) {
+export function OppositionPanel({ opponentName, blurb, threats, grudgeLine }: OppositionPanelProps) {
   return (
     <div className="opposition-panel">
       <h3>{opponentName} — Scouting Report</h3>
       <p className="opposition-sub">{blurb}</p>
+      {grudgeLine && <p className="opposition-grudge">{grudgeLine}</p>}
       {threats.map((threat, i) => (
         <div className={`threat ${i === 0 ? 'danger' : ''}`} key={threat.channel}>
           <div className="threat-headline">{threat.headline}</div>

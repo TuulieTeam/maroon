@@ -53,6 +53,16 @@
   font-weight: 700;
 }
 
+/* The grudge — a returning nemesis called out under the opponent line. Reads like a threat. */
+.hub-grudge {
+  text-align: center;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--bad);
+  margin: -8px auto 0;
+  max-width: 52ch;
+}
+
 .hub-mvp {
   text-align: center;
   border: 1px solid var(--surface-line);

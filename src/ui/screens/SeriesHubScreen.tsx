@@ -44,6 +44,8 @@ interface SeriesHubScreenProps {
   /** The coach's hot-seat index (0–100) and whoever currently holds the clipboard. */
   coachPressure: number
   coachName: string
+  /** The grudge callback — a past nemesis returning in this series' Blues sheet. */
+  grudgeLine?: string | null
 }
 
 function shieldHeadline(state: SeriesState): string {
@@ -69,6 +71,7 @@ export function SeriesHubScreen({
   newFeatNames,
   coachPressure,
   coachName,
+  grudgeLine,
 }: SeriesHubScreenProps) {
   const complete = state.status === 'complete'
   const deadRubberPending = !complete && state.seriesWinner != null
@@ -110,6 +113,7 @@ export function SeriesHubScreen({
           This series, you face <strong>{opponent.name}</strong> — {opponent.blurb}
         </p>
       )}
+      {!complete && grudgeLine && <p className="hub-grudge">{grudgeLine}</p>}
 
       {!complete && <ClubFormReport state={state} squad={roster} />}
 

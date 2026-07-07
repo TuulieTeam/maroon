@@ -93,6 +93,16 @@ function isValidConditionMap(v: unknown): boolean {
   return true
 }
 
+function isValidDamageTally(v: unknown): boolean {
+  if (!v || typeof v !== 'object' || Array.isArray(v)) return false
+  for (const t of Object.values(v as Record<string, unknown>)) {
+    if (!t || typeof t !== 'object') return false
+    const x = t as Record<string, unknown>
+    if (typeof x.tries !== 'number' || typeof x.lineBreaks !== 'number' || typeof x.damage !== 'number') return false
+  }
+  return true
+}
+
 function isValidSeries(v: unknown, validIds: ReadonlySet<string> = SQUAD_IDS): v is SeriesState {
   if (!v || typeof v !== 'object') return false
   const s = v as Record<string, unknown>
@@ -107,6 +117,8 @@ function isValidSeries(v: unknown, validIds: ReadonlySet<string> = SQUAD_IDS): v
   if (s.seriesWinner !== undefined && s.seriesWinner !== 'QLD' && s.seriesWinner !== 'NSW') return false
   if (!isScore(s.seriesScore)) return false
   if (!isValidConditionMap(s.playerConditions)) return false
+  // The nemesis tally is optional (pre-drop-7 saves omit it); reject only a present-but-bad value.
+  if (s.nswDamage !== undefined && !isValidDamageTally(s.nswDamage)) return false
   if (!Array.isArray(s.games)) return false
   return s.games.every((g) => isValidGameRecord(g, validIds))
 }

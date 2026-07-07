@@ -32,6 +32,8 @@ interface SelectionScreenProps {
   onPlayDaily?: () => void
   /** The selectable pool — a dynasty year passes its resolved roster; defaults to the base squad. */
   squad?: Player[]
+  /** The grudge callback — a past nemesis returning in this series' Blues sheet ("He's back."). */
+  grudgeLine?: string | null
 }
 
 export function SelectionScreen({
@@ -46,6 +48,7 @@ export function SelectionScreen({
   initialKickerId,
   onPlayDaily,
   squad = QLD_SQUAD,
+  grudgeLine,
 }: SelectionScreenProps) {
   const conditions = seriesState.playerConditions
   // The Blues side drawn for this series — fixed across all three games, revealed in the scouting report.
@@ -239,6 +242,7 @@ export function SelectionScreen({
             opponentName={opponent.name}
             blurb={opponent.blurb}
             threats={opponent.edgeThreats}
+            grudgeLine={grudgeLine}
           />
           <MatchupPanel you={you} opp={opponent.lineup} />
         </aside>
