@@ -14,11 +14,20 @@ export function loadDynasty(): DynastyState | null {
     if (!raw) return null
     const parsed: unknown = JSON.parse(raw)
     if (!isValid(parsed)) return null
-    // A drop-3 save predates the rookie class — normalise the empty list in.
-    if (!Array.isArray(parsed.overlay.rookies)) {
-      return { ...parsed, overlay: { ...parsed.overlay, rookies: [] } }
+    // Older saves predate the rookie class (drop 3) and the NSW machinery (drop 8) — normalise in.
+    return {
+      ...parsed,
+      overlay: {
+        ...parsed.overlay,
+        rookies: Array.isArray(parsed.overlay.rookies) ? parsed.overlay.rookies : [],
+        nswReplacements:
+          parsed.overlay.nswReplacements && typeof parsed.overlay.nswReplacements === 'object'
+            ? parsed.overlay.nswReplacements
+            : {},
+      },
+      nswCoach:
+        parsed.nswCoach && typeof parsed.nswCoach === 'object' ? parsed.nswCoach : { index: 0, lostStreak: 0 },
     }
-    return parsed
   } catch {
     return null
   }
@@ -58,8 +67,13 @@ function isOverlay(v: unknown): v is YearOverlay {
   if (!o.attrDeltas || typeof o.attrDeltas !== 'object' || Array.isArray(o.attrDeltas)) return false
   if (!Object.values(o.attrDeltas as Record<string, unknown>).every(isDelta)) return false
   if (!Array.isArray(o.retired) || !o.retired.every((id) => typeof id === 'string')) return false
-  // A pre-rookie (drop-3) overlay simply lacks the array — normalised below in loadDynasty.
-  return o.rookies === undefined || (Array.isArray(o.rookies) && o.rookies.every(isStoredRookie))
+  // Pre-rookie (drop-3) / pre-NSW (drop-8) overlays simply lack these — normalised in loadDynasty.
+  if (o.rookies !== undefined && !(Array.isArray(o.rookies) && o.rookies.every(isStoredRookie))) return false
+  if (o.nswReplacements !== undefined) {
+    if (!o.nswReplacements || typeof o.nswReplacements !== 'object' || Array.isArray(o.nswReplacements)) return false
+    if (!Object.values(o.nswReplacements as Record<string, unknown>).every(isStoredRookie)) return false
+  }
+  return true
 }
 
 function isArchive(v: unknown): v is YearArchive {

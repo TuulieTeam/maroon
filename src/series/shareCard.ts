@@ -1,4 +1,3 @@
-import { bluesById } from '../data/bluesVariants'
 import type { PlayerOfMatch } from '../engine'
 import { GAME_URL } from '../gameUrl'
 import { DIFFICULTY_META } from './difficulty'
@@ -45,7 +44,7 @@ export function buildShareCard(
     lines.push(`⚙️ Difficulty: ${DIFFICULTY_META[state.difficulty].label}`)
   }
   // A named villain makes a better story than a bland loss — the group chat needs someone to hate.
-  const nemesis = crownNemesis(state.nswDamage, Object.values(bluesById(state.opponentId).lineup))
+  const nemesis = crownNemesis(state.nswDamage)
   if (nemesis) {
     const bits = [
       nemesis.tries > 0 ? `${nemesis.tries} ${nemesis.tries === 1 ? 'try' : 'tries'}` : null,

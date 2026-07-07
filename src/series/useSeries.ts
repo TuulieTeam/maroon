@@ -7,7 +7,7 @@ import type { CareerSummary, LedgerIconicMoment } from './career'
 import { loadCareer, saveCareer } from './careerPersist'
 import { clearSeries, loadSeries, saveSeries } from './persist'
 import { applyGameResult, concludeSeries, initSeries } from './seriesReducer'
-import type { PlayedGame } from './seriesReducer'
+import type { NswResolver, PlayedGame } from './seriesReducer'
 import type { Difficulty } from './difficulty'
 import type { SeriesState } from './types'
 
@@ -48,17 +48,19 @@ export interface NewSeriesOptions {
  * so the impure seed source stays out of the pure series core. `roster` is the QLD pool the series
  * plays with — a dynasty year passes its resolved squad; omitted = the base 2026 pool.
  */
-export function useSeries(rootSeedFactory: () => number, roster?: Player[]): UseSeries {
+export function useSeries(rootSeedFactory: () => number, roster?: Player[], nswFor?: NswResolver): UseSeries {
   const [state, setState] = useState<SeriesState>(
     // The roster's ids (incl. generated rookies) are legitimate in a saved dynasty-year lineup.
-    () => loadSeries(roster ? new Set(roster.map((p) => p.id)) : undefined) ?? initSeries(rootSeedFactory(), 'origin', roster),
+    () => loadSeries(roster ? new Set(roster.map((p) => p.id)) : undefined) ?? initSeries(rootSeedFactory(), 'origin', roster, false, nswFor),
   )
   const [career, setCareer] = useState(() => loadCareer())
-  // The pool rides a ref so the recordResult callback stays stable across roster changes.
+  // The pools ride refs so the recordResult callback stays stable across roster changes.
   const rosterRef = useRef(roster)
+  const nswForRef = useRef(nswFor)
   useEffect(() => {
     rosterRef.current = roster
-  }, [roster])
+    nswForRef.current = nswFor
+  }, [roster, nswFor])
 
   useEffect(() => {
     saveSeries(state)
@@ -69,7 +71,7 @@ export function useSeries(rootSeedFactory: () => number, roster?: Player[]): Use
   }, [career])
 
   const recordResult = useCallback((played: PlayedGame) => {
-    setState((s) => applyGameResult(s, played, rosterRef.current))
+    setState((s) => applyGameResult(s, played, rosterRef.current, nswForRef.current))
   }, [])
 
   const skipDeadRubber = useCallback(() => {
@@ -89,7 +91,13 @@ export function useSeries(rootSeedFactory: () => number, roster?: Player[]): Use
       setCareer((c) => addCompletedSeries(c, state, seriesMvp, opts?.year, opts?.iconicMoment))
       clearSeries()
       setState(
-        initSeries(opts?.rootSeed ?? rootSeedFactory(), state.difficulty ?? 'origin', opts?.roster, opts?.neutralStart),
+        initSeries(
+          opts?.rootSeed ?? rootSeedFactory(),
+          state.difficulty ?? 'origin',
+          opts?.roster,
+          opts?.neutralStart,
+          nswForRef.current,
+        ),
       )
     },
     [state, rootSeedFactory],

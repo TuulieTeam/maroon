@@ -72,6 +72,18 @@ export function OffseasonScreen({ report, board, onContinue }: OffseasonScreenPr
         </section>
       )}
 
+      {(report.nswRetirements.length > 0 || report.nswCoachLine) && (
+        <section className="offseason-nsw" aria-label="Across the border">
+          <h2>Across the border</h2>
+          {report.nswRetirements.map((r) => (
+            <p key={r.name} className="nsw-change">
+              <strong>{r.name}</strong> retires at {r.age} — the Blues blood <strong>{r.replacedBy}</strong> in his place.
+            </p>
+          ))}
+          {report.nswCoachLine && <p className="nsw-change coach">{report.nswCoachLine}</p>}
+        </section>
+      )}
+
       {(report.risers.length > 0 || report.faders.length > 0) && (
         <section className="offseason-movers" aria-label="Summer form">
           <h2>The summer</h2>

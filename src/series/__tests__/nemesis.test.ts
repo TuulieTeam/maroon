@@ -35,6 +35,7 @@ describe('nemesis — the damage fold', () => {
       { id: 'qld-man', tries: 3, side: 'QLD' },
     ]), moment('nsw-cl', 'NSW'))
     expect(t1['nsw-cl']).toEqual({
+      name: 'nsw-cl',
       tries: 2,
       lineBreaks: 1,
       damage: 2 * NEMESIS_TUNING.perTry + NEMESIS_TUNING.perLineBreak + 3 * NEMESIS_TUNING.perTackleBreak + NEMESIS_TUNING.iconicBonus,
@@ -48,25 +49,33 @@ describe('nemesis — the damage fold', () => {
   it('accumulates across games and tolerates an undefined prior tally (pre-drop-7 saves)', () => {
     const g1 = foldNswDamage(undefined, statsWith([{ id: 'nsw-wr', tries: 1 }]), undefined)
     const g2 = foldNswDamage(g1, statsWith([{ id: 'nsw-wr', tries: 2, lineBreaks: 2 }]), undefined)
-    expect(g2['nsw-wr']).toEqual({ tries: 3, lineBreaks: 2, damage: 3 * 8 + 2 * 4 })
+    expect(g2['nsw-wr']).toEqual({ name: 'nsw-wr', tries: 3, lineBreaks: 2, damage: 3 * 8 + 2 * 4 })
   })
 })
 
 describe('nemesis — the crowning', () => {
-  it('crowns the max-damage man only past the threshold, resolving his real name', () => {
-    const under: NemesisTally = { 'nsw-cl': { tries: 2, lineBreaks: 1, damage: 20 } }
-    expect(crownNemesis(under, CLASSIC_PLAYERS)).toBeNull()
+  it('crowns the max-damage man only past the threshold, using the name captured at fold time', () => {
+    const under: NemesisTally = { 'nsw-cl': { name: 'Latrell Mitchell', tries: 2, lineBreaks: 1, damage: 20 } }
+    expect(crownNemesis(under)).toBeNull()
     const over: NemesisTally = {
-      'nsw-cl': { tries: 3, lineBreaks: 2, damage: 32 },
-      'nsw-wr': { tries: 1, lineBreaks: 0, damage: 8 },
+      'nsw-cl': { name: 'Latrell Mitchell', tries: 3, lineBreaks: 2, damage: 32 },
+      'nsw-wr': { name: 'Someone Else', tries: 1, lineBreaks: 0, damage: 8 },
     }
-    const crowned = crownNemesis(over, CLASSIC_PLAYERS)!
+    const crowned = crownNemesis(over)!
     expect(crowned.id).toBe('nsw-cl')
-    expect(crowned.name).toBe(CLASSIC.lineup.CL.name) // resolved from the sheet, not the id
+    expect(crowned.name).toBe('Latrell Mitchell')
     expect(crowned.damage).toBe(32)
-    // An id that no longer resolves can't be crowned; absent tally can't either.
-    expect(crownNemesis({ ghost: { tries: 5, lineBreaks: 5, damage: 99 } }, CLASSIC_PLAYERS)).toBeNull()
-    expect(crownNemesis(undefined, CLASSIC_PLAYERS)).toBeNull()
+    // A nameless entry (a pre-drop-8 save) can't be crowned; absent tally can't either.
+    expect(crownNemesis({ ghost: { tries: 5, lineBreaks: 5, damage: 99 } })).toBeNull()
+    expect(crownNemesis(undefined)).toBeNull()
+  })
+
+  it('a generated replacement Blue can be crowned — his name rode the fold, no sheet lookup needed', () => {
+    const folded = foldNswDamage(undefined, statsWith([{ id: 'dyn-b-2029-1', tries: 4, lineBreaks: 2 }]), undefined)
+    const crowned = crownNemesis(folded)!
+    expect(crowned.id).toBe('dyn-b-2029-1')
+    expect(crowned.name).toBe('dyn-b-2029-1') // statsWith uses id as name; real lines carry real names
+    expect(crowned.damage).toBe(4 * 8 + 2 * 4)
   })
 })
 

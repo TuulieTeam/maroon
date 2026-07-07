@@ -13,10 +13,12 @@ import { SERIES_SCHEDULE } from './venues'
 type Winner = Side | 'DRAW'
 
 /** Every player whose condition a series tracks — the QLD pool plus the drawn NSW side's 21.
- *  The pool is a parameter so a dynasty year's RESOLVED roster flows through; it defaults to the
- *  base 2026 squad, keeping every existing caller byte-identical. */
-function allPlayersFor(opponentId: string, qldPool: Player[] = QLD_SQUAD): Player[] {
-  return [...qldPool, ...Object.values(bluesById(opponentId).lineup)]
+ *  Both sides are parameters so a dynasty year's RESOLVED rosters flow through (aged Blues with
+ *  generated replacements included); defaults keep every existing caller byte-identical. */
+export type NswResolver = (opponentId: string) => Player[]
+
+function allPlayersFor(opponentId: string, qldPool: Player[] = QLD_SQUAD, nswFor?: NswResolver): Player[] {
+  return [...qldPool, ...(nswFor?.(opponentId) ?? Object.values(bluesById(opponentId).lineup))]
 }
 
 /** A finished game's inputs, ready to fold into the series. Lineup is player IDs, not Player objects. */
@@ -45,9 +47,10 @@ export function initSeries(
   difficulty: Difficulty = 'origin',
   qldPool: Player[] = QLD_SQUAD,
   neutralStart = false,
+  nswFor?: NswResolver,
 ): SeriesState {
   const opponentId = bluesForSeed(rootSeed).id
-  const players = allPlayersFor(opponentId, qldPool)
+  const players = allPlayersFor(opponentId, qldPool, nswFor)
   return {
     schemaVersion: 3,
     rootSeed: rootSeed >>> 0,
@@ -68,7 +71,12 @@ export function initSeries(
  * every winner, set the shield holder by the two-win rule (drawn series → QLD retains), and advance
  * the cursor or close the series after game 3. Pure — never mutates `state`. A no-op once complete.
  */
-export function applyGameResult(state: SeriesState, played: PlayedGame, qldPool: Player[] = QLD_SQUAD): SeriesState {
+export function applyGameResult(
+  state: SeriesState,
+  played: PlayedGame,
+  qldPool: Player[] = QLD_SQUAD,
+  nswFor?: NswResolver,
+): SeriesState {
   if (state.status === 'complete') return state
   const game = state.currentGame
   const record: SeriesGameRecord = {
@@ -93,7 +101,7 @@ export function applyGameResult(state: SeriesState, played: PlayedGame, qldPool:
     : advanceConditions(state.playerConditions, {
         rootSeed: state.rootSeed,
         nextGameNumber: nextGame,
-        players: allPlayersFor(state.opponentId, qldPool),
+        players: allPlayersFor(state.opponentId, qldPool, nswFor),
         lines: played.stats.players,
         carryover: extractCarryover(played.events),
       })

@@ -5,6 +5,7 @@ import { makeRng } from '../engine'
 import type { SeriesState } from '../series'
 import { ageOf, retirementChance, seasonDrift } from './aging'
 import { eraLine, farewellLine, moverNote } from './narrative'
+import { allNswIdentities, generateBluesReplacement, nswBirthYear, nswKey } from './nsw'
 import { archetypeForPosition, generateRookieClass } from './rookies'
 import { offseasonSeed } from './seed'
 import type { AttrDelta, DynastyState, OffseasonReport, YearArchive, YearOverlay } from './types'
@@ -21,6 +22,9 @@ import type { AttrDelta, DynastyState, OffseasonReport, YearArchive, YearOverlay
  * then tops the squad back up toward targetSquad with best-athlete archetypes, capped per year.
  * No immortals, absolutely: 36 is the end, whoever is behind you.
  */
+/** Sydney's coaching carousel — names for the churn line, in succession order. */
+export const NSW_COACHES = ['Laurie Daley', 'Cameron Ciraldo', 'Jason Ryles', 'Trent Barrett', 'Josh Hannay']
+
 export const VIABILITY = {
   /** The intake planner tops the squad back up toward this size. */
   targetSquad: 28,
@@ -67,6 +71,37 @@ export function runOffseason(
     }
   }
 
+  // ---- NSW ages too (fixed 7 draws per distinct Blue, canonical-key order) — a man in two
+  // sheets rolls ONCE. Replacements from earlier years are identities here and can retire in turn. ----
+  const nswIdentities = allNswIdentities(state.overlay)
+  const nswKeys = [...nswIdentities.keys()].sort()
+  const nswDrifts = new Map<string, AttrDelta>()
+  const nswRolls = new Map<string, number>()
+  for (const key of nswKeys) {
+    const p = nswIdentities.get(key)!
+    nswDrifts.set(key, seasonDrift(p, year - nswBirthYear(p), rng))
+    nswRolls.set(key, rng())
+  }
+  const nswRetirees: Player[] = []
+  for (const key of nswKeys) {
+    if (alreadyRetired.has(key)) continue
+    const p = nswIdentities.get(key)!
+    const d = sumDelta(state.overlay.attrDeltas[key], nswDrifts.get(key))
+    const overall =
+      (p.attrs.attack + d.attack + p.attrs.defence + d.defence + p.attrs.speed + d.speed +
+        p.attrs.hands + d.hands + p.attrs.composure + d.composure) / 5
+    if (nswRolls.get(key)! < retirementChance(year - nswBirthYear(p), overall)) nswRetirees.push(p)
+  }
+  // Their replacements — same shape, ~92–98% of the man they replace, from a decorrelated stream.
+  const replRng = makeRng((offseasonSeed(state.dynastySeed, year) ^ 0x5bd1e995) >>> 0)
+  const nswReplacements: Record<string, Player> = { ...state.overlay.nswReplacements }
+  const nswRetirementReport: Array<{ name: string; age: number; replacedBy: string }> = []
+  nswRetirees.forEach((p, i) => {
+    const replacement = generateBluesReplacement(replRng, p, year + 1, Object.keys(nswReplacements).length + i + 1)
+    nswReplacements[nswKey(p.name)] = replacement
+    nswRetirementReport.push({ name: p.name, age: year - nswBirthYear(p), replacedBy: replacement.name })
+  })
+
   // ---- The intake plan (no draws — pure scan): cover thinned positions, then top up the squad. ----
   const survivors = active.filter((p) => remaining.has(p.id))
   const needs: string[] = []
@@ -86,11 +121,29 @@ export function runOffseason(
     if (!remaining.has(p.id)) continue
     attrDeltas[p.id] = cumulative(p)
   }
+  // NSW drift folds into the shared delta map under canonical keys (still-active Blues only).
+  for (const key of nswKeys) {
+    if (alreadyRetired.has(key)) continue
+    if (nswRetirees.some((p) => nswKey(p.name) === key)) continue
+    attrDeltas[key] = sumDelta(state.overlay.attrDeltas[key], nswDrifts.get(key))
+  }
   const overlay: YearOverlay = {
     attrDeltas,
-    retired: [...state.overlay.retired, ...retirees.map((p) => p.id)],
+    retired: [...state.overlay.retired, ...retirees.map((p) => p.id), ...nswRetirees.map((p) => nswKey(p.name))],
     rookies: [...state.overlay.rookies, ...rookieClass],
+    nswReplacements,
   }
+
+  // ---- Sydney's board: two straight series losses to you and their coach walks. ----
+  const qldWon = completed.seriesWinner === 'QLD'
+  const nswLostStreak = qldWon ? state.nswCoach.lostStreak + 1 : 0
+  const sacked = nswLostStreak >= 2
+  const nswCoach = sacked ? { index: state.nswCoach.index + 1, lostStreak: 0 } : { ...state.nswCoach, lostStreak: nswLostStreak }
+  const outgoing = NSW_COACHES[state.nswCoach.index % NSW_COACHES.length]
+  const incoming = NSW_COACHES[nswCoach.index % NSW_COACHES.length]
+  const nswCoachLine = sacked
+    ? `Sydney acts: ${outgoing} pays for back-to-back series defeats. ${incoming} takes the Blues job — your problem now.`
+    : null
 
   // ---- Narrative (variable draws AFTER the fixed section — decisions above are deterministic). ----
   const report: OffseasonReport = {
@@ -111,6 +164,8 @@ export function runOffseason(
       positions: p.naturalPositions.map((pos) => POSITION_META[pos].label).join(' / '),
       note: p.formNote ?? '',
     })),
+    nswRetirements: nswRetirementReport,
+    nswCoachLine,
     eraLine: '',
   }
   const movers = active
@@ -136,7 +191,7 @@ export function runOffseason(
   report.eraLine = eraLine(year + 1, state.startYear, shields, straight)
 
   return {
-    next: { ...state, overlay, years, currentYear: year + 1 },
+    next: { ...state, overlay, years, currentYear: year + 1, nswCoach },
     report,
   }
 }

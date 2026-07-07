@@ -1,4 +1,3 @@
-import { bluesById } from '../data/bluesVariants'
 import type { PlayerOfMatch, Score, Side, VenueId } from '../engine'
 import type { Difficulty } from './difficulty'
 import { crownNemesis } from './nemesis'
@@ -120,7 +119,7 @@ export function addCompletedSeries(
   if (state.status !== 'complete' || !state.seriesWinner) return ledger
   if (ledger.entries.some((e) => e.rootSeed === state.rootSeed)) return ledger
   // Crown the series nemesis (if anyone cleared the bar) — the grudge the next scouting report reads.
-  const nemesis = crownNemesis(state.nswDamage, Object.values(bluesById(state.opponentId).lineup))
+  const nemesis = crownNemesis(state.nswDamage)
   const entry: LedgerEntry = {
     rootSeed: state.rootSeed,
     seriesScore: { ...state.seriesScore },

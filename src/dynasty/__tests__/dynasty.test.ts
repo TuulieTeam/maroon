@@ -19,8 +19,9 @@ function freshDynasty(seed = 12345): DynastyState {
     dynastySeed: seed,
     startYear: START,
     currentYear: START,
-    overlay: { attrDeltas: {}, retired: [], rookies: [] },
+    overlay: { attrDeltas: {}, retired: [], rookies: [], nswReplacements: {} },
     years: [],
+    nswCoach: { index: 0, lostStreak: 0 },
   }
 }
 
@@ -212,7 +213,7 @@ describe('dynasty — the rookie class', () => {
 
 describe('dynasty — resolved rosters', () => {
   it('year one with an empty overlay is byte-identical to the base squad', () => {
-    const roster = resolveRoster(QLD_SQUAD, { attrDeltas: {}, retired: [], rookies: [] }, START, START)
+    const roster = resolveRoster(QLD_SQUAD, { attrDeltas: {}, retired: [], rookies: [], nswReplacements: {} }, START, START)
     expect(roster).toEqual(QLD_SQUAD)
   })
 
@@ -221,6 +222,7 @@ describe('dynasty — resolved rosters', () => {
       attrDeltas: { ponga: { attack: -80, defence: 5, speed: 200, hands: 0, composure: 0, stamina: 0 } },
       retired: ['dce'],
       rookies: [],
+      nswReplacements: {},
     }
     const roster = resolveRoster(QLD_SQUAD, overlay, START + 3, START)
     expect(roster.some((p) => p.id === 'dce')).toBe(false)
@@ -234,7 +236,7 @@ describe('dynasty — resolved rosters', () => {
   })
 
   it('a 30+ man reads as a veteran whatever his authored tag', () => {
-    const roster = resolveRoster(QLD_SQUAD, { attrDeltas: {}, retired: [], rookies: [] }, START + 6, START)
+    const roster = resolveRoster(QLD_SQUAD, { attrDeltas: {}, retired: [], rookies: [], nswReplacements: {} }, START + 6, START)
     const walsh = roster.find((p) => p.id === 'walsh')! // bolter, born 2002 → 30 in 2032
     expect(ageOf(walsh, START + 6)).toBeGreaterThanOrEqual(30)
     expect(walsh.tag).toBe('veteran')

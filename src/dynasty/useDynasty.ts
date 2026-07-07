@@ -1,9 +1,12 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
+import { bluesById } from '../data/bluesVariants'
+import type { BluesTeamSheet } from '../data/bluesVariants'
 import { QLD_SQUAD } from '../data/qldSquad'
 import type { Player } from '../data/types'
 import { loadSeries } from '../series/persist'
 import type { SeriesState } from '../series'
 import { loadDynasty, saveDynasty } from './dynastyPersist'
+import { resolveBluesSheet } from './nsw'
 import { runOffseason } from './offseason'
 import { resolveRoster } from './roster'
 import { dynastySeriesSeed } from './seed'
@@ -13,6 +16,8 @@ export interface UseDynasty {
   state: DynastyState
   /** The current year's resolved QLD roster — what every series surface plays with. */
   roster: Player[]
+  /** The current year's resolved Blues sheet for an opponent id — retirees replaced, drift applied. */
+  blues: (opponentId: string) => BluesTeamSheet
   /** Run the off-season for a COMPLETED series: ages, retires, archives, rolls the year. Returns
    *  the report for the off-season screen. Idempotent per year (re-running returns null). */
   runOffseasonFor: (completed: SeriesState) => OffseasonReport | null
@@ -36,8 +41,9 @@ export function useDynasty(): UseDynasty {
       dynastySeed: (loadSeries()?.rootSeed ?? Date.now()) >>> 0,
       startYear: DYNASTY_START_YEAR,
       currentYear: DYNASTY_START_YEAR,
-      overlay: { attrDeltas: {}, retired: [], rookies: [] },
+      overlay: { attrDeltas: {}, retired: [], rookies: [], nswReplacements: {} },
       years: [],
+      nswCoach: { index: 0, lostStreak: 0 },
     }
     saveDynasty(adopted)
     return adopted
@@ -47,6 +53,11 @@ export function useDynasty(): UseDynasty {
   const roster = useMemo(
     () => resolveRoster(QLD_SQUAD, state.overlay, state.currentYear, state.startYear),
     [state],
+  )
+
+  const blues = useCallback(
+    (opponentId: string): BluesTeamSheet => resolveBluesSheet(bluesById(opponentId), state.overlay),
+    [state.overlay],
   )
 
   const runOffseasonFor = useCallback((completed: SeriesState): OffseasonReport | null => {
@@ -66,5 +77,5 @@ export function useDynasty(): UseDynasty {
     [],
   )
 
-  return { state, roster, runOffseasonFor, nextSeriesSeed }
+  return { state, roster, blues, runOffseasonFor, nextSeriesSeed }
 }

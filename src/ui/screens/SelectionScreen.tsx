@@ -3,6 +3,7 @@ import type { Player, Position } from '../../data/types'
 import { POSITION_META } from '../../data/positions'
 import { QLD_SQUAD } from '../../data/qldSquad'
 import { bluesById } from '../../data/bluesVariants'
+import type { BluesTeamSheet } from '../../data/bluesVariants'
 import type { SelectedTeam } from '../../engine'
 import { conditionFormDelta, DIFFICULTIES, DIFFICULTY_META } from '../../series'
 import type { Difficulty, SeriesState } from '../../series'
@@ -34,6 +35,8 @@ interface SelectionScreenProps {
   squad?: Player[]
   /** The grudge callback — a past nemesis returning in this series' Blues sheet ("He's back."). */
   grudgeLine?: string | null
+  /** The RESOLVED Blues sheet (a dynasty year's aged/replaced side); defaults to the authored one. */
+  opponent?: BluesTeamSheet
 }
 
 export function SelectionScreen({
@@ -49,10 +52,11 @@ export function SelectionScreen({
   onPlayDaily,
   squad = QLD_SQUAD,
   grudgeLine,
+  opponent: opponentProp,
 }: SelectionScreenProps) {
   const conditions = seriesState.playerConditions
   // The Blues side drawn for this series — fixed across all three games, revealed in the scouting report.
-  const opponent = bluesById(seriesState.opponentId)
+  const opponent = opponentProp ?? bluesById(seriesState.opponentId)
   // The difficulty dial is a series-start choice — adjustable only until game 1 kicks off.
   const canSetDifficulty = seriesState.games.length === 0
   // Players ruled OUT / SUSPENDED this game — blocked from the XVII.

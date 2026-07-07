@@ -29,6 +29,9 @@ export interface YearOverlay {
    *  home, so a future generator/name-pool edit can never rewrite an existing class. Retired
    *  rookies stay in the list (history) and are filtered at resolution like anyone else. */
   rookies: Player[]
+  /** Generated Blues, keyed by the RETIRED man's canonical name key (see nsw.ts) — his replacement
+   *  in every sheet he occupied. Stored verbatim; chains resolve when replacements retire too. */
+  nswReplacements: Record<string, Player>
 }
 
 /** One archived season — immutable results + the names history remembers. */
@@ -53,6 +56,9 @@ export interface DynastyState {
   currentYear: number
   overlay: YearOverlay
   years: YearArchive[]
+  /** Sydney's coaching carousel: who holds their clipboard, and how many straight series they've
+   *  lost to you (two straight and their board acts). Normalised in on old saves. */
+  nswCoach: { index: number; lostStreak: number }
 }
 
 /** What the off-season screen narrates — pure data, recomputable, never persisted whole. */
@@ -65,6 +71,10 @@ export interface OffseasonReport {
   faders: Array<{ name: string; note: string }>
   /** The summer's rookie class — the scouting report. */
   rookieClass: Array<{ id: string; name: string; age: number; club: string; positions: string; note: string }>
+  /** Across the border: Blues who hung it up, the generated men who replaced them, and (when their
+   *  board finally acts) the coaching change. */
+  nswRetirements: Array<{ name: string; age: number; replacedBy: string }>
+  nswCoachLine: string | null
   /** The era line, e.g. "Year 3 of the dynasty · 2 shields". */
   eraLine: string
 }

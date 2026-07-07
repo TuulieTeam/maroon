@@ -28,8 +28,9 @@ function fresh(): DynastyState {
     dynastySeed: 777,
     startYear: 2026,
     currentYear: 2026,
-    overlay: { attrDeltas: {}, retired: [], rookies: [] },
+    overlay: { attrDeltas: {}, retired: [], rookies: [], nswReplacements: {} },
     years: [],
+    nswCoach: { index: 0, lostStreak: 0 },
   }
 }
 
@@ -104,7 +105,7 @@ describe('dynastyPersist', () => {
   })
 
   it('a retired id that no longer resolves in base data is harmless at resolution', () => {
-    const state = { ...fresh(), overlay: { attrDeltas: {}, retired: ['some-removed-player'], rookies: [] } }
+    const state = { ...fresh(), overlay: { attrDeltas: {}, retired: ['some-removed-player'], rookies: [], nswReplacements: {} } }
     saveDynasty(state)
     const loaded = loadDynasty()!
     const roster = resolveRoster(QLD_SQUAD, loaded.overlay, 2027, 2026)

@@ -99,6 +99,7 @@ function isValidDamageTally(v: unknown): boolean {
     if (!t || typeof t !== 'object') return false
     const x = t as Record<string, unknown>
     if (typeof x.tries !== 'number' || typeof x.lineBreaks !== 'number' || typeof x.damage !== 'number') return false
+    if (x.name !== undefined && typeof x.name !== 'string') return false
   }
   return true
 }

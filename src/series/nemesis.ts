@@ -1,6 +1,7 @@
 import type { Player } from '../data/types'
 import type { IconicMoment, MatchResult } from '../engine'
 import type { CareerLedger, LedgerNemesis } from './career'
+// (Player is still used by returningNemesis — the drawn sheet the grudge scans.)
 
 /**
  * The nemesis — the Blues danger man who owns you across a series. Damage accrues game by game
@@ -20,8 +21,10 @@ export const NEMESIS_TUNING = {
   crownThreshold: 24,
 } as const
 
-/** Per-NSW-player running damage across a series. Persisted on SeriesState (IDs + tallies only). */
-export type NemesisTally = Record<string, { tries: number; lineBreaks: number; damage: number }>
+/** Per-NSW-player running damage across a series, NAME included at fold time — so a generated
+ *  replacement Blue (whose id resolves in no authored sheet) can still be crowned and remembered.
+ *  Persisted on SeriesState (ids + name labels + tallies only). */
+export type NemesisTally = Record<string, { name?: string; tries: number; lineBreaks: number; damage: number }>
 
 /**
  * Fold one finished game into the tally. Pure — returns a new map; `prev` may be undefined
@@ -42,6 +45,7 @@ export function foldNswDamage(
     if (gained === 0 && !next[line.id]) continue
     const cur = next[line.id] ?? { tries: 0, lineBreaks: 0, damage: 0 }
     next[line.id] = {
+      name: line.name,
       tries: cur.tries + line.tries,
       lineBreaks: cur.lineBreaks + line.lineBreaks,
       damage: cur.damage + gained,
@@ -49,27 +53,24 @@ export function foldNswDamage(
   }
   if (iconicMoment && iconicMoment.side === 'NSW') {
     const cur = next[iconicMoment.playerId] ?? { tries: 0, lineBreaks: 0, damage: 0 }
-    next[iconicMoment.playerId] = { ...cur, damage: cur.damage + NEMESIS_TUNING.iconicBonus }
+    next[iconicMoment.playerId] = { ...cur, name: cur.name ?? iconicMoment.playerName, damage: cur.damage + NEMESIS_TUNING.iconicBonus }
   }
   return next
 }
 
 /**
  * Crown the series nemesis: the max-damage man, iff he cleared the threshold. Ties break by id
- * ascending for determinism. `nswPlayers` (the drawn sheet) resolves his display name — an id that
- * no longer resolves simply can't be crowned.
+ * ascending for determinism. The name was captured at fold time; an entry from an older save that
+ * never recorded one simply can't be crowned.
  */
-export function crownNemesis(tally: NemesisTally | undefined, nswPlayers: Player[]): LedgerNemesis | null {
+export function crownNemesis(tally: NemesisTally | undefined): LedgerNemesis | null {
   if (!tally) return null
-  const byId = new Map(nswPlayers.map((p) => [p.id, p]))
-  let best: { id: string; tries: number; lineBreaks: number; damage: number } | null = null
+  let best: { id: string; name?: string; tries: number; lineBreaks: number; damage: number } | null = null
   for (const [id, t] of Object.entries(tally).sort(([a], [b]) => (a < b ? -1 : 1))) {
     if (t.damage > (best?.damage ?? -1)) best = { id, ...t }
   }
-  if (!best || best.damage < NEMESIS_TUNING.crownThreshold) return null
-  const player = byId.get(best.id)
-  if (!player) return null
-  return { id: best.id, name: player.name, tries: best.tries, lineBreaks: best.lineBreaks, damage: best.damage }
+  if (!best || best.damage < NEMESIS_TUNING.crownThreshold || !best.name) return null
+  return { id: best.id, name: best.name, tries: best.tries, lineBreaks: best.lineBreaks, damage: best.damage }
 }
 
 /**

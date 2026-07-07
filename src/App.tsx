@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
-import { bluesById } from './data/bluesVariants'
+import type { BluesTeamSheet } from './data/bluesVariants'
 import type { Position } from './data/types'
 import { originLabel, simulateMatch } from './engine'
 import type { IconicMoment, MatchResult, MatchSetup, PlayerOfMatch, SelectedTeam } from './engine'
@@ -49,8 +49,7 @@ type Phase =
   | 'daily-live'
   | 'daily-result'
 
-function nswTeam(opponentId: string): SelectedTeam {
-  const blues = bluesById(opponentId)
+function nswTeamFrom(blues: BluesTeamSheet): SelectedTeam {
   return {
     side: 'NSW',
     lineup: { ...blues.lineup },
@@ -75,8 +74,12 @@ export default function App() {
     () => dynastySeriesSeed(dynasty.state.dynastySeed, dynasty.state.startYear, dynasty.state.currentYear),
     [dynasty.state.dynastySeed, dynasty.state.startYear, dynasty.state.currentYear],
   )
+  const nswFor = useCallback(
+    (opponentId: string) => Object.values(dynasty.blues(opponentId).lineup),
+    [dynasty],
+  )
   const { state, currentContext, careerSummary, recordResult, skipDeadRubber, setDifficulty, newSeries } =
-    useSeries(rootSeedFactory, dynasty.roster)
+    useSeries(rootSeedFactory, dynasty.roster, nswFor)
 
   // Resume mid-series straight to the hub; a fresh series opens on selecting your Origin I side.
   const [phase, setPhase] = useState<Phase>(() =>
@@ -143,7 +146,7 @@ export default function App() {
         const mult = reinjuryMult(cond)
         if (mult !== 1) reinjury[id] = mult
       }
-      const nsw = nswTeam(state.opponentId)
+      const nsw = nswTeamFrom(dynasty.blues(state.opponentId))
       // Difficulty dial: a uniform effective-attr nudge to the drawn Blues side, folded into the form
       // map (pure arithmetic, no rng — never perturbs the seeded play stream). Origin = 0 = unchanged.
       const diffDelta = nswDifficultyDelta(state.difficulty)
@@ -185,7 +188,7 @@ export default function App() {
       state.games,
       currentContext,
       usedSpeechTitles,
-      dynasty.roster,
+      dynasty,
       coach,
     ],
   )
@@ -346,8 +349,8 @@ export default function App() {
   // sheet. Recomputed when the opponent (new series) or the career (a fresh archive) changes.
   const grudgeLine = useMemo(() => {
     void careerSummary // re-read the ledger when a series is archived
-    return returningNemesis(loadCareer(), Object.values(bluesById(state.opponentId).lineup))?.line ?? null
-  }, [state.opponentId, careerSummary])
+    return returningNemesis(loadCareer(), Object.values(dynasty.blues(state.opponentId).lineup))?.line ?? null
+  }, [state.opponentId, careerSummary, dynasty])
 
   if (phase === 'offseason' && offseasonReport) {
     return <OffseasonScreen report={offseasonReport} board={boardOutcome} onContinue={handleBeginYear} />
@@ -417,6 +420,7 @@ export default function App() {
         onPlayDaily={daily.todayRecord ? undefined : () => setPhase('daily-select')}
         squad={dynasty.roster}
         grudgeLine={grudgeLine}
+        opponent={dynasty.blues(state.opponentId)}
       />
     )
   }
@@ -442,7 +446,7 @@ export default function App() {
         gameLabel={originLabel(playingGame)}
         venueName={currentContext.venue.stadium}
         stakesLabel={STAKES_SHORT[currentContext.stakes]}
-        startingLineups={{ QLD: lockedTeam.lineup, NSW: nswTeam(state.opponentId).lineup }}
+        startingLineups={{ QLD: lockedTeam.lineup, NSW: dynasty.blues(state.opponentId).lineup }}
         onComplete={handleMatchComplete}
       />
     )

@@ -119,6 +119,34 @@
   color: var(--text-dim);
 }
 
+/* Across the border — the Blues' side of the world breathing. Blue-edged, of course. */
+.offseason-nsw h2 {
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 10px;
+}
+
+.nsw-change {
+  border-left: 3px solid var(--blue-deep);
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  color: var(--text-dim);
+}
+
+.nsw-change + .nsw-change {
+  margin-top: 6px;
+}
+
+.nsw-change strong {
+  color: var(--blue-text);
+}
+
+.nsw-change.coach {
+  border-left-color: var(--blue);
+  color: var(--text);
+}
+
 /* The rookie class — the scouting report. Good-green edge: the future arriving. */
 .offseason-rookies h2 {
   font-size: 1rem;
