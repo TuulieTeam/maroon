@@ -130,6 +130,30 @@ Recent feature work:
   surfaced as epigraphs on the hub's career ledger with year/decider tags. Scarcity is deliberate:
   one remembered moment per series is what makes it legend.
 
+- **The Hot Seat goes live** (2026-07-06 — coach pillar, drop 5) — `src/coach/coaches.ts` +
+  `board.ts`: the board meets at every season close (the off-season click) and acts on two public
+  triggers: **Dead Man Walking (≥80) whatever the result**, or **Under Siege (≥60) + a second
+  straight lost series**. A sacking closes the era into an immutable `CoachEra` archive (seasons,
+  shields, the board's frozen verdict line) and installs the next legend from the authored
+  succession (Slater → Smith → Thurston → Lockyer → Langer → Meninga), each with a media
+  temperament setting his honeymoon pressure (beloved 25 / measured 30 / combative 35). All media
+  surfaces (back pages, pressers, hub gauge) speak about the current clipboard-holder via coach
+  tokens. Era tallies (seasons/shields/lostStreak) ride `maroon.coach.v1` with normalise-on-load, so
+  drop-2 saves upgrade in place. Verified live: pressure 90 at season close → "⚫ THE BOARD HAS
+  ACTED", the Slater era 2026–2026 archived, Cameron Smith incoming.
+- **The Rookie Class** (2026-07-06 — Dynasty M2, drop 6) — `src/dynasty/rookies.ts`: generated
+  Queenslanders refill the pool. Seeded from a decorrelated stream (`rookieSeed`), positional
+  archetypes (outsideBack/fullback/half/hooker/middle/edge), overall 58–74 with a 5% generational
+  talent (75–82), debut age 19–21, ids `dyn-q-{year}-{n}`, surname pool curated against every real
+  Maroon surname (test-pinned). Classes are **stored verbatim** in the overlay (`Player.birthYear`
+  added for generated men) so generator edits can never rewrite an existing class. Intake is
+  need-driven (cover every starting position to 2 natural fits, then top toward 28, ≤6/summer) and
+  the **M1 viability floors are gone**: 36 is now absolutely the end (no immortals across 20 seeds ×
+  15 seasons) while squad strength holds within ±6 of the 2026 baseline over 15 years (the
+  calibration guard). `loadSeries(extraValidIds)` keeps mid-series saves with rookies in the XVII
+  alive across reloads; drop-3 dynasty saves normalise the empty class in. Scouting reports on the
+  off-season screen; a debutant's scout note survives his first season on the picker.
+
 ## Deferred backlog
 
 Paused 2026-06-16 — no committed dates. Roughly highest-leverage first.
