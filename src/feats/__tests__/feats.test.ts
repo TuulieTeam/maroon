@@ -185,7 +185,7 @@ describe('feats — daily predicates', () => {
     expect(idsOf(dailyCtx(ledger.results[0], ledger))).toContain('cauldron-silencer')
 
     DAILY_TWISTS.forEach((t, i) => {
-      ledger = recordDaily(ledger, dRec(`2026-08-0${i + 1}`, 'QLD', t.id))
+      ledger = recordDaily(ledger, dRec(`2026-08-${String(i + 1).padStart(2, '0')}`, 'QLD', t.id))
     })
     const last = ledger.results[ledger.results.length - 1]
     expect(idsOf(dailyCtx(last, ledger))).toContain('full-deck')

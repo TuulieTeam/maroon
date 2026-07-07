@@ -48,6 +48,10 @@ const DAILY_VENUE_POOL: VenueId[] = ['SUNCORP', 'ACCOR_SYD', 'MCG']
  * the Gauntlet (seed = whatever a mate's link carried). Pure and deterministic: the same seed always
  * yields the same Blues side, ground, twist, and match. The three draws use decorrelated bit ranges
  * so (for example) drawing the forward pack doesn't always drag the game to the same ground.
+ *
+ * NOTE: the twist draw is `% DAILY_TWISTS.length`, so expanding the catalog re-rolls the twist for
+ * every FUTURE date and for any previously shared gauntlet seed. Both are fine by design: the Daily
+ * makes no forward promises, and the Gauntlet is ephemeral (the share card is the record).
  */
 export function challengeFromSeed(seed: number, dateKey: string): DailyChallenge {
   const s = seed >>> 0

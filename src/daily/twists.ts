@@ -98,6 +98,53 @@ export const DAILY_TWISTS: DailyTwist[] = [
     blurb: 'The selectors rested every veteran. The future of Queensland gets its audition tonight.',
     ruledOut: (squad) => squad.filter((p) => p.tag === 'veteran').map((p) => p.id),
   },
+  {
+    id: 'exhibition-mcg',
+    label: 'The exhibition',
+    blurb: "Origin goes south — 90,000 neutrals at the 'G and a deck nobody owns. No cauldron to lean on.",
+    forceVenue: 'MCG',
+  },
+  {
+    id: 'full-flight',
+    label: 'Queensland at full flight',
+    blurb: 'Camp was perfect. Every Maroon trained the house down — today the game owes you one. Cash it in.',
+    qldFormDelta: 3,
+  },
+  {
+    id: 'origin-eve-chaos',
+    label: 'Origin eve chaos',
+    blurb: 'Both camps hit by a virus on the eve of the game. Two ragged teams, one ugly arm-wrestle.',
+    nswFormDelta: -2,
+    qldFormDelta: -2,
+  },
+  {
+    id: 'club-decider-dolphins',
+    label: 'Club call: Dolphins',
+    blurb: 'The Dolphins refused every release for their finals push. Their entire Queensland contingent is out.',
+    ruledOut: (squad) => squad.filter((p) => p.club === 'Dolphins').map((p) => p.id),
+  },
+  {
+    id: 'club-decider-cowboys',
+    label: 'Club call: Cowboys',
+    blurb: 'Townsville comes first this week — every Cowboy in the pool is held back for club duty.',
+    ruledOut: (squad) => squad.filter((p) => p.club === 'Cowboys').map((p) => p.id),
+  },
+  {
+    id: 'leaders-gone',
+    label: 'The leaders are gone',
+    blurb: 'Your four best players — the men the jersey is built around — are all unavailable. Someone else leads.',
+    ruledOut: (squad) =>
+      [...squad]
+        .sort((a, b) => overall(b) - overall(a))
+        .slice(0, 4)
+        .map((p) => p.id),
+  },
+  {
+    id: 'back-five-gone',
+    label: 'Back five gone',
+    blurb: 'Your first-choice back five is wiped out in one round of club footy. Find some new legs out wide.',
+    ruledOut: (squad) => bestNaturalPer(squad, ['FB', 'WL', 'WR', 'CL', 'CR']),
+  },
 ]
 
 /** Resolve a stored twist id; falls back to the plain shootout if a shipped id ever disappears. */

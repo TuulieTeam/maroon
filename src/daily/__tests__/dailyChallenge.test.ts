@@ -46,7 +46,7 @@ describe('daily challenge — determinism', () => {
     }
     expect(opponents.size).toBe(3)
     expect(venues.size).toBe(3)
-    expect(twists.size, `only saw twists: ${[...twists].join(', ')}`).toBeGreaterThanOrEqual(6)
+    expect(twists.size, `only saw twists: ${[...twists].join(', ')}`).toBeGreaterThanOrEqual(10)
   })
 
   it('dailyKey renders a local calendar date as YYYY-MM-DD', () => {
@@ -78,6 +78,40 @@ describe('daily twists — viability', () => {
     for (const p of QLD_SQUAD) {
       expect(kidsOut.has(p.id), `${p.name} (${p.tag})`).toBe(p.tag === 'veteran')
     }
+  })
+
+  it('leaders-gone rests exactly the four best men in the squad', () => {
+    const out = twistById('leaders-gone').ruledOut!(QLD_SQUAD)
+    expect(out).toHaveLength(4)
+    // The catalog sorts by the shared `overall` — pin the shape, not the names, so form-table
+    // edits to the hand-kept squad can't break the test.
+    const overallOf = (id: string) => {
+      const p = QLD_SQUAD.find((q) => q.id === id)!
+      return (p.attrs.attack + p.attrs.defence + p.attrs.speed + p.attrs.hands + p.attrs.composure) / 5
+    }
+    const floor = Math.min(...out.map(overallOf))
+    for (const p of QLD_SQUAD.filter((q) => !out.includes(q.id))) {
+      expect(overallOf(p.id)).toBeLessThanOrEqual(floor)
+    }
+  })
+
+  it('club-call twists rule out exactly that club’s contingent', () => {
+    for (const [twistId, club] of [
+      ['club-decider-dolphins', 'Dolphins'],
+      ['club-decider-cowboys', 'Cowboys'],
+    ] as const) {
+      const out = new Set(twistById(twistId).ruledOut!(QLD_SQUAD))
+      for (const p of QLD_SQUAD) {
+        expect(out.has(p.id), `${twistId}: ${p.name} (${p.club})`).toBe(p.club === club)
+      }
+      expect(out.size).toBeGreaterThan(0)
+    }
+  })
+
+  it('back-five-gone takes one best natural fit per outside-back position', () => {
+    const out = twistById('back-five-gone').ruledOut!(QLD_SQUAD)
+    expect(out).toHaveLength(5)
+    expect(new Set(out).size).toBe(5)
   })
 
   it('an unknown stored twist id falls back to the plain shootout', () => {
