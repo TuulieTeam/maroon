@@ -154,6 +154,18 @@ Recent feature work:
   alive across reloads; drop-3 dynasty saves normalise the empty class in. Scouting reports on the
   off-season screen; a debutant's scout note survives his first season on the picker.
 
+- **The Grudge** (2026-07-06 — chase layer, drop 7) — `src/series/nemesis.ts`: per-NSW-player
+  damage accrues in the pure reducer as optional `SeriesState.nswDamage` (**8×tries + 4×lineBreaks +
+  1×tackleBreaks, +8 for an NSW-side iconic moment**; pre-drop-7 saves start counting from their
+  next game). At archive time `crownNemesis` names the max-damage man iff damage ≥ 24 (~two
+  converted tries — a series-long problem) into the `LedgerEntry.nemesis` v2 slot; the share card
+  gets the `☠️ Nemesis:` line (a named villain beats a bland loss in the group chat). The payoff:
+  `returningNemesis` matches archived nemeses **by NAME** against the newly drawn Blues sheet (the
+  same man wears different ids across the three variants) and the hub + selection scouting report
+  open with the threat: "☠️ Payne Haas owned you in ’25 — 4 tries, 3 line breaks. He’s back."
+  Verified live with a seeded archive. Post-launch feat noted in the catalog: **Silenced** (beat a
+  returning nemesis while holding him under half his prior damage).
+
 ## Deferred backlog
 
 Paused 2026-06-16 — no committed dates. Roughly highest-leverage first.
