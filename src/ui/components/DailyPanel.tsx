@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { buildDailyShareCard, formatDateKey } from '../../daily'
-import type { DailyChallenge, DailyRecord, DailySummary } from '../../daily'
+import { buildDailyShareCard, buildWeekCard, formatDateKey, lastSevenSquares } from '../../daily'
+import type { DailyChallenge, DailyLedger, DailyRecord, DailySummary } from '../../daily'
 import { ShareCard } from './ShareCard'
 import './DailyPanel.css'
 
@@ -9,6 +9,8 @@ interface DailyPanelProps {
   /** Today's result once played — flips the panel from "play" to "come back tomorrow". */
   todayRecord: DailyRecord | undefined
   summary: DailySummary
+  /** The whole history — drives the last-7-days strip and the week card. */
+  ledger: DailyLedger
   onPlay: () => void
 }
 
@@ -42,8 +44,10 @@ function resultLine(record: DailyRecord): { cls: string; text: string } {
  * it sells today's one-shot challenge (the drawn Blues, the ground, the twist, the streak on the line).
  * Played, it locks in the result and counts down to tomorrow's.
  */
-export function DailyPanel({ challenge, todayRecord, summary, onPlay }: DailyPanelProps) {
+export function DailyPanel({ challenge, todayRecord, summary, ledger, onPlay }: DailyPanelProps) {
   const countdown = useMidnightCountdown()
+  const strip = lastSevenSquares(ledger, challenge.dateKey)
+  const weekCard = buildWeekCard(ledger, challenge.dateKey)
 
   return (
     <section className="daily-panel" aria-label="The Daily Origin">
@@ -51,6 +55,14 @@ export function DailyPanel({ challenge, todayRecord, summary, onPlay }: DailyPan
         <span className="daily-title">⚡ The Daily Origin</span>
         <span className="daily-date">{formatDateKey(challenge.dateKey)}</span>
       </div>
+
+      {summary.played > 0 && (
+        <div className="daily-strip" aria-label="Last seven days" title="The last seven days, oldest first">
+          {strip.map((d) => (
+            <span key={d.key}>{d.square}</span>
+          ))}
+        </div>
+      )}
 
       {todayRecord ? (
         <>
@@ -60,6 +72,7 @@ export function DailyPanel({ challenge, todayRecord, summary, onPlay }: DailyPan
             best {summary.bestStreak} · won {summary.wins}/{summary.played}
           </p>
           <ShareCard text={buildDailyShareCard(todayRecord, summary)} />
+          {weekCard && <ShareCard text={weekCard} />}
           <p className="daily-countdown">Next Daily in {countdown}</p>
         </>
       ) : (

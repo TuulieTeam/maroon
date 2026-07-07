@@ -267,6 +267,49 @@ describe('feats — ledger mechanics', () => {
     expect(buildDailyShareCard(rec, summary)).not.toContain('🏅')
   })
 
+  it('the coach-chase feats: Survived the Siege, Faith Rewarded, Silenced', () => {
+    const base = series()
+    if (base.kind !== 'series') throw new Error('unreachable')
+    // Survived the Siege: the same won series, judged with the seat boiling vs calm.
+    expect(idsOf({ ...base, coachPressure: 65 })).toContain('survived-the-siege')
+    expect(idsOf({ ...base, coachPressure: 40 })).not.toContain('survived-the-siege')
+    // Faith Rewarded: the MVP was one of the men the media put under fire.
+    expect(idsOf({ ...base, mvpId: 'dce', underFireIds: ['dce', 'walsh'] })).toContain('faith-rewarded')
+    expect(idsOf({ ...base, mvpId: 'ponga', underFireIds: ['dce'] })).not.toContain('faith-rewarded')
+    // Silenced: a prior nemesis ran out again and was held under half his old damage.
+    const career: CareerLedger = {
+      schemaVersion: 2,
+      entries: [
+        {
+          rootSeed: 5,
+          seriesScore: { qld: 1, nsw: 2 },
+          seriesWinner: 'NSW',
+          retained: false,
+          games: [],
+          mvp: null,
+          nemesis: { id: 'x', name: 'Latrell Mitchell', tries: 4, lineBreaks: 2, damage: 40 },
+        },
+      ],
+    }
+    const silencedCtx: FeatContext = {
+      ...base,
+      career,
+      nswNames: ['Latrell Mitchell', 'Someone Else'],
+      completed: { ...base.completed, nswDamage: { 'nsw-cl': { name: 'Latrell Mitchell', tries: 1, lineBreaks: 0, damage: 12 } } },
+    }
+    const mints = evaluateFeats(silencedCtx, EMPTY_FEATS_LEDGER, DATE).mints
+    const silenced = mints.find((m) => m.def.id === 'silenced')
+    expect(silenced?.detail).toContain('held to 12 (was 40)')
+    // He wasn't in the drawn sheet → no grudge to settle; big damage again → not silenced either.
+    expect(idsOf({ ...silencedCtx, nswNames: ['Someone Else'] })).not.toContain('silenced')
+    expect(
+      idsOf({
+        ...silencedCtx,
+        completed: { ...base.completed, nswDamage: { 'nsw-cl': { name: 'Latrell Mitchell', tries: 3, lineBreaks: 2, damage: 32 } } },
+      }),
+    ).not.toContain('silenced')
+  })
+
   it('every feat id is unique and every hint/flavour is non-empty', () => {
     expect(new Set(FEATS.map((f) => f.id)).size).toBe(FEATS.length)
     for (const f of FEATS) {

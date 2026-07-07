@@ -1,5 +1,5 @@
 import type { MatchResult } from '../../engine'
-import { buildDailyShareCard, formatDateKey, twistById } from '../../daily'
+import { buildDailyShareCard, buildGauntletShareCard, challengeFromSeed, dailySeed, formatDateKey, twistById } from '../../daily'
 import type { DailyRecord, DailySummary } from '../../daily'
 import type { FeatMint } from '../../feats'
 import { BroadcastPanel } from '../components/BroadcastPanel'
@@ -105,6 +105,11 @@ export function DailyResultScreen({ result, record, summary, featMints = [], onC
       </div>
 
       <ShareCard text={buildDailyShareCard(record, summary, newFeatNames)} />
+
+      {/* The Gauntlet: throw this EXACT match at a mate — same Blues, same twist, same seed. */}
+      <ShareCard
+        text={buildGauntletShareCard(challengeFromSeed(dailySeed(record.dateKey), record.dateKey), record.finalScore, record.winner)}
+      />
 
       <div className="result-actions">
         <button className="btn-primary" onClick={onContinue}>

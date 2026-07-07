@@ -6,9 +6,10 @@ import type { IconicMoment, MatchResult, MatchSetup, PlayerOfMatch, SelectedTeam
 import { buildPressConference, deriveStorylines, postGameBackPage, preGameBackPage, pressureBand } from './coach'
 import type { BackPage, BoardOutcome, PressExchange, Storyline } from './coach'
 import { useCoach } from './coach/useCoach'
-import { dailyKey, recordDaily, summariseDaily } from './daily'
+import { dailyKey, gauntletFromParam, recordDaily, summariseDaily } from './daily'
+import type { DailyChallenge } from './daily'
 import { useDaily } from './daily/useDaily'
-import { dynastySeriesSeed } from './dynasty'
+import { dynastySeriesSeed, eraCardLine } from './dynasty'
 import type { OffseasonReport } from './dynasty'
 import { useDynasty } from './dynasty/useDynasty'
 import type { FeatMint } from './feats'
@@ -35,6 +36,7 @@ import { SeriesHubScreen } from './ui/screens/SeriesHubScreen'
 import { DailySelectionScreen } from './ui/screens/DailySelectionScreen'
 import { DailyResultScreen } from './ui/screens/DailyResultScreen'
 import { OffseasonScreen } from './ui/screens/OffseasonScreen'
+import { GauntletResultScreen } from './ui/screens/GauntletResultScreen'
 import { STAKES_SHORT } from './ui/seriesStakes'
 
 type Phase =
@@ -48,6 +50,10 @@ type Phase =
   | 'daily-pregame'
   | 'daily-live'
   | 'daily-result'
+  | 'gauntlet-select'
+  | 'gauntlet-pregame'
+  | 'gauntlet-live'
+  | 'gauntlet-result'
 
 function nswTeamFrom(blues: BluesTeamSheet): SelectedTeam {
   return {
@@ -81,9 +87,44 @@ export default function App() {
   const { state, currentContext, careerSummary, recordResult, skipDeadRubber, setDifficulty, newSeries } =
     useSeries(rootSeedFactory, dynasty.roster, nswFor)
 
-  // Resume mid-series straight to the hub; a fresh series opens on selecting your Origin I side.
+  // A mate's ?g= link jumps straight into the Gauntlet (browsing costs nothing — it's ephemeral).
+  // Otherwise: resume mid-series straight to the hub; a fresh series opens on the Origin I picker.
+  const [gauntlet] = useState<DailyChallenge | null>(() =>
+    gauntletFromParam(new URLSearchParams(window.location.search).get('g')),
+  )
   const [phase, setPhase] = useState<Phase>(() =>
-    state.games.length === 0 && state.status === 'in-progress' ? 'select' : 'hub',
+    gauntlet ? 'gauntlet-select' : state.games.length === 0 && state.status === 'in-progress' ? 'select' : 'hub',
+  )
+  const [gauntletResult, setGauntletResult] = useState<MatchResult | null>(null)
+  const [gauntletTeam, setGauntletTeam] = useState<SelectedTeam | null>(null)
+
+  // Leaving the Gauntlet drops the ?g= param so a reload lands on the player's own game.
+  const exitGauntlet = useCallback(() => {
+    window.history.replaceState(null, '', window.location.pathname)
+    setGauntletResult(null)
+    setGauntletTeam(null)
+    setPhase(state.games.length === 0 && state.status === 'in-progress' ? 'select' : 'hub')
+  }, [state.games.length, state.status])
+
+  // Lock in a Gauntlet side — the same boundary composition as the Daily, nothing persisted.
+  const handleGauntletKickOff = useCallback(
+    (team: SelectedTeam) => {
+      if (!gauntlet) return
+      const { twist, opponent, venue, seed } = gauntlet
+      const form: Record<string, number> = {}
+      if (twist.nswFormDelta) for (const p of Object.values(opponent.lineup)) form[p.id] = twist.nswFormDelta
+      if (twist.qldFormDelta) for (const p of Object.values(team.lineup)) form[p.id] = twist.qldFormDelta
+      const setup: MatchSetup = {
+        qld: team,
+        nsw: { side: 'NSW', lineup: { ...opponent.lineup }, kickerId: opponent.kickerId, edgeThreats: opponent.edgeThreats },
+        series: { gameNumber: 1, seriesScore: { qld: 0, nsw: 0 }, venue, stakes: 'OPENER' },
+        form,
+      }
+      setGauntletTeam(team)
+      setGauntletResult(simulateMatch(setup, seed))
+      setPhase('gauntlet-pregame')
+    },
+    [gauntlet],
   )
   const [lockedTeam, setLockedTeam] = useState<SelectedTeam | null>(null)
   const [result, setResult] = useState<MatchResult | null>(null)
@@ -121,16 +162,32 @@ export default function App() {
   const [postPage, setPostPage] = useState<BackPage | null>(null)
   const [presser, setPresser] = useState<PressExchange[]>([])
 
+  // The men the media put under fire this series (recalls, kept faith, blooded rookies, gambles) —
+  // Faith Rewarded pays off when one of them takes the Player of the Series medal.
+  const [underFireIds, setUnderFireIds] = useState<string[]>([])
+
   // Judge the series feats against a COMPLETED state. The reducers are pure, so callers compute the
   // post-fold state themselves — no effect, no double-judgement (one-shot feats no-op anyway).
+  // The coach-chase feats read the siege AS IT STOOD (pressureNow, before the result cools it).
   const judgeCompletedSeries = useCallback(
-    (completed: SeriesState) => {
+    (completed: SeriesState, mvpId: string | null) => {
       if (completed.status !== 'complete' || !completed.seriesWinner) return
-      const mints = feats.evaluate({ kind: 'series', completed, career: loadCareer() }, todayKey)
+      const mints = feats.evaluate(
+        {
+          kind: 'series',
+          completed,
+          career: loadCareer(),
+          coachPressure: coach.pressureNow(),
+          mvpId,
+          underFireIds,
+          nswNames: Object.values(dynasty.blues(completed.opponentId).lineup).map((p) => p.name),
+        },
+        todayKey,
+      )
       if (mints.length > 0) setRecentMints((prev) => [...prev, ...mints])
       coach.seriesHeat(completed)
     },
-    [feats, todayKey, coach],
+    [feats, todayKey, coach, underFireIds, dynasty],
   )
 
   // Lock in the picked XVII and simulate this game — series context drives venue/stakes commentary.
@@ -173,6 +230,10 @@ export default function App() {
         priorLineup: state.games.at(-1)?.qldLineup,
       })
       setStories(derived)
+      const boldKinds = new Set(['recalled-outcast', 'kept-faith', 'blooded-rookie', 'gamble-doubtful'])
+      setUnderFireIds((prev) => [
+        ...new Set([...prev, ...derived.filter((s) => boldKinds.has(s.kind)).map((s) => s.playerId)]),
+      ])
       setPrePage(preGameBackPage(derived[0], seed, coach.coach))
       setPostPage(null)
       setPresser([])
@@ -229,10 +290,11 @@ export default function App() {
         setPresser(buildPressConference(result, pressureBand(coach.state.pressure), stories[0], seed, coach.coach))
         coach.gameHeat(prePage.stance, won)
       }
-      judgeCompletedSeries(applyGameResult(state, played))
+      const mvpCandidate = pickSeriesMvp([...potms, result.playerOfMatch])
+      judgeCompletedSeries(applyGameResult(state, played), mvpCandidate.id)
     }
     setPhase('result')
-  }, [result, lockedTeam, playingGame, recordResult, feats, state, todayKey, judgeCompletedSeries, prePage, stories, coach])
+  }, [result, lockedTeam, playingGame, recordResult, feats, state, todayKey, judgeCompletedSeries, prePage, stories, coach, potms])
 
   // Lock in the daily XVII and simulate — the twist composes at this boundary exactly like the
   // difficulty dial (uniform form-map deltas + a venue), so the engine never learns "daily".
@@ -289,9 +351,9 @@ export default function App() {
 
   // Skipping the dead rubber concludes the series — judge the concluded state it will become.
   const handleSkipDeadRubber = useCallback(() => {
-    judgeCompletedSeries(concludeSeries(state))
+    judgeCompletedSeries(concludeSeries(state), potms.length > 0 ? pickSeriesMvp(potms).id : null)
     skipDeadRubber()
-  }, [state, skipDeadRubber, judgeCompletedSeries])
+  }, [state, skipDeadRubber, judgeCompletedSeries, potms])
 
   // ---- The off-season: the completed year hardens into the dynasty, then the next campaign opens. ----
   const [offseasonReport, setOffseasonReport] = useState<OffseasonReport | null>(null)
@@ -337,6 +399,7 @@ export default function App() {
     setResult(null)
     setPotms([])
     setMoments([])
+    setUnderFireIds([])
     setUsedSpeechTitles([])
     recordedGameRef.current = null
     setPhase('select')
@@ -354,6 +417,48 @@ export default function App() {
 
   if (phase === 'offseason' && offseasonReport) {
     return <OffseasonScreen report={offseasonReport} board={boardOutcome} onContinue={handleBeginYear} />
+  }
+
+  if (phase === 'gauntlet-select' && gauntlet) {
+    return (
+      <DailySelectionScreen
+        challenge={gauntlet}
+        summary={daily.summary}
+        mode="gauntlet"
+        onKickOff={handleGauntletKickOff}
+        onBack={exitGauntlet}
+      />
+    )
+  }
+
+  if (phase === 'gauntlet-pregame' && gauntlet && gauntletResult) {
+    return (
+      <PreGameScreen
+        result={gauntletResult}
+        gameLabel="The Gauntlet"
+        venueName={gauntlet.venue.stadium}
+        stakesLabel={`⚡ ${gauntlet.twist.label} · same match as your mate`}
+        onKickOff={() => setPhase('gauntlet-live')}
+      />
+    )
+  }
+
+  if (phase === 'gauntlet-live' && gauntlet && gauntletResult && gauntletTeam) {
+    return (
+      <LiveMatchScreen
+        key={`gauntlet-${gauntlet.seed}`}
+        result={gauntletResult}
+        gameLabel="The Gauntlet"
+        venueName={gauntlet.venue.stadium}
+        stakesLabel={`⚡ ${gauntlet.twist.label}`}
+        startingLineups={{ QLD: gauntletTeam.lineup, NSW: gauntlet.opponent.lineup }}
+        onComplete={() => setPhase('gauntlet-result')}
+      />
+    )
+  }
+
+  if (phase === 'gauntlet-result' && gauntlet && gauntletResult) {
+    return <GauntletResultScreen result={gauntletResult} challenge={gauntlet} onContinue={exitGauntlet} />
   }
 
   if (phase === 'daily-select') {
@@ -484,7 +589,14 @@ export default function App() {
       newFeatNames={recentMints.filter((m) => m.isFirst).map((m) => m.def.name)}
       coachPressure={coach.state.pressure}
       coachName={coach.coach.name}
+      coachEras={coach.state.eras}
+      currentEraShields={coach.state.eraShields}
       grudgeLine={grudgeLine}
+      eraLine={
+        state.status === 'complete'
+          ? eraCardLine(dynasty.state.years, state.seriesWinner === 'QLD', dynasty.state.currentYear - dynasty.state.startYear + 1)
+          : null
+      }
     />
   )
 }

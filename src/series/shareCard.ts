@@ -32,6 +32,8 @@ export function buildShareCard(
   mvp: PlayerOfMatch | null,
   /** Feats FIRST-earned during this series — cards brag about this run, never the back catalog. */
   newFeatNames: string[] = [],
+  /** The dynasty's long arc ("🏆 Year 6 · 4 shields · 4 straight") — the run matters beyond itself. */
+  eraLine: string | null = null,
 ): string {
   const lines = ['MAROON · State of Origin 2026', headline(state)]
   const games = state.games
@@ -53,6 +55,7 @@ export function buildShareCard(
     lines.push(`☠️ Nemesis: ${nemesis.name}${bits.length ? ` — ${bits.join(', ')}` : ''}`)
   }
   if (newFeatNames.length > 0) lines.push(`🏅 First: ${newFeatNames.join(' · ')}`)
+  if (eraLine) lines.push(eraLine)
   lines.push(GAME_URL)
   return lines.join('\n')
 }

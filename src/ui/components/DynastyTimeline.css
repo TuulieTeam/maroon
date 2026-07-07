@@ -1,0 +1,35 @@
+/* The dynasty timeline — year chips + coach-era chapters. (The .dynasty-strip chip styles live in
+   OffseasonScreen.css from the drop-3 strip; this file adds the era rows.) */
+
+.dynasty-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.era-rows {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 14px;
+  font-size: 0.8rem;
+}
+
+.era-row {
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+}
+
+.era-name {
+  font-weight: 800;
+  color: var(--text-dim);
+}
+
+.era-row.current .era-name {
+  color: var(--gold);
+}
+
+.era-span {
+  color: var(--text-faint);
+}

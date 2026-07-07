@@ -3,10 +3,12 @@ import type { PlayerOfMatch, SeriesContext } from '../../engine'
 import { bluesById } from '../../data/bluesVariants'
 import { buildShareCard } from '../../series'
 import type { CareerSummary, SeriesState } from '../../series'
+import type { CoachEra } from '../../coach'
 import type { Player } from '../../data/types'
 import type { UseDaily } from '../../daily/useDaily'
 import type { DynastyState } from '../../dynasty'
 import type { FeatsLedger } from '../../feats'
+import { DynastyTimeline } from '../components/DynastyTimeline'
 import { SeriesScoreboard } from '../components/SeriesScoreboard'
 import { ClubFormReport } from '../components/ClubFormReport'
 import { ShareCard } from '../components/ShareCard'
@@ -44,8 +46,13 @@ interface SeriesHubScreenProps {
   /** The coach's hot-seat index (0–100) and whoever currently holds the clipboard. */
   coachPressure: number
   coachName: string
+  /** Closed coaching eras + the current era's shield count — the timeline's chapters. */
+  coachEras: CoachEra[]
+  currentEraShields: number
   /** The grudge callback — a past nemesis returning in this series' Blues sheet. */
   grudgeLine?: string | null
+  /** The dynasty's long-arc line for the completed-series share card. */
+  eraLine?: string | null
 }
 
 function shieldHeadline(state: SeriesState): string {
@@ -71,7 +78,10 @@ export function SeriesHubScreen({
   newFeatNames,
   coachPressure,
   coachName,
+  coachEras,
+  currentEraShields,
   grudgeLine,
+  eraLine,
 }: SeriesHubScreenProps) {
   const complete = state.status === 'complete'
   const deadRubberPending = !complete && state.seriesWinner != null
@@ -97,14 +107,12 @@ export function SeriesHubScreen({
         </h1>
       </header>
 
-      <div className="dynasty-strip" aria-label="Dynasty years">
-        {dynasty.years.map((y) => (
-          <span key={y.year} className={`year-chip ${y.seriesWinner === 'QLD' ? 'win' : 'loss'}`} title={`${y.year}: ${y.seriesScore.qld}–${y.seriesScore.nsw}`}>
-            ’{String(y.year).slice(2)} {y.seriesWinner === 'QLD' ? '🛡' : '·'}
-          </span>
-        ))}
-        <span className="year-now">{dynasty.currentYear} · season {dynasty.currentYear - dynasty.startYear + 1}</span>
-      </div>
+      <DynastyTimeline
+        dynasty={dynasty}
+        eras={coachEras}
+        currentCoachName={coachName}
+        currentEraShields={currentEraShields}
+      />
 
       <SeriesScoreboard state={state} upcoming={upcoming} />
 
@@ -126,7 +134,7 @@ export function SeriesHubScreen({
               <div className="hub-mvp-side">{seriesMvp.side === 'QLD' ? 'Queensland' : 'New South Wales'}</div>
             </div>
           )}
-          <ShareCard text={buildShareCard(state, seriesMvp, newFeatNames)} />
+          <ShareCard text={buildShareCard(state, seriesMvp, newFeatNames, eraLine)} />
           <div className="hub-actions">
             <button className="btn-primary" onClick={onRunOffseason}>
               End the season · run the off-season
@@ -154,6 +162,7 @@ export function SeriesHubScreen({
         challenge={daily.challenge}
         todayRecord={daily.todayRecord}
         summary={daily.summary}
+        ledger={daily.ledger}
         onPlay={onPlayDaily}
       />
 
@@ -162,6 +171,8 @@ export function SeriesHubScreen({
       <FeatCabinet ledger={featsLedger} />
 
       <CareerLedger summary={careerSummary} />
+
+      <footer className="hub-build-stamp">build {__BUILD_STAMP__}</footer>
     </div>
   )
 }

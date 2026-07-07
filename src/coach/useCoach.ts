@@ -18,6 +18,8 @@ export interface UseCoach {
   seriesHeat: (completed: SeriesState) => void
   /** The board's annual review, run at the off-season. May close the era and install a successor. */
   review: (completed: SeriesState, endedYear: number) => BoardOutcome
+  /** The ref-accurate CURRENT pressure — for same-tick reads (feats judge the siege as it stood). */
+  pressureNow: () => number
 }
 
 /**
@@ -72,5 +74,7 @@ export function useCoach(): UseCoach {
     [commit],
   )
 
-  return { state, coach: coachById(state.coachId), gameHeat, seriesHeat, review }
+  const pressureNow = useCallback(() => ref.current.pressure, [])
+
+  return { state, coach: coachById(state.coachId), gameHeat, seriesHeat, review, pressureNow }
 }

@@ -26,6 +26,25 @@ export function eraLine(nextYear: number, startYear: number, shields: number, st
   return `Year ${yearNo} of the dynasty · ${shieldPart}${straightPart}`
 }
 
+/**
+ * The era line for a COMPLETED series' share card — the long arc on the brag. Counts the archived
+ * years plus the series being shared. Null in year one with nothing archived (no arc to brag yet).
+ */
+export function eraCardLine(
+  archivedYears: Array<{ seriesWinner: 'QLD' | 'NSW' }>,
+  thisWinnerQld: boolean,
+  yearNo: number,
+): string | null {
+  if (archivedYears.length === 0) return null
+  const shields = archivedYears.filter((y) => y.seriesWinner === 'QLD').length + (thisWinnerQld ? 1 : 0)
+  let straight = thisWinnerQld ? 1 : 0
+  if (thisWinnerQld) {
+    for (let i = archivedYears.length - 1; i >= 0 && archivedYears[i].seriesWinner === 'QLD'; i--) straight++
+  }
+  const base = `🏆 Year ${yearNo} of the dynasty · ${shields} shield${shields === 1 ? '' : 's'}`
+  return straight >= 3 ? `${base} · ${straight} straight` : base
+}
+
 /** Riser/fader notes for the movers list. */
 const RISE_NOTES = ['took another step this summer', 'came back leaner and meaner', 'trained the house down']
 const FADE_NOTES = ['the miles are showing', 'lost half a yard over the break', 'battled through a quiet summer']

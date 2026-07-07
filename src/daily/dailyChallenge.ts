@@ -44,14 +44,20 @@ export function dailySeed(dateKey: string): number {
 const DAILY_VENUE_POOL: VenueId[] = ['SUNCORP', 'ACCOR_SYD', 'MCG']
 
 /**
- * Build the day's challenge from its date key. Pure and deterministic — the same key always yields
- * the same Blues side, ground, twist, and match seed. The three draws use decorrelated bit ranges of
- * the hash so (for example) drawing the forward pack doesn't always drag the game to the same ground.
+ * Build a one-shot challenge from a raw SEED — the shared core of the Daily (seed = date hash) and
+ * the Gauntlet (seed = whatever a mate's link carried). Pure and deterministic: the same seed always
+ * yields the same Blues side, ground, twist, and match. The three draws use decorrelated bit ranges
+ * so (for example) drawing the forward pack doesn't always drag the game to the same ground.
  */
+export function challengeFromSeed(seed: number, dateKey: string): DailyChallenge {
+  const s = seed >>> 0
+  const opponent = bluesForSeed(s)
+  const twist = DAILY_TWISTS[(s >>> 8) % DAILY_TWISTS.length]
+  const venueId = twist.forceVenue ?? DAILY_VENUE_POOL[(s >>> 16) % DAILY_VENUE_POOL.length]
+  return { dateKey, seed: s, opponent, venue: VENUES[venueId], twist }
+}
+
+/** The day's challenge — the same challenge for every mate who opens the game that day. */
 export function buildDailyChallenge(dateKey: string): DailyChallenge {
-  const seed = dailySeed(dateKey)
-  const opponent = bluesForSeed(seed)
-  const twist = DAILY_TWISTS[(seed >>> 8) % DAILY_TWISTS.length]
-  const venueId = twist.forceVenue ?? DAILY_VENUE_POOL[(seed >>> 16) % DAILY_VENUE_POOL.length]
-  return { dateKey, seed, opponent, venue: VENUES[venueId], twist }
+  return challengeFromSeed(dailySeed(dateKey), dateKey)
 }

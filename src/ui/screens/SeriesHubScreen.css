@@ -53,6 +53,14 @@
   font-weight: 700;
 }
 
+/* The build stamp — service workers auto-update, and this answers "are we on the same drop?". */
+.hub-build-stamp {
+  text-align: center;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: var(--text-faint);
+}
+
 /* The grudge — a returning nemesis called out under the opponent line. Reads like a threat. */
 .hub-grudge {
   text-align: center;

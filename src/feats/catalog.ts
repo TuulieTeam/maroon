@@ -214,6 +214,56 @@ export const FEATS: FeatDef[] = [
     },
   },
 
+  // ---- The coach's chase (live judgements only — these read state the archive never stored) ----
+  {
+    id: 'survived-the-siege',
+    name: 'Survived the Siege',
+    flavour: 'They were writing the succession pieces. You handed the board a shield instead.',
+    hint: 'Win a series while the coach is Under Siege.',
+    scope: 'series',
+    test: (ctx) =>
+      ctx.kind === 'series' &&
+      meaningful(ctx.completed.difficulty) &&
+      ctx.completed.seriesWinner === 'QLD' &&
+      (ctx.coachPressure ?? 0) >= 60,
+  },
+  {
+    id: 'faith-rewarded',
+    name: 'Faith Rewarded',
+    flavour: 'The papers savaged the pick. He answered with a Player of the Series medal.',
+    hint: 'A selection the media questioned wins Player of the Series (in a won series).',
+    scope: 'series',
+    test: (ctx) =>
+      ctx.kind === 'series' &&
+      meaningful(ctx.completed.difficulty) &&
+      ctx.completed.seriesWinner === 'QLD' &&
+      ctx.mvpId != null &&
+      (ctx.underFireIds ?? []).includes(ctx.mvpId),
+  },
+  {
+    id: 'silenced',
+    name: 'Silenced',
+    flavour: 'He owned you last time. This series he barely touched the ball. Grudge settled.',
+    hint: 'Beat a returning nemesis while holding him under half his old damage.',
+    scope: 'series',
+    test: (ctx) => {
+      if (ctx.kind !== 'series' || !meaningful(ctx.completed.difficulty)) return false
+      if (ctx.completed.seriesWinner !== 'QLD' || !ctx.completed.nswDamage || !ctx.nswNames) return false
+      const tallies = Object.values(ctx.completed.nswDamage)
+      for (let i = ctx.career.entries.length - 1; i >= 0; i--) {
+        const prior = ctx.career.entries[i].nemesis
+        // The grudge only settles against a man who actually RAN OUT this series (an untallied
+        // returnee did literally nothing all series — silenced completely).
+        if (!prior || !ctx.nswNames.includes(prior.name)) continue
+        const now = tallies.find((t) => t.name === prior.name)
+        if ((now?.damage ?? 0) < prior.damage / 2) {
+          return `${prior.name} — held to ${now?.damage ?? 0} (was ${prior.damage})`
+        }
+      }
+      return false
+    },
+  },
+
   // ---- The Daily ----
   {
     id: 'magnificent-seven',

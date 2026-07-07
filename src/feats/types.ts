@@ -19,6 +19,9 @@ export interface SeriesFacts {
   games: Array<{ gameNumber: GameNo; venueId: VenueId; winner: Side | 'DRAW' }>
   difficulty?: Difficulty
   opponentId?: string
+  /** The nemesis damage tally (live SeriesState only — archived entries lack it, so the feats that
+   *  read it are honestly earn-forward). */
+  nswDamage?: Record<string, { name?: string; tries: number; lineBreaks: number; damage: number }>
 }
 
 /** The three moments a feat can be judged at, with everything each moment actually has in hand. */
@@ -43,6 +46,13 @@ export type FeatContext =
       completed: SeriesFacts
       /** The career so far — career-scope feats (Seen 'Em All) read across it. */
       career: CareerLedger
+      /** The hot seat AS IT STOOD when the shield was decided (live judgements only). */
+      coachPressure?: number
+      /** The series MVP + the men the media put under fire this series (Faith Rewarded reads both). */
+      mvpId?: string | null
+      underFireIds?: string[]
+      /** The names on the RESOLVED drawn Blues sheet — Silenced needs to know who actually ran out. */
+      nswNames?: string[]
     }
 
 export type FeatScope = FeatContext['kind']

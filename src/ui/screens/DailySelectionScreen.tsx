@@ -19,6 +19,8 @@ interface DailySelectionScreenProps {
   onKickOff: (team: SelectedTeam) => void
   /** Leave without playing — browsing the challenge never burns the day's one attempt. */
   onBack: () => void
+  /** The Gauntlet reuses this whole picker — same challenge machinery, mate-thrown seed. */
+  mode?: 'daily' | 'gauntlet'
 }
 
 /**
@@ -27,8 +29,9 @@ interface DailySelectionScreenProps {
  * takes away, and the one-shot stakes are framed up top. Kicking off is the moment the day's single
  * attempt is committed; backing out from here costs nothing.
  */
-export function DailySelectionScreen({ challenge, summary, onKickOff, onBack }: DailySelectionScreenProps) {
+export function DailySelectionScreen({ challenge, summary, onKickOff, onBack, mode = 'daily' }: DailySelectionScreenProps) {
   const { twist, opponent, venue } = challenge
+  const isGauntlet = mode === 'gauntlet'
 
   // The twist's unavailable men — the daily equivalent of the series' injury table.
   const ruledOutIds = useMemo(() => new Set(twist.ruledOut?.(QLD_SQUAD) ?? []), [twist])
@@ -96,7 +99,9 @@ export function DailySelectionScreen({ challenge, summary, onKickOff, onBack }: 
       <header>
         <div className="app-title">MAROON</div>
         <div className="app-sub">
-          The Daily Origin · {formatDateKey(challenge.dateKey)} · one match, one attempt — pick it right.
+          {isGauntlet
+            ? `The Gauntlet · a mate threw this exact match at you — pick a better 19 than they did.`
+            : `The Daily Origin · ${formatDateKey(challenge.dateKey)} · one match, one attempt — pick it right.`}
         </div>
       </header>
 
@@ -118,7 +123,7 @@ export function DailySelectionScreen({ challenge, summary, onKickOff, onBack }: 
             ))}
           </div>
         )}
-        {summary.streak > 0 && (
+        {!isGauntlet && summary.streak > 0 && (
           <p className="daily-challenge-stakes">
             🔥 Your <strong>{summary.streak}-day streak</strong> is on the line.
           </p>
@@ -187,7 +192,11 @@ export function DailySelectionScreen({ challenge, summary, onKickOff, onBack }: 
           Back to the hub
         </button>
         <button className="btn-primary" disabled={!selection.validation.valid} onClick={handleKickOff}>
-          {selection.validation.valid ? 'LOCK IN · PLAY THE DAILY' : 'NAME YOUR 19 + 2 RESERVES'}
+          {selection.validation.valid
+            ? isGauntlet
+              ? 'LOCK IN · ANSWER THE GAUNTLET'
+              : 'LOCK IN · PLAY THE DAILY'
+            : 'NAME YOUR 19 + 2 RESERVES'}
         </button>
       </div>
     </div>

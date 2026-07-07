@@ -30,6 +30,14 @@
   color: var(--text-dim);
 }
 
+/* The last-7-days strip — the habit, visible at a glance. */
+.daily-strip {
+  display: flex;
+  gap: 3px;
+  font-size: 0.95rem;
+  letter-spacing: 1px;
+}
+
 .daily-pitch {
   font-size: 0.95rem;
   line-height: 1.5;

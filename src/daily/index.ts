@@ -1,4 +1,6 @@
-export { buildDailyChallenge, dailyKey, dailySeed } from './dailyChallenge'
+export { buildDailyChallenge, challengeFromSeed, dailyKey, dailySeed } from './dailyChallenge'
+export { gauntletFromParam, gauntletUrl, buildGauntletShareCard } from './gauntlet'
+export { lastSevenSquares, buildWeekCard, mondayOf, shiftKey } from './week'
 export type { DailyChallenge } from './dailyChallenge'
 export { DAILY_TWISTS, twistById } from './twists'
 export type { DailyTwist } from './twists'
