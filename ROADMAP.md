@@ -83,6 +83,19 @@ Recent feature work:
   toasts on both result screens, hub trophy cabinet (locked feats = silhouettes with hint text),
   `🏅 First:` share-card line for new mints only.
 
+- **The Back Page** (2026-07-06 — coach pillar, drop 2) — `src/coach/**`: the media reacts to YOUR
+  team sheet. `storylines.ts` derives the bold calls at lock-in (picked 19 vs the media-expected
+  side — last game's XVII mid-series, form-aware auto side for an opener): axed-star /
+  recalled-outcast / blooded-rookie / kept-faith / gamble-doubtful / positional-shock, one story per
+  man, boldest first. `headlines.ts`: the paper takes a POSITION on the splash pre-game
+  (backs/savages, seeded) and the result settles it — vindication or the pile-on. Slater fronts a
+  seeded post-game press conference (`pressConference.ts`) whose tone shifts with the hot-seat band.
+  `pressure.ts`: 0–100 index persisted under `maroon.coach.v1`, moved by series results (lost
+  deciders burn, sweeps are a crisis, shields buy air) + settled takes; bands Untouchable → Dead Man
+  Walking on a hub gauge. **The sack (era end) lands with the Dynasty** — CoachState reserves the
+  shape. UI: newsprint-inverted `BackPagePanel` on pre-game + result, `HotSeat` on the hub. All at
+  the App boundary; zero engine changes; the Daily stays media-free (arcade).
+
 ## Deferred backlog
 
 Paused 2026-06-16 — no committed dates. Roughly highest-leverage first.
