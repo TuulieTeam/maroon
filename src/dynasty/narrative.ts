@@ -31,15 +31,22 @@ export function eraLine(nextYear: number, startYear: number, shields: number, st
  * years plus the series being shared. Null in year one with nothing archived (no arc to brag yet).
  */
 export function eraCardLine(
-  archivedYears: Array<{ seriesWinner: 'QLD' | 'NSW' }>,
+  archivedYears: Array<{ seriesWinner: 'QLD' | 'NSW'; retained?: boolean }>,
   thisWinnerQld: boolean,
   yearNo: number,
+  /** A drawn-series retain keeps the shield but does NOT extend the streak (the record-book rule). */
+  thisRetained = false,
 ): string | null {
   if (archivedYears.length === 0) return null
   const shields = archivedYears.filter((y) => y.seriesWinner === 'QLD').length + (thisWinnerQld ? 1 : 0)
-  let straight = thisWinnerQld ? 1 : 0
-  if (thisWinnerQld) {
-    for (let i = archivedYears.length - 1; i >= 0 && archivedYears[i].seriesWinner === 'QLD'; i--) straight++
+  // "Straight" counts OUTRIGHT wins only — retained ≠ won, same cruelty as shieldStreak.
+  let straight = thisWinnerQld && !thisRetained ? 1 : 0
+  if (straight > 0) {
+    for (let i = archivedYears.length - 1; i >= 0; i--) {
+      const y = archivedYears[i]
+      if (y.seriesWinner !== 'QLD' || y.retained) break
+      straight++
+    }
   }
   const base = `🏆 Year ${yearNo} of the dynasty · ${shields} shield${shields === 1 ? '' : 's'}`
   return straight >= 3 ? `${base} · ${straight} straight` : base

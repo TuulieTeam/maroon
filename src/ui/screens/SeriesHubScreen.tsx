@@ -6,12 +6,13 @@ import type { CareerSummary, SeriesState } from '../../series'
 import type { CoachEra } from '../../coach'
 import type { Player } from '../../data/types'
 import type { UseDaily } from '../../daily/useDaily'
-import type { DynastyState } from '../../dynasty'
+import type { DynastyState, ShieldStreak } from '../../dynasty'
 import type { FeatsLedger } from '../../feats'
 import type { ScenarioDef, ScenarioLedger } from '../../scenarios'
 import { DynastyTimeline } from '../components/DynastyTimeline'
 import { ScenarioBrowser } from '../components/ScenarioBrowser'
 import { TheChase } from '../components/TheChase'
+import { TheEight } from '../components/TheEight'
 import { hubSpotlight } from '../hubOrder'
 import { SeriesScoreboard } from '../components/SeriesScoreboard'
 import { ClubFormReport } from '../components/ClubFormReport'
@@ -59,6 +60,8 @@ interface SeriesHubScreenProps {
   currentEraShields: number
   /** The grudge callback — a past nemesis returning in this series' Blues sheet. */
   grudgeLine?: string | null
+  /** The shield streak — current outright run + best, fills the 8-in-a-row strip. */
+  streak: ShieldStreak
   /** The dynasty's long-arc line for the completed-series share card. */
   eraLine?: string | null
 }
@@ -91,6 +94,7 @@ export function SeriesHubScreen({
   coachEras,
   currentEraShields,
   grudgeLine,
+  streak,
   eraLine,
 }: SeriesHubScreenProps) {
   const complete = state.status === 'complete'
@@ -133,6 +137,8 @@ export function SeriesHubScreen({
         currentCoachName={coachName}
         currentEraShields={currentEraShields}
       />
+
+      <TheEight streak={streak} />
 
       <SeriesScoreboard state={state} upcoming={upcoming} />
 

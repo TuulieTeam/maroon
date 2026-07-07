@@ -9,8 +9,8 @@ import { useCoach } from './coach/useCoach'
 import { dailyKey, gauntletFromParam, recordDaily, summariseDaily } from './daily'
 import type { DailyChallenge } from './daily'
 import { useDaily } from './daily/useDaily'
-import { dynastySeriesSeed, eraCardLine } from './dynasty'
-import type { OffseasonReport } from './dynasty'
+import { dynastySeriesSeed, eraCardLine, shieldStreak } from './dynasty'
+import type { OffseasonReport, StreakFacts } from './dynasty'
 import { useDynasty } from './dynasty/useDynasty'
 import type { FeatMint, NearMiss } from './feats'
 import { useFeats } from './feats/useFeats'
@@ -501,6 +501,15 @@ export default function App() {
     return returningNemesis(loadCareer(), Object.values(dynasty.blues(state.opponentId).lineup))?.line ?? null
   }, [state.opponentId, careerSummary, dynasty])
 
+  // The 8-in-a-row read: every archived season plus the live one once it's decided. Only outright
+  // wins fill a square — the streak the hub shows is exactly the one the long-arc feats judge.
+  const streak = useMemo(() => {
+    void careerSummary // re-read the ledger when a series is archived
+    const seasons: StreakFacts[] = [...loadCareer().entries]
+    if (state.status === 'complete' && state.seriesWinner) seasons.push(state)
+    return shieldStreak(seasons)
+  }, [careerSummary, state])
+
   if (phase === 'offseason' && offseasonReport) {
     return <OffseasonScreen report={offseasonReport} board={boardOutcome} onContinue={handleBeginYear} />
   }
@@ -737,9 +746,15 @@ export default function App() {
       coachEras={coach.state.eras}
       currentEraShields={coach.state.eraShields}
       grudgeLine={grudgeLine}
+      streak={streak}
       eraLine={
         state.status === 'complete'
-          ? eraCardLine(dynasty.state.years, state.seriesWinner === 'QLD', dynasty.state.currentYear - dynasty.state.startYear + 1)
+          ? eraCardLine(
+              dynasty.state.years,
+              state.seriesWinner === 'QLD',
+              dynasty.state.currentYear - dynasty.state.startYear + 1,
+              state.seriesWinner === 'QLD' && state.seriesScore.qld === state.seriesScore.nsw,
+            )
           : null
       }
     />

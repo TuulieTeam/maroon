@@ -1,7 +1,8 @@
 import { DAILY_TWISTS } from '../daily'
+import { THE_RECORD } from '../dynasty/streak'
 import { SCENARIOS } from '../scenarios/catalog'
 import { scenariosDone } from '../scenarios/scenarioLedger'
-import { featById } from './catalog'
+import { featById, streakThrough } from './catalog'
 import type { FeatContext, FeatsLedger } from './types'
 
 /**
@@ -90,6 +91,17 @@ const APPROACHES: Record<string, Measure> = {
     if (ctx.completed.seriesWinner === 'QLD') return null
     if (ctx.completed.seriesScore.qld !== 1 || ctx.completed.seriesScore.nsw !== 2) return null
     return { closeness: 0.6, line: 'A game away on Hard — Hard Yards is right there' }
+  },
+  'three-peat': (ctx) => {
+    if (ctx.kind !== 'series') return null
+    if (streakThrough(ctx) !== 2) return null
+    return { closeness: 2 / 3, line: '2 shields straight — Three-Peat wants the third' }
+  },
+  'the-eight': (ctx) => {
+    if (ctx.kind !== 'series') return null
+    const s = streakThrough(ctx)
+    if (s < 5 || s >= THE_RECORD) return null
+    return { closeness: s / THE_RECORD, line: `${s} straight — The Eight is the record` }
   },
   'the-historian': (ctx) => {
     if (ctx.kind !== 'scenario') return null

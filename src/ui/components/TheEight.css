@@ -1,0 +1,56 @@
+/* The Eight — eight pixel squares filling gold toward the 8-in-a-row. */
+
+.the-eight {
+  border: 1px solid var(--surface-line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 10px 14px;
+}
+
+.the-eight-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.the-eight-label {
+  font-size: var(--fs-label);
+  text-transform: uppercase;
+  letter-spacing: var(--track-1);
+  color: var(--gold);
+  font-weight: 800;
+}
+
+.the-eight-best {
+  font-size: var(--fs-label);
+  color: var(--text-faint);
+}
+
+.the-eight-strip {
+  display: flex;
+  gap: 6px;
+}
+
+.the-eight-square {
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--surface-line);
+  background: var(--surface-2);
+}
+
+.the-eight-square.is-filled {
+  border-color: var(--gold);
+  background: var(--gold);
+}
+
+.the-eight-caption {
+  margin-top: 6px;
+  font-size: var(--fs-label);
+  color: var(--text-dim);
+}
+
+.the-eight-caption.is-legend {
+  color: var(--gold);
+  font-weight: 800;
+}

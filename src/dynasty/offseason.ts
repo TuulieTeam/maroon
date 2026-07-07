@@ -186,8 +186,9 @@ export function runOffseason(
   }
   const years = [...state.years, archive]
   const shields = years.filter((y) => y.seriesWinner === 'QLD').length
+  // "Straight" = outright wins only — a drawn retain keeps the shield but snaps the streak.
   let straight = 0
-  for (let i = years.length - 1; i >= 0 && years[i].seriesWinner === 'QLD'; i--) straight++
+  for (let i = years.length - 1; i >= 0 && years[i].seriesWinner === 'QLD' && !years[i].retained; i--) straight++
   report.eraLine = eraLine(year + 1, state.startYear, shields, straight)
 
   return {

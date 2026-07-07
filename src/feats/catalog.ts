@@ -1,5 +1,7 @@
 import { MATCHDAY_POSITIONS } from '../data/positions'
 import { DAILY_TWISTS } from '../daily'
+import { shieldStreak } from '../dynasty/streak'
+import type { StreakFacts } from '../dynasty/streak'
 import { SCENARIOS } from '../scenarios/catalog'
 import { scenariosDone } from '../scenarios/scenarioLedger'
 import type { FeatContext, FeatDef } from './types'
@@ -14,6 +16,22 @@ import type { FeatContext, FeatDef } from './types'
 /** Series/match feats don't mint on Casual. Absent difficulty (a v1 archive) is taken at its word. */
 function meaningful(difficulty: string | undefined): boolean {
   return difficulty !== 'casual'
+}
+
+/**
+ * The season history UP TO AND INCLUDING the series being judged. Live judgements happen before
+ * archiving (completed isn't in the career yet → append it); retro-minting replays archived entries
+ * (completed IS one of them, by reference → slice to its position so entry i sees history-as-of-i).
+ */
+export function seasonsThrough(ctx: Extract<FeatContext, { kind: 'series' }>): StreakFacts[] {
+  const entries = ctx.career.entries
+  const idx = entries.indexOf(ctx.completed as (typeof entries)[number])
+  return idx >= 0 ? entries.slice(0, idx + 1) : [...entries, ctx.completed]
+}
+
+/** The shield streak as it stands after the judged series — the long-arc feats' one number. */
+export function streakThrough(ctx: Extract<FeatContext, { kind: 'series' }>): number {
+  return shieldStreak(seasonsThrough(ctx)).current
 }
 
 /** Wins per side over the first two games — the decider test (draws leave both short of two). */
@@ -336,6 +354,35 @@ export const FEATS: FeatDef[] = [
     hint: 'Conquer every scenario in the library.',
     scope: 'scenario',
     test: (ctx) => ctx.kind === 'scenario' && scenariosDone(ctx.ledger) >= SCENARIOS.length,
+  },
+
+  // ---- The Long Arc (the dynasty's chase — all retro-mintable from the career ledger) ----
+  {
+    id: 'three-peat',
+    category: 'dynasty',
+    name: 'Three-Peat',
+    flavour: 'Three shields, three straight years, won outright every time.',
+    hint: 'Win three series outright, back to back (retains and Casual don’t count).',
+    scope: 'series',
+    test: (ctx) => ctx.kind === 'series' && streakThrough(ctx) >= 3,
+  },
+  {
+    id: 'the-eight',
+    category: 'dynasty',
+    name: 'The Eight',
+    flavour: '2006–2013 has company. Queensland’s holy grail, in YOUR cabinet.',
+    hint: 'Win eight series outright, back to back — equal the record.',
+    scope: 'series',
+    test: (ctx) => ctx.kind === 'series' && streakThrough(ctx) >= 8,
+  },
+  {
+    id: 'dynasty-decade',
+    category: 'dynasty',
+    name: 'Decade of Origin',
+    flavour: 'Ten seasons in the job. Whatever the ledger says, that is an era.',
+    hint: 'Complete ten seasons of the dynasty.',
+    scope: 'series',
+    test: (ctx) => ctx.kind === 'series' && seasonsThrough(ctx).length >= 10,
   },
 ]
 
