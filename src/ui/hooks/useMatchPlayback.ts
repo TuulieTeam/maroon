@@ -23,8 +23,6 @@ export function useMatchPlayback(result: MatchResult): PlaybackState {
   const [speed, setSpeed] = useState<PlaybackSpeed>(1)
   const [paused, setPaused] = useState(false)
   const timer = useRef<number | null>(null)
-  const speedRef = useRef<PlaybackSpeed>(1)
-  speedRef.current = speed
 
   const events = result.events
   const done = count >= events.length
@@ -46,7 +44,7 @@ export function useMatchPlayback(result: MatchResult): PlaybackState {
     const gameMinutesGap = Math.max(0.2, (next?.minute ?? prev.minute) - prev.minute)
     const jitter = 0.75 + Math.random() * 0.5
     const baseDelay = (Math.min(2.2, gameMinutesGap) || 0.6) * MS_PER_GAME_MINUTE * jitter
-    const delay = Math.max(180, baseDelay / speedRef.current)
+    const delay = Math.max(180, baseDelay / speed)
 
     timer.current = window.setTimeout(() => {
       setCount((c) => Math.min(events.length, c + 1))

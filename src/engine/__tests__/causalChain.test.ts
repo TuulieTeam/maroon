@@ -31,7 +31,7 @@ describe('causal chain: weak left centre is targeted by NSW right edge', () => {
     expect(margin).toBeGreaterThan(0.4)
 
     // Report the observed margin for the change summary.
-    // eslint-disable-next-line no-console
+     
     console.log(
       `[causalChain] weak-CL RIGHT-edge NSW tries=${weak.tries.toFixed(2)} ` +
         `strong-CL=${strong.tries.toFixed(2)} margin=${margin.toFixed(2)} (N=${N})`,
@@ -80,7 +80,7 @@ describe('bench quality affects late-match defence (interchange addendum)', () =
   it('a fresh, strong bench concedes fewer late NSW middle tries than a weak bench', () => {
     const weakBench = lateMiddleNswTries(28)
     const strongBench = lateMiddleNswTries(95)
-    // eslint-disable-next-line no-console
+     
     console.log(
       `[bench] late(60-80) NSW MIDDLE tries weakBench=${weakBench.toFixed(3)} ` +
         `strongBench=${strongBench.toFixed(3)} (N=${N})`,

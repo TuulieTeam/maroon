@@ -64,7 +64,7 @@ describe('player of the match', () => {
     }
     expect(decisive).toBeGreaterThan(0)
     const share = fromWinner / decisive
-    // eslint-disable-next-line no-console
+     
     console.log(`[playerStats] POTM from winning side ${fromWinner}/${decisive} (${(share * 100).toFixed(0)}%)`)
     expect(share).toBeGreaterThan(0.6)
   })

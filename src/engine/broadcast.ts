@@ -293,7 +293,7 @@ function derivePostGameFacts(result: MatchResult): PostGameFacts {
     potmLine: `${potm.line.runMetres}m, ${potm.line.tries} tries, ${potm.line.tackles} tackles`,
     deciderEdge: deciderChannel ? yourEdgeFor(deciderChannel) : null,
     deciderChannelLabel: deciderChannel ? CHANNEL_LABEL[deciderChannel] : null,
-    turningPoint: deriveTurningPoint(events, winner),
+    turningPoint: deriveTurningPoint(events),
   }
 }
 
@@ -301,7 +301,7 @@ function derivePostGameFacts(result: MatchResult): PostGameFacts {
  * The turning point: the last TRY that changed the lead (in scan order), else the highest-drama
  * event, else the final/decisive try. Returned as a short human phrase.
  */
-function deriveTurningPoint(events: MatchEvent[], _winner: Side | 'DRAW'): string {
+function deriveTurningPoint(events: MatchEvent[]): string {
   let prevLeader: 'QLD' | 'NSW' | 'LEVEL' = 'LEVEL'
   let lastLeadChange: MatchEvent | null = null
   for (const e of events) {

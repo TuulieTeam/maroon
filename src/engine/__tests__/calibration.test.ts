@@ -117,7 +117,7 @@ describe('box-score calibration (per team, mean over N seeds)', () => {
       back_def_CL: { runs: mean(backRuns), metres: mean(backMetres), tackles: mean(backTackles) },
     }
 
-    // eslint-disable-next-line no-console
+     
     console.log(
       `[calibration] (N=${N}, per team)\n` +
         `  tries          = ${report.tries.toFixed(2)}   (target >3 <6)\n` +

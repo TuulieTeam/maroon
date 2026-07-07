@@ -362,7 +362,7 @@ describe('like-for-like tactical substitution (Pass A)', () => {
 
     const lowStaminaSubMinute = meanFirstLkSubMinute(50)
     const highStaminaSubMinute = meanFirstLkSubMinute(99)
-    // eslint-disable-next-line no-console
+     
     console.log(
       `[stamina-timing] mean first LK sub minute: lowStamina=${lowStaminaSubMinute.toFixed(1)} ` +
         `highStamina=${highStaminaSubMinute.toFixed(1)}`,

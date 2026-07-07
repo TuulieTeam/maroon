@@ -39,7 +39,7 @@ describe('drama: HIA / foul-play unlock the 5th & 6th BENCH (never the 20th/21st
     ).length
     expect(failsBefore).toBeGreaterThanOrEqual(3)
 
-    // eslint-disable-next-line no-console
+     
     console.log(`[drama] HIA unlock: ${failsBefore} failed HIAs before RESERVE_ACTIVATED (side ${activation.side})`)
   })
 
@@ -102,7 +102,7 @@ describe('drama: HIA / foul-play unlock the 5th & 6th BENCH (never the 20th/21st
     }
     expect(laterMentions).toBe(0)
 
-    // eslint-disable-next-line no-console
+     
     console.log(`[drama] send-off: ${ruledOut.name} (${ruledOut.id}, side ${sendOff.side}) excluded from all ${events!.length - sendOff.seq} later events`)
   })
 
@@ -175,7 +175,7 @@ describe('drama: HIA / foul-play unlock the 5th & 6th BENCH (never the 20th/21st
 
     const base = baselineConceded / N
     const binned = binnedConceded / N
-    // eslint-disable-next-line no-console
+     
     console.log(`[drama] NSW tries vs QLD: baseline=${base.toFixed(2)} heavy-QLD-sinbin=${binned.toFixed(2)} (N=${N})`)
     expect(binned).toBeGreaterThan(base)
   })

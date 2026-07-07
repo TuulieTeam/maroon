@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Player, Position } from '../../data/types'
 import type { MatchEvent, MatchResult, Side } from '../../engine'
 import { Scoreboard } from '../components/Scoreboard'
@@ -52,23 +52,25 @@ export function LiveMatchScreen({
 }: LiveMatchScreenProps) {
   const playback = useMatchPlayback(result)
   const [halfTimeShown, setHalfTimeShown] = useState(false)
-  const [halfTimeOpen, setHalfTimeOpen] = useState(false)
   const resumeRef = useRef<HTMLButtonElement>(null)
-  const { pause } = playback
+  const { pause, resume } = playback
 
-  // When the feed reaches the half-time siren for the first time, pause and pop the interstitial.
+  // playback.current is the latest revealed event — plain derived state, not a mutable ref, so
+  // alias it before it lands in any dependency array.
+  const currentEvent = playback.current
+
+  // The interstitial is open from the moment the feed reaches the half-time siren until the user
+  // dismisses it; the ticker is paused behind it.
+  const halfTimeOpen = !halfTimeShown && currentEvent?.type === 'HALF_TIME'
+
   useEffect(() => {
-    if (!halfTimeShown && playback.current?.type === 'HALF_TIME') {
-      pause()
-      setHalfTimeOpen(true)
-    }
-  }, [playback.current, halfTimeShown, pause])
+    if (halfTimeOpen) pause()
+  }, [halfTimeOpen, pause])
 
-  const resumeFromHalfTime = () => {
-    setHalfTimeOpen(false)
+  const resumeFromHalfTime = useCallback(() => {
     setHalfTimeShown(true)
-    playback.resume()
-  }
+    resume()
+  }, [resume])
 
   // Move focus into the half-time dialog on open, and let Escape resume — basic modal hygiene so a
   // keyboard/AT user isn't stranded in the now-hidden feed behind it.
@@ -80,14 +82,14 @@ export function LiveMatchScreen({
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [halfTimeOpen])
+  }, [halfTimeOpen, resumeFromHalfTime])
 
   useEffect(() => {
-    if (playback.done && playback.current?.type === 'FULL_TIME') {
+    if (playback.done && currentEvent?.type === 'FULL_TIME') {
       const t = window.setTimeout(onComplete, 1600)
       return () => window.clearTimeout(t)
     }
-  }, [playback.done, playback.current, onComplete])
+  }, [playback.done, currentEvent, onComplete])
 
   return (
     <div className="app-shell">

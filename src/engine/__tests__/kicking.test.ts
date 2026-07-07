@@ -259,7 +259,7 @@ describe('kicking: frequency bands (real-NRL realism)', () => {
     const fortyAttPerMatch = fortyAtt / N // both sides per match
     const fortySuccessPerMatch = fortySuccess / N
     const dropOutsPerMatch = dropOuts / N
-    // eslint-disable-next-line no-console
+     
     console.log(
       `[kicking] per-team kicks=${perTeamKicks.toFixed(2)} | 40/20 att/match=${fortyAttPerMatch.toFixed(2)} ` +
         `success/match=${fortySuccessPerMatch.toFixed(2)} | dropOuts/match=${dropOutsPerMatch.toFixed(2)}`,
