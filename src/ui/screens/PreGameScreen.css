@@ -13,8 +13,8 @@
 
 .pregame-kicker {
   text-transform: uppercase;
-  letter-spacing: 0.12em;
-  font-size: 0.74rem;
+  letter-spacing: var(--track-2);
+  font-size: var(--fs-label);
   color: var(--text-faint);
 }
 
@@ -28,7 +28,7 @@
 
 .pregame-sub {
   color: var(--text-dim);
-  font-size: 0.92rem;
+  font-size: var(--fs-body);
   margin-top: 6px;
 }
 
@@ -40,10 +40,10 @@
   border-radius: 999px;
   background: rgba(244, 196, 48, 0.1);
   color: var(--gold);
-  font-size: 0.78rem;
+  font-size: var(--fs-label);
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: var(--track-1);
 }
 
 @media (max-width: 560px) {
@@ -60,6 +60,6 @@
 
 .pregame-kickoff {
   font-size: 1.05rem;
-  letter-spacing: 0.08em;
+  letter-spacing: var(--track-1);
   padding: 14px 48px;
 }

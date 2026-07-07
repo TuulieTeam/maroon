@@ -12,9 +12,9 @@
 }
 
 .gus-eyebrow {
-  font-size: 0.72rem;
+  font-size: var(--fs-label);
   text-transform: uppercase;
-  letter-spacing: 0.16em;
+  letter-spacing: var(--track-2);
   color: var(--text-dim);
 }
 
@@ -29,7 +29,7 @@
 
 .gus-body p {
   margin: 0 0 0.72em;
-  font-size: 1.12rem;
+  font-size: var(--fs-read);
   line-height: 1.55;
   color: var(--text);
   opacity: 0;
@@ -45,9 +45,9 @@
 
 .gus-signoff {
   margin-top: 16px;
-  font-size: 0.95rem;
+  font-size: var(--fs-body);
   font-weight: 800;
-  letter-spacing: 0.06em;
+  letter-spacing: var(--track-1);
   text-transform: uppercase;
   color: var(--maroon-bright);
 }

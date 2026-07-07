@@ -10,8 +10,8 @@
   background: var(--surface-2);
   border-bottom: 1px solid var(--surface-line);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 0.78rem;
+  letter-spacing: var(--track-2);
+  font-size: var(--fs-label);
   font-weight: 800;
   color: var(--gold);
 }
@@ -43,14 +43,14 @@
 
 .broadcast-name {
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: var(--fs-sub);
   color: var(--text);
 }
 
 .broadcast-role {
-  font-size: 0.64rem;
+  font-size: var(--fs-label);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: var(--track-1);
   font-weight: 700;
   padding: 2px 7px;
   border-radius: 999px;
@@ -76,7 +76,8 @@
 }
 
 .broadcast-line {
-  font-size: 1.05rem;
+  font-size: var(--fs-read);
   line-height: 1.5;
   color: var(--text);
+  max-width: 60ch;
 }
