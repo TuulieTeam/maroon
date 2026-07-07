@@ -11,13 +11,14 @@ import type { Rng } from '../engine'
  * never impersonate a real Maroon.
  */
 export const ROOKIE_TUNING = {
-  /** Overall band for a standard draft class. */
-  overallMin: 58,
-  overallMax: 74,
+  /** Overall band for a standard draft class — calibrated ~6.5 under the post-rebalance squad mean
+   *  (~79), so a debutant is a project, not a finished Origin player. Retune WITH qldSquad.ts. */
+  overallMin: 65,
+  overallMax: 80,
   /** One-in-twenty is a generational talent. */
   generationalChance: 0.05,
-  generationalMin: 75,
-  generationalMax: 82,
+  generationalMin: 81,
+  generationalMax: 88,
   /** Debut age band. */
   ageMin: 19,
   ageMax: 21,

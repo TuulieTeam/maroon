@@ -26,11 +26,13 @@ export const CONDITIONS_TUNING = {
   doubtfulFormPenalty: -8, // flat effective-attr penalty for playing hurt
   // Role baselines for the Origin-performance z-score (per-80 performanceScore). CALIBRATED from a
   // 120-match neutral real-squad run (backs swing widest, forwards' tackle volume is steady), so an
-  // average game nets ~0 form and only a genuine blinder/shocker moves the needle.
+  // average game nets ~0 form and only a genuine blinder/shocker moves the needle. RE-DERIVED after
+  // the Great Rebalance (parity squads); if the authored squads move again, re-derive (mirror
+  // originPerformanceDelta's gate + per-80 scaling over ~120 neutral sims) or every game reads biased.
   roleBaseline: {
-    back: { mean: 984, sd: 689 },
-    forward: { mean: 857, sd: 346 },
-    half: { mean: 858, sd: 419 },
+    back: { mean: 1015, sd: 550 },
+    forward: { mean: 848, sd: 290 },
+    half: { mean: 842, sd: 341 },
   } as Record<PlayerRole, { mean: number; sd: number }>,
 } as const
 

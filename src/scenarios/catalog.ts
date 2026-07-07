@@ -61,10 +61,10 @@ export const SCENARIOS: ScenarioDef[] = [
     blurb:
       'Super League took every star you had, and the papers laughed at the team sheet. Fatty believed. Win with the four best men in Queensland watching from the stands.',
     tier: 'origin',
-    seed: 13,
+    seed: 7,
     opponentId: 'classic',
     venueId: 'SUNCORP',
-    constraint: { ruledOut: (squad) => topMen(squad, 4), nswFormDelta: 2 },
+    constraint: { ruledOut: (squad) => topMen(squad, 4), nswFormDelta: 3 },
     winLabel: 'Win without your four best players.',
     winCondition: (r) => won(r),
   },
@@ -73,11 +73,10 @@ export const SCENARIOS: ScenarioDef[] = [
     title: 'Into the Cauldron',
     blurb:
       "Eighty thousand in sky blue and the left-field Blues running their strike moves at your right edge. Sydney decider footy: it isn't enough to score — you have to strangle them.",
-    tier: 'origin',
-    seed: 150,
+    tier: 'hard',
+    seed: 7,
     opponentId: 'leftshift',
     venueId: 'ACCOR_SYD',
-    constraint: { nswFormDelta: 2 },
     winLabel: 'Win and hold NSW under 12.',
     winCondition: (r) => (won(r) && r.finalScore.nsw < 12 ? `Held them to ${r.finalScore.nsw}` : false),
   },
@@ -92,8 +91,8 @@ export const SCENARIOS: ScenarioDef[] = [
     venueId: 'SUNCORP',
     constraint: {
       ruledOut: (squad) => squad.filter((p) => p.naturalPositions.includes('HB')).map((p) => p.id),
+      nswFormDelta: 3,
     },
-    // (seed 7 verified against this exact constraint in scenarios.test.ts)
     winLabel: 'Win without a recognised halfback in the squad.',
     winCondition: (r) => won(r),
   },
@@ -105,7 +104,7 @@ export const SCENARIOS: ScenarioDef[] = [
     blurb:
       'Ninety thousand neutrals in Melbourne and the biggest, ugliest Blues pack ever assembled grinding at your middle. Beat the Wall — and barely let it over your line.',
     tier: 'hard',
-    seed: 117,
+    seed: 33,
     opponentId: 'forwards',
     venueId: 'MCG',
     winLabel: 'Win and hold the Wall to one try or none.',
@@ -116,8 +115,8 @@ export const SCENARIOS: ScenarioDef[] = [
     title: "The Kids' Crusade",
     blurb:
       'The selectors rested every veteran and handed the future its audition — and an audition means the kids have to DO something, not just survive the night.',
-    tier: 'hard',
-    seed: 56,
+    tier: 'legendary',
+    seed: 26,
     opponentId: 'classic',
     venueId: 'SUNCORP',
     constraint: { ruledOut: (squad) => squad.filter((p) => p.tag === 'veteran').map((p) => p.id) },
@@ -139,7 +138,7 @@ export const SCENARIOS: ScenarioDef[] = [
     blurb:
       "They moved their whole attack to the other edge and dared you to adjust. Don't just adjust — humiliate the idea. A close win rewards the experiment; a hiding ends it.",
     tier: 'hard',
-    seed: 471,
+    seed: 20,
     opponentId: 'leftshift',
     venueId: 'ACCOR_SYD',
     constraint: { nswFormDelta: 2 },
@@ -154,10 +153,10 @@ export const SCENARIOS: ScenarioDef[] = [
     blurb:
       'Their best seventeen, in the form of their lives, at home, with everything on the line. The nights that make Immortals are exactly the nights nobody gives you a chance.',
     tier: 'legendary',
-    seed: 336,
+    seed: 17,
     opponentId: 'classic',
     venueId: 'ACCOR_SYD',
-    constraint: { nswFormDelta: 3 },
+    constraint: { nswFormDelta: 8 },
     winLabel: 'Beat the Blues at their career best, in Sydney.',
     winCondition: (r) => won(r),
   },
@@ -167,7 +166,7 @@ export const SCENARIOS: ScenarioDef[] = [
     blurb:
       'Great sides win. Feared sides win without letting the other mob cross at all — eighty minutes of goal-line hate the Blues remember for a decade.',
     tier: 'legendary',
-    seed: 254,
+    seed: 150,
     opponentId: 'classic',
     venueId: 'SUNCORP',
     winLabel: 'Win and keep New South Wales tryless.',

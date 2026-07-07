@@ -3,12 +3,13 @@ import type { GameNo } from './types'
 
 /**
  * The three Origin grounds. `homeAdvantage` (0..1) scales the home-ground rating edge: Suncorp is a
- * genuine fortress (1), Accor a strong but lesser Sydney home (0.8), and the MCG a near-neutral
- * interstate deck where the nominal NSW "home" barely counts (0.2). See TUNING.homeEdge for the points.
+ * genuine fortress (1), Accor a hostile but never one-sided Sydney home (0.5 — half those stands are
+ * expat Queenslanders anyway), and the MCG a near-neutral interstate deck where the nominal NSW
+ * "home" barely counts (0.2). See TUNING.homeEdge for the points; realBalance.test.ts for the feel.
  */
 export const VENUES: Record<VenueId, Venue> = {
   SUNCORP: { id: 'SUNCORP', stadium: 'Suncorp Stadium', groundShort: 'Suncorp', city: 'Brisbane', homeSide: 'QLD', homeAdvantage: 1 },
-  ACCOR_SYD: { id: 'ACCOR_SYD', stadium: 'Accor Stadium', groundShort: 'Accor', city: 'Sydney', homeSide: 'NSW', homeAdvantage: 0.8 },
+  ACCOR_SYD: { id: 'ACCOR_SYD', stadium: 'Accor Stadium', groundShort: 'Accor', city: 'Sydney', homeSide: 'NSW', homeAdvantage: 0.5 },
   MCG: { id: 'MCG', stadium: 'the MCG', groundShort: 'the MCG', city: 'Melbourne', homeSide: 'NSW', homeAdvantage: 0.2 },
 }
 

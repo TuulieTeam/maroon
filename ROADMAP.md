@@ -232,6 +232,30 @@ Recent feature work:
      classes are verbatim, so shifted draws never rewrite history). Pool floors + no-duplicate
      guards in `contentPools.test.ts`.
 
+- **The Great Rebalance** (2026-07-07) — QLD almost never won and losses were blowouts (5% win rate
+  in Sydney, avg −26; 0% on Hard). Root cause: the NSW starting 13 was authored ~7.6 overall points
+  stronger than QLD's best 13 (81.7 vs 74.1), Cleary's boot dwarfed every Maroon kicker, NSW carried
+  +4 stamina, and no test had ever fielded the REAL squad (calibration runs synthetic fixtures). The
+  fix, to the user-chosen "Maroon-tinted" target (~60% at Suncorp / ~50% away at Origin, close losses,
+  Hard ~35%, Casual comfortable):
+  - **`qldSquad.ts` re-authored to parity+** — all 32 players lifted preserving relative order and
+    positional shape (weak links stay exploitable: Walsh D62, HTF D65, Nanai D66, D. Fifita D62);
+    stars 84–88 (Munster 87, Grant 86, Ponga 85.6), rookies ~74; Ponga GK 80→88 (the natural
+    first-choice boot), Holmes GK→90 (a real recall dilemma), stamina to NSW's level.
+  - **`realBalance.test.ts`** — the missing guard: the auto-picked best legal 19+2 from the real
+    squad vs all three Blues sheets × all three venues × 50 seeds, plus Hard/Casual cells, with a
+    printed per-cell report and TIGHT pins on win rate / margin / closeness / blowout rate. Tuned
+    result: Suncorp 61% (+4.7, median |m| 8), Accor 43%, MCG 47%, Hard 30%, Casual 88%.
+  - **The win curve is steep** (~7–13pp per uniform effective-attr point once squads are at parity),
+    so `TUNING.homeEdge` compressed 2.5/1.5 → 1.0/0.5, Accor `homeAdvantage` 0.8 → 0.5, and the Hard
+    dial +6 → +3 (Casual −6 unchanged).
+  - **Knock-ons swept**: dynasty `ROOKIE_TUNING` lifted (65–80, generational 81–88) so the 15-year
+    strength guard holds; `CONDITIONS_TUNING.roleBaseline` re-derived from a 120-match parity run
+    (back 1015/550, forward 848/290, half 842/341) so an average game reads as average again;
+    scenario constraints re-tuned + seeds re-pinned at tier rarity for the stronger squad (easy ~55%,
+    origin ~33%, hard 9–13%, legendary 0.7–3.3% for the reference side; hold-the-cauldron re-tiered
+    hard, kids-crusade re-tiered legendary, Immortal Territory now NSW +8).
+
 ## Deferred backlog
 
 Paused 2026-06-16 — no committed dates. Roughly highest-leverage first.

@@ -5,9 +5,10 @@
  * whichever Blues side was drawn, and (being pure arithmetic on the form map) never perturbs the seeded
  * play stream. `origin` is 0, so an Origin-difficulty series is byte-identical to the dial-free game.
  *
- * Magnitude: bigger than a home fortress (~2.5 pts) but inside the form band (±12) — a real lever on the
- * result without making it a foregone conclusion. Tune `DIFFICULTY_TUNING`; the monotonic-win-rate guard
- * in difficulty.test.ts re-checks the dial still bites in the right direction.
+ * Magnitude: TUNED AGAINST realBalance.test.ts — the win curve is steep (~7pp per uniform point), so
+ * hard's +4 is ~a third of the win rate at Suncorp (target ~35%) and casual's -6 is a comfortable night
+ * (~85%+). The monotonic guard in difficulty.test.ts re-checks the dial still bites in the right
+ * direction; the real-squad bands in realBalance.test.ts pin what each setting FEELS like.
  */
 export type Difficulty = 'casual' | 'origin' | 'hard'
 
@@ -17,7 +18,7 @@ export const DIFFICULTIES: Difficulty[] = ['casual', 'origin', 'hard']
 export const DIFFICULTY_TUNING: Record<Difficulty, number> = {
   casual: -6,
   origin: 0,
-  hard: 6,
+  hard: 3,
 }
 
 export const DIFFICULTY_META: Record<Difficulty, { label: string; blurb: string }> = {

@@ -75,11 +75,12 @@ export const TUNING = {
   /**
    * Home-ground edge. A uniform, pre-kickoff effective-attr nudge applied to EVERY selected player by
    * side — the home side up by `home`, the visitor down by `away` — then scaled by the venue's
-   * homeAdvantage (0..1). Points, the same unit as form deltas (which cap at ±12), so a full-strength
-   * fortress is a ~4pt net swing: real, but smaller than an individual's hot/cold form. Folded into the
-   * form map in simulate.ts, so it's pure arithmetic that draws no rng and never shifts the play stream.
+   * homeAdvantage (0..1). Points, the same unit as form deltas. TUNED AGAINST realBalance.test.ts:
+   * because the edge hits every man on the park at once, the win curve is steep (~7pp of win rate per
+   * net point with parity squads) — a full fortress is deliberately only a ~1.5pt net swing, which is
+   * ~+10pp at home. Folded into the form map in simulate.ts; pure arithmetic, no rng drawn.
    */
-  homeEdge: { home: 2.5, away: 1.5 },
+  homeEdge: { home: 1.0, away: 0.5 },
 
   /**
    * Drama — HIA & foul play. Deliberately RARE spice: a typical match has 0–1 of each,
@@ -556,7 +557,7 @@ function clamp(x: number, lo: number, hi: number): number {
  * A kicker's boot quality (1–99), derived from existing attrs — NO new Player field. Goal-kicking
  * dominates (a long, accurate boot is the headline trait), composure carries the nerve to land the
  * tough one, hands the touch on a grubber. Fatigue shaves composure + hands (not the trained
- * goal-kicking leg). Cleary ~83, DCE ~73, Munster ~52, a forward ~35; the synthetic def-HB fixture
+ * goal-kicking leg). Cleary ~85, Ponga ~83, DCE ~80, Munster ~55, a forward ~35; the synthetic def-HB fixture
  * (gk 10 / comp 70 / hands 70) lands ~37 → 40/20s & field goals are rightly rare for that team.
  */
 export function kickSkill(p: Player, fatigue = 0, formDelta = 0): number {
