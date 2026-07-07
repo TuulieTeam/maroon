@@ -3,7 +3,9 @@ import type { PlayerOfMatch, SeriesContext } from '../../engine'
 import { bluesById } from '../../data/bluesVariants'
 import { buildShareCard } from '../../series'
 import type { CareerSummary, SeriesState } from '../../series'
+import type { Player } from '../../data/types'
 import type { UseDaily } from '../../daily/useDaily'
+import type { DynastyState } from '../../dynasty'
 import type { FeatsLedger } from '../../feats'
 import { SeriesScoreboard } from '../components/SeriesScoreboard'
 import { ClubFormReport } from '../components/ClubFormReport'
@@ -26,8 +28,12 @@ interface SeriesHubScreenProps {
   onPick: () => void
   /** Close out a clinched series without playing the dead rubber. */
   onSkipDeadRubber: () => void
-  /** Wipe the series and start fresh. */
-  onNewSeries: () => void
+  /** End the season: run the off-season (aging, retirements) and open the next year's campaign. */
+  onRunOffseason: () => void
+  /** The dynasty's calendar + archive — drives the year strip. */
+  dynasty: DynastyState
+  /** The current year's resolved roster (feeds the form guide). */
+  roster: Player[]
   /** The Daily Origin — today's challenge, today's result (if played), and the streak read. */
   daily: UseDaily
   onPlayDaily: () => void
@@ -53,7 +59,9 @@ export function SeriesHubScreen({
   seriesMvp,
   onPick,
   onSkipDeadRubber,
-  onNewSeries,
+  onRunOffseason,
+  dynasty,
+  roster,
   daily,
   onPlayDaily,
   featsLedger,
@@ -84,6 +92,15 @@ export function SeriesHubScreen({
         </h1>
       </header>
 
+      <div className="dynasty-strip" aria-label="Dynasty years">
+        {dynasty.years.map((y) => (
+          <span key={y.year} className={`year-chip ${y.seriesWinner === 'QLD' ? 'win' : 'loss'}`} title={`${y.year}: ${y.seriesScore.qld}–${y.seriesScore.nsw}`}>
+            ’{String(y.year).slice(2)} {y.seriesWinner === 'QLD' ? '🛡' : '·'}
+          </span>
+        ))}
+        <span className="year-now">{dynasty.currentYear} · season {dynasty.currentYear - dynasty.startYear + 1}</span>
+      </div>
+
       <SeriesScoreboard state={state} upcoming={upcoming} />
 
       {!complete && (
@@ -92,7 +109,7 @@ export function SeriesHubScreen({
         </p>
       )}
 
-      {!complete && <ClubFormReport state={state} />}
+      {!complete && <ClubFormReport state={state} squad={roster} />}
 
       {complete ? (
         <>
@@ -105,8 +122,8 @@ export function SeriesHubScreen({
           )}
           <ShareCard text={buildShareCard(state, seriesMvp, newFeatNames)} />
           <div className="hub-actions">
-            <button className="btn-primary" onClick={onNewSeries}>
-              Start a new series
+            <button className="btn-primary" onClick={onRunOffseason}>
+              End the season · run the off-season
             </button>
           </div>
         </>

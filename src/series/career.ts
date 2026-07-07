@@ -108,6 +108,8 @@ export function addCompletedSeries(
   ledger: CareerLedger,
   state: SeriesState,
   mvp: PlayerOfMatch | null,
+  /** The dynasty year this series was, e.g. 2027 — labels the archive ("won the '27 shield"). */
+  year?: number,
 ): CareerLedger {
   if (state.status !== 'complete' || !state.seriesWinner) return ledger
   if (ledger.entries.some((e) => e.rootSeed === state.rootSeed)) return ledger
@@ -126,6 +128,7 @@ export function addCompletedSeries(
     // v2: how it was won matters to the record — the dial and the drawn Blues side are results too.
     difficulty: state.difficulty ?? 'origin',
     opponentId: state.opponentId,
+    ...(year !== undefined ? { year } : {}),
   }
   return { ...ledger, entries: [...ledger.entries, entry] }
 }

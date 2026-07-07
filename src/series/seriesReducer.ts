@@ -11,9 +11,11 @@ import { SERIES_SCHEDULE } from './venues'
 
 type Winner = Side | 'DRAW'
 
-/** Every player whose condition a series tracks — the QLD pool plus the drawn NSW side's 21. */
-function allPlayersFor(opponentId: string): Player[] {
-  return [...QLD_SQUAD, ...Object.values(bluesById(opponentId).lineup)]
+/** Every player whose condition a series tracks — the QLD pool plus the drawn NSW side's 21.
+ *  The pool is a parameter so a dynasty year's RESOLVED roster flows through; it defaults to the
+ *  base 2026 squad, keeping every existing caller byte-identical. */
+function allPlayersFor(opponentId: string, qldPool: Player[] = QLD_SQUAD): Player[] {
+  return [...qldPool, ...Object.values(bluesById(opponentId).lineup)]
 }
 
 /** A finished game's inputs, ready to fold into the series. Lineup is player IDs, not Player objects. */
@@ -30,9 +32,19 @@ export interface PlayedGame {
 
 /** A fresh series, parked on game 1, scoreless, with conditions seeded from the real-world form notes.
  *  The Blues opponent is drawn deterministically from the seed and fixed for the whole series; the
- *  difficulty (adjustable until game 1 kicks off) defaults to Origin. */
-export function initSeries(rootSeed: number, difficulty: Difficulty = 'origin'): SeriesState {
+ *  difficulty (adjustable until game 1 kicks off) defaults to Origin.
+ *
+ *  `qldPool` lets a dynasty year pass its resolved roster; `neutralStart` skips the authored 2026
+ *  form/injury tables (they are facts about THIS season — a 2029 campaign starts everyone level and
+ *  lets the club rounds swing it). Defaults preserve the standalone behaviour byte-for-byte. */
+export function initSeries(
+  rootSeed: number,
+  difficulty: Difficulty = 'origin',
+  qldPool: Player[] = QLD_SQUAD,
+  neutralStart = false,
+): SeriesState {
   const opponentId = bluesForSeed(rootSeed).id
+  const players = allPlayersFor(opponentId, qldPool)
   return {
     schemaVersion: 3,
     rootSeed: rootSeed >>> 0,
@@ -42,7 +54,9 @@ export function initSeries(rootSeed: number, difficulty: Difficulty = 'origin'):
     seriesScore: { qld: 0, nsw: 0 },
     games: [],
     status: 'in-progress',
-    playerConditions: initConditions(allPlayersFor(opponentId), STARTING_FORM, STARTING_INJURY),
+    playerConditions: neutralStart
+      ? initConditions(players, {}, {})
+      : initConditions(players, STARTING_FORM, STARTING_INJURY),
   }
 }
 
@@ -51,7 +65,7 @@ export function initSeries(rootSeed: number, difficulty: Difficulty = 'origin'):
  * every winner, set the shield holder by the two-win rule (drawn series → QLD retains), and advance
  * the cursor or close the series after game 3. Pure — never mutates `state`. A no-op once complete.
  */
-export function applyGameResult(state: SeriesState, played: PlayedGame): SeriesState {
+export function applyGameResult(state: SeriesState, played: PlayedGame, qldPool: Player[] = QLD_SQUAD): SeriesState {
   if (state.status === 'complete') return state
   const game = state.currentGame
   const record: SeriesGameRecord = {
@@ -76,7 +90,7 @@ export function applyGameResult(state: SeriesState, played: PlayedGame): SeriesS
     : advanceConditions(state.playerConditions, {
         rootSeed: state.rootSeed,
         nextGameNumber: nextGame,
-        players: allPlayersFor(state.opponentId),
+        players: allPlayersFor(state.opponentId, qldPool),
         lines: played.stats.players,
         carryover: extractCarryover(played.events),
       })

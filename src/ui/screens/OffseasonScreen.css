@@ -1,0 +1,152 @@
+/* The off-season — retirements get gravity, the era line gets gold. */
+
+.offseason-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 640px;
+}
+
+.offseason-header {
+  text-align: center;
+}
+
+.offseason-kicker {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--text-dim);
+}
+
+.offseason-title {
+  font-size: 1.7rem;
+  font-weight: 700;
+  margin-top: 6px;
+}
+
+.offseason-era {
+  margin-top: 6px;
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.offseason-retirements h2,
+.offseason-movers h2 {
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 10px;
+}
+
+.retirement-card {
+  border: 1px solid var(--surface-line);
+  border-left: 4px solid var(--gold);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 12px 14px;
+}
+
+.retirement-card + .retirement-card {
+  margin-top: 10px;
+}
+
+.retirement-name {
+  font-weight: 800;
+  font-size: 1.05rem;
+}
+
+.retirement-meta {
+  color: var(--text-dim);
+  font-weight: 400;
+  font-size: 0.85rem;
+}
+
+.retirement-farewell {
+  margin-top: 4px;
+  color: var(--text-dim);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.offseason-quiet {
+  text-align: center;
+  color: var(--text-dim);
+}
+
+.movers-cols {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.movers-col {
+  border: 1px solid var(--surface-line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 10px 12px;
+  font-size: 0.9rem;
+}
+
+.movers-col p {
+  margin-top: 6px;
+  color: var(--text-dim);
+}
+
+.movers-col strong {
+  color: var(--text);
+}
+
+.movers-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 800;
+}
+
+.movers-label.up {
+  color: var(--good);
+}
+
+.movers-label.down {
+  color: var(--warn);
+}
+
+.offseason-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.offseason-actions .btn-primary {
+  min-width: 280px;
+}
+
+/* The hub's year strip — the dynasty's arc at a glance. */
+.dynasty-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+
+.dynasty-strip .year-chip {
+  border: 1px solid var(--surface-line);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.dynasty-strip .year-chip.win {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.dynasty-strip .year-chip.loss {
+  color: var(--blue-text);
+}
+
+.dynasty-strip .year-now {
+  font-weight: 800;
+  color: var(--text);
+}

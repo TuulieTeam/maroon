@@ -30,6 +30,8 @@ interface SelectionScreenProps {
   /** When today's Daily Origin is still unplayed, the teaser row that jumps to it (a fresh save
    *  starts HERE, not on the hub — without this the Daily would be undiscoverable until game 1). */
   onPlayDaily?: () => void
+  /** The selectable pool — a dynasty year passes its resolved roster; defaults to the base squad. */
+  squad?: Player[]
 }
 
 export function SelectionScreen({
@@ -43,6 +45,7 @@ export function SelectionScreen({
   initialLineup,
   initialKickerId,
   onPlayDaily,
+  squad = QLD_SQUAD,
 }: SelectionScreenProps) {
   const conditions = seriesState.playerConditions
   // The Blues side drawn for this series — fixed across all three games, revealed in the scouting report.
@@ -59,7 +62,7 @@ export function SelectionScreen({
     () => new Map(Object.entries(conditions).map(([id, c]) => [id, conditionFormDelta(c)])),
     [conditions],
   )
-  const selection = useSquadSelection({ initialLineup, initialKickerId, ruledOutIds, formDeltas })
+  const selection = useSquadSelection({ initialLineup, initialKickerId, ruledOutIds, formDeltas, squad })
   const [activePosition, setActivePosition] = useState<Position | null>(null)
 
   // A starting slot (XIII) has natural-fit specialists; INT/RES slots take anyone, so no fit-sorting.
@@ -70,15 +73,15 @@ export function SelectionScreen({
   // When a specialist slot is being filled, float its natural fits to the top of the pool so the eye
   // doesn't have to scan the whole 32-man list across the column gap; INT/RES keep the squad order.
   const { orderedPool, fitCount } = useMemo(() => {
-    if (!activeIsStarting || !activePosition) return { orderedPool: QLD_SQUAD, fitCount: 0 }
+    if (!activeIsStarting || !activePosition) return { orderedPool: squad, fitCount: 0 }
     const fits: Player[] = []
     const rest: Player[] = []
-    for (const p of QLD_SQUAD) {
+    for (const p of squad) {
       if (p.naturalPositions.includes(activePosition)) fits.push(p)
       else rest.push(p)
     }
     return { orderedPool: [...fits, ...rest], fitCount: fits.length }
-  }, [activeIsStarting, activePosition])
+  }, [activeIsStarting, activePosition, squad])
 
   // Bring the pool back into view when a slot opens (it sits above the lineup on a narrow, stacked
   // layout). Instant scroll, so it respects prefers-reduced-motion.
@@ -89,11 +92,13 @@ export function SelectionScreen({
   // The unavailable QLD men, for the "team news" banner that explains an emptied pre-fill slot.
   const teamNews = useMemo(
     () =>
-      QLD_SQUAD.filter((p) => {
-        const k = conditions[p.id]?.injury.kind
-        return k === 'out' || k === 'suspended' || k === 'doubtful'
-      }).map((p) => ({ name: p.name, kind: conditions[p.id].injury.kind })),
-    [conditions],
+      squad
+        .filter((p) => {
+          const k = conditions[p.id]?.injury.kind
+          return k === 'out' || k === 'suspended' || k === 'doubtful'
+        })
+        .map((p) => ({ name: p.name, kind: conditions[p.id].injury.kind })),
+    [conditions, squad],
   )
 
   // Resolve the current selection's assigned slots to Players for the live matchup read.
@@ -170,7 +175,7 @@ export function SelectionScreen({
       <div className="selection-layout">
         <section ref={poolRef}>
           <div className="pool-header">
-            <h2>Your Squad ({QLD_SQUAD.length})</h2>
+            <h2>Your Squad ({squad.length})</h2>
             <div className="pool-actions">
               <button className="btn-ghost" onClick={selection.autoFill}>
                 Auto-fill

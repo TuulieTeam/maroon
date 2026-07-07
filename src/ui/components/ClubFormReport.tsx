@@ -1,4 +1,5 @@
 import { QLD_SQUAD } from '../../data/qldSquad'
+import type { Player } from '../../data/types'
 import { formBand } from '../../series'
 import type { SeriesState } from '../../series'
 import './ClubFormReport.css'
@@ -8,11 +9,11 @@ const INJURY_LABEL: Record<string, string> = { out: 'out', doubtful: 'doubtful',
 /**
  * The "team news" the player reads on the series hub before re-picking: who's red-hot, who's slumping,
  * and who's hurt. Queensland only — NSW form is hidden. Falls out of the way (returns null) if there's
- * nothing notable to report.
+ * nothing notable to report. `squad` defaults to the base pool; a dynasty year passes its roster.
  */
-export function ClubFormReport({ state }: { state: SeriesState }) {
+export function ClubFormReport({ state, squad = QLD_SQUAD }: { state: SeriesState; squad?: Player[] }) {
   const conds = state.playerConditions
-  const qld = QLD_SQUAD.map((p) => ({ p, c: conds[p.id] })).filter((x) => x.c)
+  const qld = squad.map((p) => ({ p, c: conds[p.id] })).filter((x) => x.c)
   const hot = qld.filter((x) => x.c.injury.kind === 'fit' && x.c.form >= 64).sort((a, b) => b.c.form - a.c.form).slice(0, 5)
   const cold = qld.filter((x) => x.c.injury.kind === 'fit' && x.c.form <= 40).sort((a, b) => a.c.form - b.c.form).slice(0, 5)
   const news = qld.filter((x) => x.c.injury.kind !== 'fit')

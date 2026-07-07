@@ -3,12 +3,14 @@ import { bluesById } from './data/bluesVariants'
 import type { Position } from './data/types'
 import { originLabel, simulateMatch } from './engine'
 import type { MatchResult, MatchSetup, PlayerOfMatch, SelectedTeam } from './engine'
-import { QLD_SQUAD } from './data/qldSquad'
 import { buildPressConference, deriveStorylines, postGameBackPage, preGameBackPage, pressureBand } from './coach'
 import type { BackPage, PressExchange, Storyline } from './coach'
 import { useCoach } from './coach/useCoach'
 import { dailyKey, recordDaily, summariseDaily } from './daily'
 import { useDaily } from './daily/useDaily'
+import { dynastySeriesSeed } from './dynasty'
+import type { OffseasonReport } from './dynasty'
+import { useDynasty } from './dynasty/useDynasty'
 import type { FeatMint } from './feats'
 import { useFeats } from './feats/useFeats'
 import {
@@ -30,6 +32,7 @@ import { ResultScreen } from './ui/screens/ResultScreen'
 import { SeriesHubScreen } from './ui/screens/SeriesHubScreen'
 import { DailySelectionScreen } from './ui/screens/DailySelectionScreen'
 import { DailyResultScreen } from './ui/screens/DailyResultScreen'
+import { OffseasonScreen } from './ui/screens/OffseasonScreen'
 import { STAKES_SHORT } from './ui/seriesStakes'
 
 type Phase =
@@ -38,6 +41,7 @@ type Phase =
   | 'live'
   | 'result'
   | 'hub'
+  | 'offseason'
   | 'daily-select'
   | 'daily-pregame'
   | 'daily-live'
@@ -62,9 +66,15 @@ function lineupIds(team: SelectedTeam): Record<Position, string> {
 }
 
 export default function App() {
-  const rootSeedFactory = useCallback(() => Date.now(), [])
+  // The dynasty owns the calendar: it adopts the live series as year one on first run, resolves the
+  // current year's roster, and hands the series layer its deterministic per-year seeds.
+  const dynasty = useDynasty()
+  const rootSeedFactory = useCallback(
+    () => dynastySeriesSeed(dynasty.state.dynastySeed, dynasty.state.startYear, dynasty.state.currentYear),
+    [dynasty.state.dynastySeed, dynasty.state.startYear, dynasty.state.currentYear],
+  )
   const { state, currentContext, careerSummary, recordResult, skipDeadRubber, setDifficulty, newSeries } =
-    useSeries(rootSeedFactory)
+    useSeries(rootSeedFactory, dynasty.roster)
 
   // Resume mid-series straight to the hub; a fresh series opens on selecting your Origin I side.
   const [phase, setPhase] = useState<Phase>(() =>
@@ -150,7 +160,7 @@ export default function App() {
       const seed = gameSeed(state.rootSeed, game)
       const derived = deriveStorylines({
         team,
-        squad: QLD_SQUAD,
+        squad: dynasty.roster,
         conditions: state.playerConditions,
         priorLineup: state.games.at(-1)?.qldLineup,
       })
@@ -170,6 +180,7 @@ export default function App() {
       state.games,
       currentContext,
       usedSpeechTitles,
+      dynasty.roster,
     ],
   )
 
@@ -268,20 +279,42 @@ export default function App() {
     skipDeadRubber()
   }, [state, skipDeadRubber, judgeCompletedSeries])
 
-  const handleNewSeries = useCallback(() => {
-    // Capture this series' MVP (in-memory POTMs) so it lands in the career ledger before the wipe.
+  // ---- The off-season: the completed year hardens into the dynasty, then the next campaign opens. ----
+  const [offseasonReport, setOffseasonReport] = useState<OffseasonReport | null>(null)
+
+  const handleRunOffseason = useCallback(() => {
+    const report = dynasty.runOffseasonFor(state)
+    if (report) {
+      setOffseasonReport(report)
+      setPhase('offseason')
+    }
+  }, [dynasty, state])
+
+  const handleBeginYear = useCallback(() => {
+    // Archive the finished series (labelled with the year it WAS) and open the new year's campaign
+    // with the freshly-aged roster, everyone starting level, on the year's deterministic seed.
     const seriesMvp = state.status === 'complete' && potms.length > 0 ? pickSeriesMvp(potms) : null
-    newSeries(seriesMvp)
+    newSeries(seriesMvp, {
+      rootSeed: dynasty.nextSeriesSeed(),
+      roster: dynasty.roster,
+      neutralStart: true,
+      year: offseasonReport?.endedYear,
+    })
+    setOffseasonReport(null)
     setLockedTeam(null)
     setResult(null)
     setPotms([])
     setUsedSpeechTitles([])
     recordedGameRef.current = null
     setPhase('select')
-  }, [newSeries, state.status, potms])
+  }, [newSeries, state.status, potms, dynasty, offseasonReport])
 
   // The prior game's XVII pre-fills the next selection (survives a reload via the saved series).
   const prior = state.games.at(-1)
+
+  if (phase === 'offseason' && offseasonReport) {
+    return <OffseasonScreen report={offseasonReport} onContinue={handleBeginYear} />
+  }
 
   if (phase === 'daily-select') {
     return (
@@ -345,6 +378,7 @@ export default function App() {
         initialKickerId={prior?.qldKickerId}
         onKickOff={handleKickOff}
         onPlayDaily={daily.todayRecord ? undefined : () => setPhase('daily-select')}
+        squad={dynasty.roster}
       />
     )
   }
@@ -398,7 +432,9 @@ export default function App() {
       seriesMvp={state.status === 'complete' && potms.length > 0 ? pickSeriesMvp(potms) : null}
       onPick={() => setPhase('select')}
       onSkipDeadRubber={handleSkipDeadRubber}
-      onNewSeries={handleNewSeries}
+      onRunOffseason={handleRunOffseason}
+      dynasty={dynasty.state}
+      roster={dynasty.roster}
       daily={daily}
       onPlayDaily={() => setPhase('daily-select')}
       featsLedger={feats.ledger}

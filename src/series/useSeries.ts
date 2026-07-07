@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import type { Player } from '../data/types'
 import type { PlayerOfMatch, SeriesContext } from '../engine'
 import { buildSeriesContext } from './buildContext'
 import { addCompletedSeries, summariseCareer } from './career'
@@ -22,19 +23,37 @@ export interface UseSeries {
   skipDeadRubber: () => void
   /** Set the challenge level — only takes effect before game 1 kicks off (then the series locks it). */
   setDifficulty: (difficulty: Difficulty) => void
-  /** Archive the just-finished series into the career ledger (if complete), then start a fresh one. */
-  newSeries: (seriesMvp?: PlayerOfMatch | null) => void
+  /** Archive the just-finished series into the career ledger (if complete), then start a fresh one.
+   *  A dynasty passes the next year's seed/roster/label; omitted = the standalone behaviour. */
+  newSeries: (seriesMvp?: PlayerOfMatch | null, opts?: NewSeriesOptions) => void
+}
+
+export interface NewSeriesOptions {
+  /** Explicit root seed for the fresh series (a dynasty year's deterministic seed). */
+  rootSeed?: number
+  /** The QLD pool the fresh series plays with (a dynasty year's resolved roster). */
+  roster?: Player[]
+  /** Start everyone level instead of the authored 2026 form/injury tables (year 2+). */
+  neutralStart?: boolean
+  /** The dynasty year label archived onto the finished series' career entry. */
+  year?: number
 }
 
 /**
  * The React boundary for series state: owns the `SeriesState`, rehydrates it from localStorage on
  * mount, and persists on every change. The pure reducer/derivations live elsewhere; only this file and
  * `persist.ts` touch React / `localStorage`. `rootSeedFactory` is injected (e.g. `() => Date.now()`)
- * so the impure seed source stays out of the pure series core.
+ * so the impure seed source stays out of the pure series core. `roster` is the QLD pool the series
+ * plays with — a dynasty year passes its resolved squad; omitted = the base 2026 pool.
  */
-export function useSeries(rootSeedFactory: () => number): UseSeries {
+export function useSeries(rootSeedFactory: () => number, roster?: Player[]): UseSeries {
   const [state, setState] = useState<SeriesState>(() => loadSeries() ?? initSeries(rootSeedFactory()))
   const [career, setCareer] = useState(() => loadCareer())
+  // The pool rides a ref so the recordResult callback stays stable across roster changes.
+  const rosterRef = useRef(roster)
+  useEffect(() => {
+    rosterRef.current = roster
+  }, [roster])
 
   useEffect(() => {
     saveSeries(state)
@@ -45,7 +64,7 @@ export function useSeries(rootSeedFactory: () => number): UseSeries {
   }, [career])
 
   const recordResult = useCallback((played: PlayedGame) => {
-    setState((s) => applyGameResult(s, played))
+    setState((s) => applyGameResult(s, played, rosterRef.current))
   }, [])
 
   const skipDeadRubber = useCallback(() => {
@@ -58,13 +77,15 @@ export function useSeries(rootSeedFactory: () => number): UseSeries {
   }, [])
 
   const newSeries = useCallback(
-    (seriesMvp: PlayerOfMatch | null = null) => {
+    (seriesMvp: PlayerOfMatch | null = null, opts?: NewSeriesOptions) => {
       // Archive the finished series before wiping the live save — addCompletedSeries no-ops if the
       // series isn't complete or was already archived (deduped by rootSeed). The fresh series inherits
       // the just-finished series' difficulty (re-adjustable before its game 1).
-      setCareer((c) => addCompletedSeries(c, state, seriesMvp))
+      setCareer((c) => addCompletedSeries(c, state, seriesMvp, opts?.year))
       clearSeries()
-      setState(initSeries(rootSeedFactory(), state.difficulty ?? 'origin'))
+      setState(
+        initSeries(opts?.rootSeed ?? rootSeedFactory(), state.difficulty ?? 'origin', opts?.roster, opts?.neutralStart),
+      )
     },
     [state, rootSeedFactory],
   )
