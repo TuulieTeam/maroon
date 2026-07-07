@@ -93,6 +93,8 @@ export interface CareerSummary {
   gameDraws: number
   /** Series MVPs across the career, most-decorated first. */
   mvpHallOfFame: MvpTally[]
+  /** The remembered moments — one frozen booth line per archived series that has one, newest first. */
+  epigraphs: Array<{ year?: number; gameNumber: GameNo; line: string; side: Side }>
 }
 
 function toMvp(mvp: PlayerOfMatch | null): LedgerMvp | null {
@@ -110,6 +112,8 @@ export function addCompletedSeries(
   mvp: PlayerOfMatch | null,
   /** The dynasty year this series was, e.g. 2027 — labels the archive ("won the '27 shield"). */
   year?: number,
+  /** The shield-deciding game's iconic moment — ONE remembered play per series, frozen verbatim. */
+  iconicMoment?: LedgerIconicMoment,
 ): CareerLedger {
   if (state.status !== 'complete' || !state.seriesWinner) return ledger
   if (ledger.entries.some((e) => e.rootSeed === state.rootSeed)) return ledger
@@ -129,6 +133,7 @@ export function addCompletedSeries(
     difficulty: state.difficulty ?? 'origin',
     opponentId: state.opponentId,
     ...(year !== undefined ? { year } : {}),
+    ...(iconicMoment ? { iconicMoment } : {}),
   }
   return { ...ledger, entries: [...ledger.entries, entry] }
 }
@@ -146,6 +151,7 @@ export function summariseCareer(ledger: CareerLedger): CareerSummary {
     gameLosses: 0,
     gameDraws: 0,
     mvpHallOfFame: [],
+    epigraphs: [],
   }
   const byPlayer = new Map<string, MvpTally>()
   for (const e of ledger.entries) {
@@ -173,5 +179,14 @@ export function summariseCareer(ledger: CareerLedger): CareerSummary {
   summary.mvpHallOfFame = [...byPlayer.values()].sort(
     (a, b) => b.count - a.count || b.bestRating - a.bestRating || a.name.localeCompare(b.name),
   )
+  summary.epigraphs = ledger.entries
+    .filter((e) => e.iconicMoment)
+    .map((e) => ({
+      year: e.year,
+      gameNumber: e.iconicMoment!.gameNumber,
+      line: e.iconicMoment!.line,
+      side: e.iconicMoment!.side,
+    }))
+    .reverse()
   return summary
 }

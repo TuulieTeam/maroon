@@ -34,6 +34,20 @@ export function CareerLedger({ summary }: CareerLedgerProps) {
         </div>
       </div>
 
+      {summary.epigraphs.length > 0 && (
+        <div className="career-epigraphs">
+          <div className="career-hof-label">The moments the career remembers</div>
+          {summary.epigraphs.slice(0, 4).map((e, i) => (
+            <blockquote key={i} className={`career-epigraph ${e.side.toLowerCase()}`}>
+              <span className="career-epigraph-tag">
+                {e.year ? `’${String(e.year).slice(2)}` : 'the'} {e.gameNumber === 3 ? 'decider' : `game ${e.gameNumber}`}
+              </span>
+              {e.line}
+            </blockquote>
+          ))}
+        </div>
+      )}
+
       {mvpHallOfFame.length > 0 && (
         <div className="career-hof">
           <div className="career-hof-label">Series MVP hall of fame</div>

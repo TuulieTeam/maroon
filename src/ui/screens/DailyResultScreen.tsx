@@ -81,6 +81,13 @@ export function DailyResultScreen({ result, record, summary, featMints = [], onC
 
       <FeatToast mints={featMints} />
 
+      {result.iconicMoment && (
+        <div className={`iconic-moment ${result.iconicMoment.side.toLowerCase()}`}>
+          <div className="iconic-moment-label">⭐ The Moment · {result.iconicMoment.minute}′</div>
+          <div className="iconic-moment-line">{result.iconicMoment.line}</div>
+        </div>
+      )}
+
       <div className="result-broadcast">
         <BroadcastPanel slot="postGame" segments={result.broadcast.postGame} />
       </div>

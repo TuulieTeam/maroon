@@ -1,7 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { addCompletedSeries, EMPTY_LEDGER } from '../career'
-import type { CareerLedger } from '../career'
+import { addCompletedSeries, EMPTY_LEDGER, summariseCareer } from '../career'
+import type { CareerLedger, LedgerIconicMoment } from '../career'
 import { clearCareer, loadCareer, saveCareer } from '../careerPersist'
+import { decidingGame } from '../summary'
 import type { Position } from '../../data/types'
 import type { Score, Side, VenueId } from '../../engine'
 import type { GameNo, SeriesGameRecord, SeriesState } from '../types'
@@ -114,6 +115,42 @@ describe('careerPersist — v1 → v2 upgrade', () => {
     const bad = { ...sampleLedger().entries[0], nemesis: { id: 1 } }
     localStorage.setItem(CAREER_KEY, JSON.stringify({ schemaVersion: 2, entries: [bad] }))
     expect(loadCareer()).toEqual(EMPTY_LEDGER)
+  })
+})
+
+describe('the remembered moment — deciding game + epigraph', () => {
+  it('decidingGame finds the clincher, falls back to the last game of a drawn retain', () => {
+    // 2-0 after two: game 2 clinched it (dead rubber may or may not follow).
+    expect(decidingGame([game(1, 'SUNCORP', 'QLD', 20, 10), game(2, 'ACCOR_SYD', 'QLD', 14, 12)])).toBe(2)
+    // 1-1 into a live decider: game 3.
+    expect(
+      decidingGame([game(1, 'SUNCORP', 'QLD', 20, 10), game(2, 'ACCOR_SYD', 'NSW', 8, 14), game(3, 'MCG', 'QLD', 16, 12)]),
+    ).toBe(3)
+    // Drawn series (1-1-1): the retain settled at the last whistle — game 3.
+    expect(
+      decidingGame([game(1, 'SUNCORP', 'QLD', 20, 10), game(2, 'ACCOR_SYD', 'NSW', 8, 14), game(3, 'MCG', 'DRAW', 12, 12)]),
+    ).toBe(3)
+    expect(decidingGame([])).toBeNull()
+  })
+
+  it('archives the frozen line, round-trips it, and surfaces it as a career epigraph', () => {
+    const moment: LedgerIconicMoment = {
+      playerId: 'cobbo',
+      playerName: 'Selwyn Cobbo',
+      side: 'QLD',
+      gameNumber: 3,
+      minute: 74,
+      kind: 'TRY',
+      line: 'The Selwyn Cobbo try in the 74th — that’s the one they’ll still be talking about in twenty years.',
+    }
+    const led = addCompletedSeries(EMPTY_LEDGER, completed(7, { qld: 2, nsw: 1 }, 'QLD'), null, 2026, moment)
+    saveCareer(led)
+    const loaded = loadCareer()
+    expect(loaded.entries[0].iconicMoment).toEqual(moment)
+    const summary = summariseCareer(loaded)
+    expect(summary.epigraphs).toHaveLength(1)
+    expect(summary.epigraphs[0]).toMatchObject({ year: 2026, gameNumber: 3, side: 'QLD' })
+    expect(summary.epigraphs[0].line).toContain('Selwyn Cobbo')
   })
 })
 

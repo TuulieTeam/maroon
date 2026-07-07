@@ -76,6 +76,37 @@
   color: var(--text-dim);
 }
 
+/* The Moment — the booth's crowned play, on both result screens. Gold for ours, blue for theirs. */
+.iconic-moment {
+  border: 1px solid var(--gold);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--pixel-shadow);
+  padding: 12px 14px;
+}
+
+.iconic-moment.nsw {
+  border-color: var(--blue);
+}
+
+.iconic-moment-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 800;
+  color: var(--gold);
+}
+
+.iconic-moment.nsw .iconic-moment-label {
+  color: var(--blue-text);
+}
+
+.iconic-moment-line {
+  margin-top: 4px;
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
 /* The streak reveal — the emotional payoff of the Daily, so it gets banner treatment. */
 .daily-streak-banner {
   text-align: center;

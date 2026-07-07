@@ -3,7 +3,7 @@ import type { Player } from '../data/types'
 import type { PlayerOfMatch, SeriesContext } from '../engine'
 import { buildSeriesContext } from './buildContext'
 import { addCompletedSeries, summariseCareer } from './career'
-import type { CareerSummary } from './career'
+import type { CareerSummary, LedgerIconicMoment } from './career'
 import { loadCareer, saveCareer } from './careerPersist'
 import { clearSeries, loadSeries, saveSeries } from './persist'
 import { applyGameResult, concludeSeries, initSeries } from './seriesReducer'
@@ -37,6 +37,8 @@ export interface NewSeriesOptions {
   neutralStart?: boolean
   /** The dynasty year label archived onto the finished series' career entry. */
   year?: number
+  /** The shield-deciding game's iconic moment, archived onto the career entry. */
+  iconicMoment?: LedgerIconicMoment
 }
 
 /**
@@ -81,7 +83,7 @@ export function useSeries(rootSeedFactory: () => number, roster?: Player[]): Use
       // Archive the finished series before wiping the live save — addCompletedSeries no-ops if the
       // series isn't complete or was already archived (deduped by rootSeed). The fresh series inherits
       // the just-finished series' difficulty (re-adjustable before its game 1).
-      setCareer((c) => addCompletedSeries(c, state, seriesMvp, opts?.year))
+      setCareer((c) => addCompletedSeries(c, state, seriesMvp, opts?.year, opts?.iconicMoment))
       clearSeries()
       setState(
         initSeries(opts?.rootSeed ?? rootSeedFactory(), state.difficulty ?? 'origin', opts?.roster, opts?.neutralStart),

@@ -8,6 +8,42 @@
   gap: 12px;
 }
 
+/* The remembered moments — one frozen booth line per archived series, quoted like an epigraph. */
+.career-epigraphs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.career-epigraph {
+  border-left: 3px solid var(--gold);
+  padding: 6px 10px;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--text-dim);
+  font-style: italic;
+  background: var(--surface-2);
+}
+
+.career-epigraph.nsw {
+  border-left-color: var(--blue);
+}
+
+.career-epigraph-tag {
+  display: inline-block;
+  margin-right: 8px;
+  font-style: normal;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--gold);
+}
+
+.career-epigraph.nsw .career-epigraph-tag {
+  color: var(--blue-text);
+}
+
 .career-label {
   font-size: 0.72rem;
   text-transform: uppercase;

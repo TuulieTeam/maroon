@@ -86,8 +86,10 @@ describe('series-aware broadcast — content integrity', () => {
     expect(result.broadcast.preGame.length).toBeLessThanOrEqual(5)
     expect(result.broadcast.halfTime.length).toBeGreaterThanOrEqual(3)
     expect(result.broadcast.halfTime.length).toBeLessThanOrEqual(4)
+    // Post-game gained one deliberate beat: Thommo closing the wrap with the iconic moment (when
+    // one was crowned — nearly always). Band widened 5 → 6 for exactly that segment.
     expect(result.broadcast.postGame.length).toBeGreaterThanOrEqual(4)
-    expect(result.broadcast.postGame.length).toBeLessThanOrEqual(5)
+    expect(result.broadcast.postGame.length).toBeLessThanOrEqual(6)
   })
 })
 

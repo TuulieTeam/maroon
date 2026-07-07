@@ -24,8 +24,17 @@ export { deriveWrap } from './wrap'
 export { initSeries, applyGameResult, concludeSeries } from './seriesReducer'
 export type { PlayedGame } from './seriesReducer'
 export { buildSeriesContext } from './buildContext'
-export { summariseSeries, pickSeriesMvp } from './summary'
+export { summariseSeries, pickSeriesMvp, decidingGame } from './summary'
 export { buildShareCard } from './shareCard'
 export { addCompletedSeries, summariseCareer, EMPTY_LEDGER } from './career'
-export type { CareerLedger, CareerSummary, LedgerEntry, LedgerGame, LedgerMvp, MvpTally } from './career'
+export type {
+  CareerLedger,
+  CareerSummary,
+  LedgerEntry,
+  LedgerGame,
+  LedgerIconicMoment,
+  LedgerMvp,
+  LedgerNemesis,
+  MvpTally,
+} from './career'
 export { loadCareer, saveCareer, clearCareer } from './careerPersist'

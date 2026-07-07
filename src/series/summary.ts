@@ -22,6 +22,23 @@ export function summariseSeries(games: SeriesGameRecord[]): SeriesResult {
 }
 
 /**
+ * The SHIELD-DECIDING game: the one where a side reached two wins, or — when nobody did (the drawn
+ * retain) — the last game played. This is the game whose iconic moment the career remembers; the
+ * scarcity is deliberate (one remembered moment per series is what makes it legend). Null only when
+ * no games were played at all.
+ */
+export function decidingGame(games: SeriesGameRecord[]): GameNo | null {
+  let qld = 0
+  let nsw = 0
+  for (const g of games) {
+    if (g.winner === 'QLD') qld += 1
+    if (g.winner === 'NSW') nsw += 1
+    if (qld >= 2 || nsw >= 2) return g.gameNumber
+  }
+  return games.length > 0 ? games[games.length - 1].gameNumber : null
+}
+
+/**
  * Series MVP across the played games — the highest player-of-match rating, ties broken by player id
  * ascending for determinism. Takes the in-memory POTMs (which are not persisted) so the stored series
  * stays lightweight. Precondition: at least one game has been played.

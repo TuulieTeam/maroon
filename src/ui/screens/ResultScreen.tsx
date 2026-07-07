@@ -190,6 +190,13 @@ export function ResultScreen({
 
       {backPage && <BackPagePanel page={backPage} />}
 
+      {result.iconicMoment && (
+        <div className={`iconic-moment ${result.iconicMoment.side.toLowerCase()}`}>
+          <div className="iconic-moment-label">⭐ The Moment · {result.iconicMoment.minute}′</div>
+          <div className="iconic-moment-line">{result.iconicMoment.line}</div>
+        </div>
+      )}
+
       <div className="result-broadcast">
         <BroadcastPanel slot="postGame" segments={result.broadcast.postGame} />
       </div>

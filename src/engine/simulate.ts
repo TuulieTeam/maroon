@@ -47,6 +47,7 @@ import type { KickOutcome } from './ratings'
 import { bucketFieldZone, bucketPhase, bucketScoreline, renderCommentary } from './commentary'
 import type { CommentaryContext, CommentaryInput } from './commentary'
 import { buildBroadcast } from './broadcast'
+import { iconicMomentSegment, pickIconicMoment, renderIconicLine } from './iconicMoment'
 import { originLabel } from './series'
 import { pickColor } from './colorCommentary'
 import type { ColorMoment } from './colorCommentary'
@@ -832,7 +833,12 @@ export function simulateMatch(setup: MatchSetup, seed: number): MatchResult {
   const winner: Side | 'DRAW' = score.qld > score.nsw ? 'QLD' : score.nsw > score.qld ? 'NSW' : 'DRAW'
   const playerOfMatch = pickPlayerOfMatch(stats, winner)
   const broadcast = buildBroadcast(setup, { finalScore: score, winner, events, stats, playerOfMatch }, seed)
-  return { finalScore: score, winner, events, stats, playerOfMatch, broadcast }
+  // The iconic moment: a pure post-hoc scan of the finished stream — zero rng draws, so the
+  // play-by-play above is byte-identical with this feature on. Thommo closes the wrap with it.
+  const picked = pickIconicMoment(events, winner, playerOfMatch)
+  const iconicMoment = picked ? { ...picked, line: renderIconicLine(picked, seed) } : undefined
+  if (iconicMoment) broadcast.postGame.push(iconicMomentSegment(iconicMoment))
+  return { finalScore: score, winner, events, stats, playerOfMatch, broadcast, ...(iconicMoment ? { iconicMoment } : {}) }
 
   // ---- inner helpers (close over loop state) ----
 

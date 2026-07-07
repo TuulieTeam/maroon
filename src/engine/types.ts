@@ -299,6 +299,21 @@ export type ScorelineBucket =
 
 export type PhaseBucket = 'early' | 'middle' | 'last10' | 'post-siren'
 
+/**
+ * The match's defining play, crowned by a pure zero-rng scan AFTER the final whistle (see
+ * iconicMoment.ts). Crowned regardless of side; `line` is the rendered booth call — frozen text,
+ * which is what the career archives (the MVP-label rule: results, never re-renderables).
+ */
+export interface IconicMoment {
+  playerId: string
+  playerName: string
+  side: Side
+  minute: number
+  kind: 'TRY' | 'FIELD_GOAL' | 'LINE_BREAK'
+  scoreAfter: Score
+  line: string
+}
+
 export interface MatchResult {
   finalScore: Score
   winner: Side | 'DRAW'
@@ -307,4 +322,6 @@ export interface MatchResult {
   playerOfMatch: PlayerOfMatch
   /** Pre/half/post-game broadcaster build-up & wrap, always populated by simulateMatch. */
   broadcast: MatchBroadcast
+  /** The defining play — set by simulateMatch whenever one is scannable (a 0-0 slog has none). */
+  iconicMoment?: IconicMoment
 }

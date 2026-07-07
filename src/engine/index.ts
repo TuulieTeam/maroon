@@ -22,8 +22,10 @@ export type {
   SegmentSlot,
   ScorelineBucket,
   PhaseBucket,
+  IconicMoment,
 } from './types'
 export { simulateMatch } from './simulate'
+export { pickIconicMoment, renderIconicLine, iconicMomentSegment } from './iconicMoment'
 export { makeRng, chance, pick, gauss } from './rng'
 export type { Rng } from './rng'
 export { TUNING, chooseKickType, resolveKick, kickSkill } from './ratings'

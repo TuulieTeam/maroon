@@ -2,7 +2,7 @@ import { useCallback, useRef, useState } from 'react'
 import { bluesById } from './data/bluesVariants'
 import type { Position } from './data/types'
 import { originLabel, simulateMatch } from './engine'
-import type { MatchResult, MatchSetup, PlayerOfMatch, SelectedTeam } from './engine'
+import type { IconicMoment, MatchResult, MatchSetup, PlayerOfMatch, SelectedTeam } from './engine'
 import { buildPressConference, deriveStorylines, postGameBackPage, preGameBackPage, pressureBand } from './coach'
 import type { BackPage, PressExchange, Storyline } from './coach'
 import { useCoach } from './coach/useCoach'
@@ -17,13 +17,14 @@ import {
   applyGameResult,
   concludeSeries,
   conditionFormDelta,
+  decidingGame,
   gameSeed,
   loadCareer,
   nswDifficultyDelta,
   pickSeriesMvp,
   reinjuryMult,
 } from './series'
-import type { SeriesState } from './series'
+import type { GameNo, SeriesState } from './series'
 import { useSeries } from './series/useSeries'
 import { SelectionScreen } from './ui/screens/SelectionScreen'
 import { PreGameScreen } from './ui/screens/PreGameScreen'
@@ -84,6 +85,9 @@ export default function App() {
   const [result, setResult] = useState<MatchResult | null>(null)
   const [playingGame, setPlayingGame] = useState<1 | 2 | 3>(state.currentGame)
   const [potms, setPotms] = useState<PlayerOfMatch[]>([])
+  // Each game's crowned play, kept in memory like the POTMs — the shield-deciding game's moment is
+  // the ONE the career archives when the season closes.
+  const [moments, setMoments] = useState<Array<{ gameNumber: GameNo; moment: IconicMoment }>>([])
   // Pre-match addresses already shown this series — fed back so a Gus speech never repeats.
   const [usedSpeechTitles, setUsedSpeechTitles] = useState<string[]>([])
   // Guards against folding the same game into the series twice (e.g. the auto-advance + the button).
@@ -198,6 +202,10 @@ export default function App() {
       }
       recordResult(played)
       setPotms((prev) => [...prev, result.playerOfMatch])
+      if (result.iconicMoment) {
+        const moment = result.iconicMoment
+        setMoments((prev) => [...prev, { gameNumber: playingGame, moment }])
+      }
       setUsedSpeechTitles((prev) => [...prev, result.broadcast.preMatchSpeech.title])
       // Judge the single-match feats while the stats + the locked 19 are in hand, then — because
       // applyGameResult is pure — fold the game locally to see if this one ended the series.
@@ -294,20 +302,35 @@ export default function App() {
     // Archive the finished series (labelled with the year it WAS) and open the new year's campaign
     // with the freshly-aged roster, everyone starting level, on the year's deterministic seed.
     const seriesMvp = state.status === 'complete' && potms.length > 0 ? pickSeriesMvp(potms) : null
+    // The career remembers ONE play per series: the shield-deciding game's crowned moment.
+    const decider = decidingGame(state.games)
+    const remembered = decider !== null ? moments.find((m) => m.gameNumber === decider) : undefined
     newSeries(seriesMvp, {
       rootSeed: dynasty.nextSeriesSeed(),
       roster: dynasty.roster,
       neutralStart: true,
       year: offseasonReport?.endedYear,
+      iconicMoment: remembered
+        ? {
+            playerId: remembered.moment.playerId,
+            playerName: remembered.moment.playerName,
+            side: remembered.moment.side,
+            gameNumber: remembered.gameNumber,
+            minute: remembered.moment.minute,
+            kind: remembered.moment.kind,
+            line: remembered.moment.line,
+          }
+        : undefined,
     })
     setOffseasonReport(null)
     setLockedTeam(null)
     setResult(null)
     setPotms([])
+    setMoments([])
     setUsedSpeechTitles([])
     recordedGameRef.current = null
     setPhase('select')
-  }, [newSeries, state.status, potms, dynasty, offseasonReport])
+  }, [newSeries, state.status, state.games, potms, moments, dynasty, offseasonReport])
 
   // The prior game's XVII pre-fills the next selection (survives a reload via the saved series).
   const prior = state.games.at(-1)
