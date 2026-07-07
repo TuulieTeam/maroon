@@ -6,9 +6,9 @@
 }
 
 .club-report-title {
-  font-size: 0.74rem;
+  font-size: var(--fs-label);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: var(--track-2);
   color: var(--text-dim);
   margin-bottom: 10px;
 }
@@ -20,9 +20,9 @@
 }
 
 .club-col-label {
-  font-size: 0.68rem;
+  font-size: var(--fs-label);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: var(--track-1);
   font-weight: 800;
   margin-bottom: 6px;
 }
@@ -42,7 +42,7 @@
   justify-content: space-between;
   gap: 8px;
   padding: 3px 0;
-  font-size: 0.82rem;
+  font-size: var(--fs-sub);
 }
 
 .club-name {
@@ -51,9 +51,9 @@
 
 .club-band,
 .club-injury {
-  font-size: 0.6rem;
+  font-size: var(--fs-label);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: var(--track-1);
   padding: 1px 6px;
   border-radius: 999px;
   font-weight: 800;

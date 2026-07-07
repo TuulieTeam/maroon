@@ -13,7 +13,7 @@
 
 .matchup-sub {
   color: var(--text-dim);
-  font-size: 0.82rem;
+  font-size: var(--fs-sub);
   margin-bottom: 12px;
   line-height: 1.35;
 }
@@ -42,26 +42,24 @@
 
 .mu-edge-name {
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: var(--fs-body);
 }
 
 .mu-edge-vs {
-  font-size: 0.74rem;
+  font-size: var(--fs-label);
   color: var(--blue-text);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 
 .mu-edge-owners {
-  font-size: 0.72rem;
+  font-size: var(--fs-label);
   color: var(--text-faint);
   margin-top: 2px;
   margin-bottom: 8px;
 }
 
 .mu-warning {
-  font-size: 0.78rem;
-  line-height: 1.35;
+  font-size: var(--fs-label);
+  line-height: 1.4;
   color: var(--bad);
   background: rgba(226, 83, 63, 0.12);
   border-radius: var(--radius-sm);
@@ -70,7 +68,7 @@
 }
 
 .mu-fill-hint {
-  font-size: 0.8rem;
+  font-size: var(--fs-sub);
   color: var(--text-faint);
   font-style: italic;
   padding: 4px 0;
@@ -89,10 +87,10 @@
 }
 
 .mu-h2h-label {
-  font-size: 0.78rem;
+  font-size: var(--fs-label);
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: var(--track-1);
   color: var(--text-dim);
 }
 
@@ -100,10 +98,10 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.66rem;
+  font-size: var(--fs-label);
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: var(--track-1);
   padding: 2px 8px;
   border-radius: 999px;
 }
@@ -140,11 +138,11 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.74rem;
+  font-size: var(--fs-label);
 }
 
 .mu-bar-who {
-  width: 32px;
+  width: 36px;
   flex-shrink: 0;
   color: var(--text-dim);
 }
@@ -172,7 +170,7 @@
 }
 
 .mu-bar-val {
-  width: 26px;
+  width: 28px;
   flex-shrink: 0;
   text-align: right;
   color: var(--text);

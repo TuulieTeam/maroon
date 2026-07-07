@@ -13,13 +13,13 @@
 
 .opposition-sub {
   color: var(--text-dim);
-  font-size: 0.85rem;
+  font-size: var(--fs-sub);
   margin-bottom: 12px;
 }
 
 /* The grudge — a returning nemesis called out at the top of the scouting read. */
 .opposition-grudge {
-  font-size: 0.85rem;
+  font-size: var(--fs-sub);
   font-weight: 700;
   color: var(--bad);
   margin: -6px 0 12px;
@@ -37,12 +37,12 @@
 
 .threat-headline {
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: var(--fs-body);
 }
 
 .threat-detail {
   color: var(--text-dim);
-  font-size: 0.84rem;
+  font-size: var(--fs-sub);
   margin-top: 3px;
 }
 
@@ -54,7 +54,7 @@
 }
 
 .threat-man {
-  font-size: 0.74rem;
+  font-size: var(--fs-label);
   background: rgba(30, 100, 180, 0.18);
   border: 1px solid var(--blue-deep);
   color: var(--text);

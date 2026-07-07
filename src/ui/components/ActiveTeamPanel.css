@@ -39,7 +39,7 @@
 
 .active-team-name {
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: var(--fs-body);
 }
 
 .active-team.qld .active-team-name {
@@ -57,7 +57,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.82rem;
+  font-size: var(--fs-sub);
   padding: 1px 0;
 }
 
@@ -91,7 +91,7 @@
   gap: 6px;
   align-items: center;
   margin-top: 8px;
-  font-size: 0.74rem;
+  font-size: var(--fs-label);
 }
 
 .bench-count {
@@ -99,12 +99,12 @@
 }
 
 .badge {
-  font-size: 0.68rem;
+  font-size: var(--fs-label);
   font-weight: 700;
   padding: 2px 7px;
   border-radius: 999px;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: var(--track-1);
 }
 
 .badge.bin {
@@ -131,7 +131,7 @@
   margin-top: 8px;
   border-top: 1px dashed var(--surface-line);
   padding-top: 6px;
-  font-size: 0.76rem;
+  font-size: var(--fs-label);
   color: var(--text-dim);
 }
 

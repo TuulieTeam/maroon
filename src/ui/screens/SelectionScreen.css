@@ -28,7 +28,7 @@
 }
 
 .pool-active-hint {
-  font-size: 0.95rem;
+  font-size: var(--fs-body);
   font-weight: 600;
   color: var(--gold);
   margin-bottom: 10px;
@@ -48,13 +48,13 @@
   border-left: 3px solid var(--warn);
   border-radius: var(--radius-sm);
   background: var(--surface);
-  font-size: 0.8rem;
+  font-size: var(--fs-sub);
 }
 
 .team-news-label {
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 0.7rem;
+  letter-spacing: var(--track-2);
+  font-size: var(--fs-label);
   font-weight: 800;
   color: var(--warn);
   margin-right: 4px;
@@ -66,8 +66,8 @@
 .team-news-item em {
   font-style: normal;
   text-transform: uppercase;
-  font-size: 0.66rem;
-  letter-spacing: 0.05em;
+  font-size: var(--fs-label);
+  letter-spacing: var(--track-1);
   font-weight: 700;
 }
 .news-out em {
@@ -80,7 +80,8 @@
 
 .pool-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  /* 240px floor: the card's meta/attr rows grew to the --fs-label size floor. */
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 10px;
 }
 
@@ -112,8 +113,8 @@
 
 .difficulty-label {
   text-transform: uppercase;
-  letter-spacing: 0.12em;
-  font-size: 0.72rem;
+  letter-spacing: var(--track-2);
+  font-size: var(--fs-label);
   font-weight: 800;
   color: var(--text-dim);
 }
@@ -135,7 +136,7 @@
   font-size: 1rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: var(--track-1);
   cursor: pointer;
 }
 
@@ -155,7 +156,7 @@
 }
 
 .difficulty-blurb {
-  font-size: 0.85rem;
+  font-size: var(--fs-sub);
   color: var(--text-dim);
   max-width: 46ch;
   min-height: 1.2em;

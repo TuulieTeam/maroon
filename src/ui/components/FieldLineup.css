@@ -17,16 +17,16 @@
 }
 
 .lineup-section-label {
-  font-size: 0.72rem;
+  font-size: var(--fs-label);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: var(--track-2);
   color: var(--text-faint);
   margin: 8px 0 2px;
 }
 
 .lineup-slot {
   display: grid;
-  grid-template-columns: 28px 1fr auto;
+  grid-template-columns: 32px 1fr auto;
   align-items: center;
   gap: 10px;
   min-height: 44px;
@@ -62,7 +62,7 @@
    ROI retro hit on the team sheet (the player's NAME beside it stays Inter). */
 .slot-jersey {
   font-family: var(--font-pixel);
-  font-size: 0.82rem;
+  font-size: var(--fs-sub);
   color: var(--gold);
   font-variant-numeric: tabular-nums;
   text-align: center;
@@ -76,23 +76,23 @@
 }
 
 .slot-pos {
-  font-size: 0.72rem;
+  font-size: var(--fs-label);
   color: var(--text-dim);
 }
 
 .slot-player {
   font-weight: 600;
-  font-size: 0.92rem;
+  font-size: var(--fs-body);
 }
 
 .slot-empty-text {
   color: var(--text-dim);
   font-style: italic;
-  font-size: 0.88rem;
+  font-size: var(--fs-sub);
 }
 
 .slot-kicker {
-  font-size: 0.66rem;
+  font-size: var(--fs-label);
   background: var(--maroon);
   color: var(--text);
   border: 1px solid var(--maroon-bright);
@@ -109,7 +109,7 @@
 }
 
 .reserve-note {
-  font-size: 0.72rem;
+  font-size: var(--fs-label);
   color: var(--text-dim);
   font-style: italic;
   margin: -2px 0 4px;
@@ -117,13 +117,13 @@
 
 .validation-line {
   margin-top: 12px;
-  font-size: 0.85rem;
+  font-size: var(--fs-sub);
   color: var(--text-dim);
 }
 
 .validation-warnings {
   margin-top: 6px;
-  font-size: 0.78rem;
+  font-size: var(--fs-label);
   color: var(--warn);
   display: flex;
   flex-direction: column;
