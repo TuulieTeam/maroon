@@ -1,10 +1,11 @@
 import { QLD_SQUAD } from '../data/qldSquad'
-import { POSITION_META } from '../data/positions'
+import { POSITION_META, STARTING_POSITIONS } from '../data/positions'
 import type { Player } from '../data/types'
 import { makeRng } from '../engine'
 import type { SeriesState } from '../series'
-import { AGING_TUNING, ageOf, retirementChance, seasonDrift } from './aging'
+import { ageOf, retirementChance, seasonDrift } from './aging'
 import { eraLine, farewellLine, moverNote } from './narrative'
+import { archetypeForPosition, generateRookieClass } from './rookies'
 import { offseasonSeed } from './seed'
 import type { AttrDelta, DynastyState, OffseasonReport, YearArchive, YearOverlay } from './types'
 
@@ -15,18 +16,16 @@ import type { AttrDelta, DynastyState, OffseasonReport, YearArchive, YearOverlay
  * (sorted by id) before any variable-count narrative draws — the advanceConditions discipline, so
  * a squad edit or branch can never desync the stream mid-loop.
  *
- * M1 interim rule (until the rookie class ships in the next drop): probabilistic retirements are
- * viability-capped — a man "goes around one more year" rather than leave the squad unfillable —
- * but the age-36 hard cap ALWAYS retires (no immortals). Rookie intake replaces the cap in M2.
+ * M2: retirements are UNCONDITIONAL — the rookie class refills the pool. The intake planner covers
+ * every thinned position first (each natural position keeps ≥ minNaturalFits among the survivors),
+ * then tops the squad back up toward targetSquad with best-athlete archetypes, capped per year.
+ * No immortals, absolutely: 36 is the end, whoever is behind you.
  */
 export const VIABILITY = {
-  /** Never let probabilistic retirements shrink the pool below this (auto-fill needs 21). */
-  minSquad: 24,
-  /** Every natural position keeps at least this many fits among the unretired. */
+  /** The intake planner tops the squad back up toward this size. */
+  targetSquad: 28,
+  /** Every natural position keeps at least this many fits after intake. */
   minNaturalFits: 2,
-  /** The absolute floor even FORCED (36+) retirements respect in M1 — "someone has to go around
-   *  one more year". Removed when rookie intake (M2) starts refilling the pool. */
-  forcedFloor: 22,
 } as const
 
 export function runOffseason(
@@ -37,7 +36,9 @@ export function runOffseason(
   const year = state.currentYear
   const rng = makeRng(offseasonSeed(state.dynastySeed, year))
   const alreadyRetired = new Set(state.overlay.retired)
-  const active = base.filter((p) => !alreadyRetired.has(p.id)).sort((a, b) => (a.id < b.id ? -1 : 1))
+  const active = [...base, ...state.overlay.rookies]
+    .filter((p) => !alreadyRetired.has(p.id))
+    .sort((a, b) => (a.id < b.id ? -1 : 1))
 
   // ---- Fixed-draw section: 6 drift draws + 1 retirement roll per active player, in id order. ----
   const drifts = new Map<string, AttrDelta>()
@@ -58,24 +59,26 @@ export function runOffseason(
   }
   const remaining = new Set(active.map((p) => p.id))
   const retirees: Player[] = []
-  const canRetire = (p: Player): boolean => {
-    if (remaining.size - 1 < VIABILITY.minSquad) return false
-    for (const pos of p.naturalPositions) {
-      const fits = active.filter((q) => remaining.has(q.id) && q.id !== p.id && q.naturalPositions.includes(pos))
-      if (fits.length < VIABILITY.minNaturalFits) return false
-    }
-    return true
-  }
   for (const p of [...active].sort((a, b) => ageOf(b, year) - ageOf(a, year) || (a.id < b.id ? -1 : 1))) {
-    const age = ageOf(p, year)
-    const chance = retirementChance(age, resolvedOverall(p))
-    const forced = age >= AGING_TUNING.retirementForcedAge
-    const allowed = forced ? remaining.size - 1 >= VIABILITY.forcedFloor : canRetire(p)
-    if (rolls.get(p.id)! < chance && allowed) {
+    const chance = retirementChance(ageOf(p, year), resolvedOverall(p))
+    if (rolls.get(p.id)! < chance) {
       remaining.delete(p.id)
       retirees.push(p)
     }
   }
+
+  // ---- The intake plan (no draws — pure scan): cover thinned positions, then top up the squad. ----
+  const survivors = active.filter((p) => remaining.has(p.id))
+  const needs: string[] = []
+  for (const pos of STARTING_POSITIONS) {
+    const fits = survivors.filter((q) => q.naturalPositions.includes(pos)).length
+    for (let i = fits; i < VIABILITY.minNaturalFits; i++) needs.push(archetypeForPosition(pos))
+  }
+  const TOP_UP_ROTATION = ['middle', 'outsideBack', 'edge', 'half']
+  for (let i = survivors.length + needs.length, r = 0; i < VIABILITY.targetSquad; i++, r++) {
+    needs.push(TOP_UP_ROTATION[r % TOP_UP_ROTATION.length])
+  }
+  const rookieClass = needs.length > 0 ? generateRookieClass(state.dynastySeed, year + 1, needs) : []
 
   // ---- Fold into the cumulative overlay. ----
   const attrDeltas: Record<string, AttrDelta> = {}
@@ -86,6 +89,7 @@ export function runOffseason(
   const overlay: YearOverlay = {
     attrDeltas,
     retired: [...state.overlay.retired, ...retirees.map((p) => p.id)],
+    rookies: [...state.overlay.rookies, ...rookieClass],
   }
 
   // ---- Narrative (variable draws AFTER the fixed section — decisions above are deterministic). ----
@@ -99,6 +103,14 @@ export function runOffseason(
     }),
     risers: [],
     faders: [],
+    rookieClass: rookieClass.map((p) => ({
+      id: p.id,
+      name: p.name,
+      age: year + 1 - (p.birthYear ?? year - 19),
+      club: p.club,
+      positions: p.naturalPositions.map((pos) => POSITION_META[pos].label).join(' / '),
+      note: p.formNote ?? '',
+    })),
     eraLine: '',
   }
   const movers = active

@@ -28,7 +28,7 @@ function fresh(): DynastyState {
     dynastySeed: 777,
     startYear: 2026,
     currentYear: 2026,
-    overlay: { attrDeltas: {}, retired: [] },
+    overlay: { attrDeltas: {}, retired: [], rookies: [] },
     years: [],
   }
 }
@@ -84,8 +84,27 @@ describe('dynastyPersist', () => {
     expect(loadDynasty()).toBeNull()
   })
 
+  it('a drop-3 save (overlay without rookies) upgrades in place with an empty class', () => {
+    const preRookie = { ...fresh(), overlay: { attrDeltas: {}, retired: ['dce'] } }
+    localStorage.setItem(KEY, JSON.stringify(preRookie))
+    const loaded = loadDynasty()
+    expect(loaded).not.toBeNull()
+    expect(loaded!.overlay.rookies).toEqual([])
+    expect(loaded!.overlay.retired).toEqual(['dce'])
+  })
+
+  it('round-trips a dynasty with a stored rookie class verbatim', () => {
+    let state = fresh()
+    for (let i = 0; i < 3; i++) {
+      state = runOffseason(state, completed(777 + i)).next
+    }
+    expect(state.overlay.rookies.length).toBeGreaterThan(0)
+    saveDynasty(state)
+    expect(loadDynasty()).toEqual(state)
+  })
+
   it('a retired id that no longer resolves in base data is harmless at resolution', () => {
-    const state = { ...fresh(), overlay: { attrDeltas: {}, retired: ['some-removed-player'] } }
+    const state = { ...fresh(), overlay: { attrDeltas: {}, retired: ['some-removed-player'], rookies: [] } }
     saveDynasty(state)
     const loaded = loadDynasty()!
     const roster = resolveRoster(QLD_SQUAD, loaded.overlay, 2027, 2026)

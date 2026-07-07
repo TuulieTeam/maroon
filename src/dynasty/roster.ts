@@ -37,25 +37,29 @@ function applyDelta(p: Player, d: AttrDelta | undefined): Player {
 }
 
 /**
- * The year's QLD roster. For the dynasty's FIRST year the overlay is empty and `year === startYear`,
- * so the resolved roster is byte-identical to the base squad — statuses, form notes and all. From
- * year two the 2026-season facts no longer apply: statuses clear (a new season, everyone reports
- * fit) and the form note becomes the dynasty's own line.
+ * The year's QLD roster: base squad plus every generated rookie, minus retirees. For the dynasty's
+ * FIRST year the overlay is empty and `year === startYear`, so the resolved roster is byte-identical
+ * to the base squad — statuses, form notes and all. From year two the 2026-season facts no longer
+ * apply: statuses clear (a new season, everyone reports fit) and the form note becomes the dynasty's
+ * own line — except a debutant's scouting note, which survives his first season on the picker.
  */
 export function resolveRoster(base: Player[], overlay: YearOverlay, year: number, startYear: number): Player[] {
   const retired = new Set(overlay.retired)
-  return base
+  return [...base, ...overlay.rookies]
     .filter((p) => !retired.has(p.id))
     .map((p) => {
       const drifted = applyDelta(p, overlay.attrDeltas[p.id])
       if (year === startYear) return drifted
       const age = ageOf(p, year)
+      const debutsThisYear = p.formNote?.includes(`Debuts ${year}`) ?? false
       return {
         ...drifted,
         // A 30+ man reads as the veteran he now is; younger men keep their authored identity.
         tag: age >= 30 ? 'veteran' : p.tag,
         status: 'available',
-        formNote: `Age ${age} in ${year} — season ${year - startYear + 1} of your dynasty.`,
+        formNote: debutsThisYear
+          ? p.formNote
+          : `Age ${age} in ${year} — season ${year - startYear + 1} of your dynasty.`,
       }
     })
 }

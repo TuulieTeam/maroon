@@ -1,8 +1,11 @@
+import type { BoardOutcome } from '../../coach'
 import type { OffseasonReport } from '../../dynasty'
 import './OffseasonScreen.css'
 
 interface OffseasonScreenProps {
   report: OffseasonReport
+  /** The board's annual review — a survival line, or the sacking and the succession. */
+  board?: BoardOutcome | null
   onContinue: () => void
 }
 
@@ -11,7 +14,7 @@ interface OffseasonScreenProps {
  * the men who bow out get their farewell, the summer's movers get a line, and the era gets
  * its scoreboard before the next campaign opens.
  */
-export function OffseasonScreen({ report, onContinue }: OffseasonScreenProps) {
+export function OffseasonScreen({ report, board, onContinue }: OffseasonScreenProps) {
   return (
     <div className="app-shell offseason-screen">
       <header className="offseason-header">
@@ -19,6 +22,25 @@ export function OffseasonScreen({ report, onContinue }: OffseasonScreenProps) {
         <h1 className="offseason-title">THE OFF-SEASON</h1>
         <p className="offseason-era">{report.eraLine}</p>
       </header>
+
+      {board && (
+        <section className={`board-verdict ${board.sacked ? 'sacked' : ''}`} aria-label="Board review">
+          <div className="board-verdict-label">{board.sacked ? '⚫ THE BOARD HAS ACTED' : 'The board meets'}</div>
+          <p className="board-verdict-line">{board.statement}</p>
+          {board.sacked && board.era && board.successor && (
+            <>
+              <p className="board-era-line">
+                The {board.era.coachName} era: {board.era.fromYear}–{board.era.toYear} · {board.era.seasons}{' '}
+                {board.era.seasons === 1 ? 'season' : 'seasons'} · {board.era.shields}{' '}
+                {board.era.shields === 1 ? 'shield' : 'shields'}
+              </p>
+              <p className="board-successor">
+                Incoming: <strong>{board.successor.name}</strong> — {board.successor.billing}.
+              </p>
+            </>
+          )}
+        </section>
+      )}
 
       {report.retirements.length > 0 ? (
         <section className="offseason-retirements" aria-label="Retirements">
@@ -34,6 +56,20 @@ export function OffseasonScreen({ report, onContinue }: OffseasonScreenProps) {
         </section>
       ) : (
         <p className="offseason-quiet">No retirements this summer — the whole squad goes around again.</p>
+      )}
+
+      {report.rookieClass.length > 0 && (
+        <section className="offseason-rookies" aria-label="Rookie class">
+          <h2>The next generation</h2>
+          {report.rookieClass.map((r) => (
+            <div key={r.id} className="rookie-card">
+              <div className="rookie-name">
+                {r.name} <span className="rookie-meta">· {r.age} · {r.club} · {r.positions}</span>
+              </div>
+              <p className="rookie-note">{r.note}</p>
+            </div>
+          ))}
+        </section>
       )}
 
       {(report.risers.length > 0 || report.faders.length > 0) && (

@@ -41,8 +41,9 @@ interface SeriesHubScreenProps {
   featsLedger: FeatsLedger
   /** Feats FIRST-earned by the just-finished series — bragged on the share card. */
   newFeatNames: string[]
-  /** The coach's hot-seat index (0–100). */
+  /** The coach's hot-seat index (0–100) and whoever currently holds the clipboard. */
   coachPressure: number
+  coachName: string
 }
 
 function shieldHeadline(state: SeriesState): string {
@@ -67,6 +68,7 @@ export function SeriesHubScreen({
   featsLedger,
   newFeatNames,
   coachPressure,
+  coachName,
 }: SeriesHubScreenProps) {
   const complete = state.status === 'complete'
   const deadRubberPending = !complete && state.seriesWinner != null
@@ -151,7 +153,7 @@ export function SeriesHubScreen({
         onPlay={onPlayDaily}
       />
 
-      <HotSeat pressure={coachPressure} />
+      <HotSeat pressure={coachPressure} coachName={coachName} />
 
       <FeatCabinet ledger={featsLedger} />
 

@@ -51,6 +51,8 @@ export interface Player {
   status?: PlayerStatus
   /** Short real-world form / availability note shown on the player card. */
   formNote?: string
+  /** Birth year, carried by GENERATED players (dynasty rookies). Authored players use data/ages.ts. */
+  birthYear?: number
 }
 
 export interface PositionMeta {

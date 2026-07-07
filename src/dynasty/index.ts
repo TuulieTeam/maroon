@@ -1,5 +1,6 @@
 export { AGING_TUNING, ageOf, birthYearOf, retirementChance, seasonDrift } from './aging'
 export { runOffseason, VIABILITY } from './offseason'
+export { generateRookieClass, archetypeForPosition, rookieSeed, ROOKIE_TUNING, ARCHETYPES } from './rookies'
 export { resolveRoster, RESOLVE_CLAMP } from './roster'
 export { dynastySeriesSeed, offseasonSeed } from './seed'
 export { loadDynasty, saveDynasty } from './dynastyPersist'

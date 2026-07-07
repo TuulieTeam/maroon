@@ -19,8 +19,10 @@ interface ResultScreenProps {
   featMints?: FeatMint[]
   /** The morning-after back page — the paper's pre-game position, settled by this result. */
   backPage?: BackPage | null
-  /** Slater fronting the press after the game. */
+  /** The coach fronting the press after the game. */
   pressConference?: PressExchange[]
+  /** Whoever holds the clipboard this era — labels the presser. */
+  coachSurname?: string
   onContinue: () => void
 }
 
@@ -153,6 +155,7 @@ export function ResultScreen({
   featMints = [],
   backPage,
   pressConference = [],
+  coachSurname,
   onContinue,
 }: ResultScreenProps) {
   const v = verdict(result, gameLabel)
@@ -201,7 +204,7 @@ export function ResultScreen({
         <BroadcastPanel slot="postGame" segments={result.broadcast.postGame} />
       </div>
 
-      <PressConferencePanel exchanges={pressConference} />
+      <PressConferencePanel exchanges={pressConference} coachSurname={coachSurname} />
 
       <div className={`potm-card ${potm.side.toLowerCase()}`}>
         <div className="potm-label">Player of the Match</div>

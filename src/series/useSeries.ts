@@ -49,7 +49,10 @@ export interface NewSeriesOptions {
  * plays with — a dynasty year passes its resolved squad; omitted = the base 2026 pool.
  */
 export function useSeries(rootSeedFactory: () => number, roster?: Player[]): UseSeries {
-  const [state, setState] = useState<SeriesState>(() => loadSeries() ?? initSeries(rootSeedFactory()))
+  const [state, setState] = useState<SeriesState>(
+    // The roster's ids (incl. generated rookies) are legitimate in a saved dynasty-year lineup.
+    () => loadSeries(roster ? new Set(roster.map((p) => p.id)) : undefined) ?? initSeries(rootSeedFactory(), 'origin', roster),
+  )
   const [career, setCareer] = useState(() => loadCareer())
   // The pool rides a ref so the recordResult callback stays stable across roster changes.
   const rosterRef = useRef(roster)

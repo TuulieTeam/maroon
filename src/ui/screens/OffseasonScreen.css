@@ -30,6 +30,52 @@
   font-weight: 700;
 }
 
+/* The board's annual review — quiet strip normally, black-edged drama on a sacking. */
+.board-verdict {
+  border: 1px solid var(--surface-line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--pixel-shadow);
+  padding: 12px 14px;
+}
+
+.board-verdict.sacked {
+  border-color: var(--bad);
+}
+
+.board-verdict-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 800;
+  color: var(--text-dim);
+}
+
+.board-verdict.sacked .board-verdict-label {
+  color: var(--bad);
+}
+
+.board-verdict-line {
+  margin-top: 6px;
+  font-size: 0.98rem;
+  line-height: 1.5;
+}
+
+.board-era-line {
+  margin-top: 8px;
+  font-size: 0.88rem;
+  color: var(--text-dim);
+}
+
+.board-successor {
+  margin-top: 4px;
+  font-size: 0.95rem;
+}
+
+.board-successor strong {
+  color: var(--gold);
+}
+
 .offseason-retirements h2,
 .offseason-movers h2 {
   font-size: 1rem;
@@ -71,6 +117,42 @@
 .offseason-quiet {
   text-align: center;
   color: var(--text-dim);
+}
+
+/* The rookie class — the scouting report. Good-green edge: the future arriving. */
+.offseason-rookies h2 {
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 10px;
+}
+
+.rookie-card {
+  border: 1px solid var(--surface-line);
+  border-left: 4px solid var(--good);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 10px 14px;
+}
+
+.rookie-card + .rookie-card {
+  margin-top: 8px;
+}
+
+.rookie-name {
+  font-weight: 800;
+}
+
+.rookie-meta {
+  color: var(--text-dim);
+  font-weight: 400;
+  font-size: 0.85rem;
+}
+
+.rookie-note {
+  margin-top: 3px;
+  color: var(--text-dim);
+  font-size: 0.88rem;
 }
 
 .movers-cols {

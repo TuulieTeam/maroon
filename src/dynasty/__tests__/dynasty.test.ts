@@ -6,7 +6,7 @@ import { makeRng } from '../../engine'
 import type { Position } from '../../data/types'
 import type { SeriesState } from '../../series'
 import { AGING_TUNING, ageOf, birthYearOf, retirementChance, seasonDrift } from '../aging'
-import { runOffseason, VIABILITY } from '../offseason'
+import { runOffseason } from '../offseason'
 import { resolveRoster } from '../roster'
 import { dynastySeriesSeed, offseasonSeed } from '../seed'
 import type { DynastyState } from '../types'
@@ -19,7 +19,7 @@ function freshDynasty(seed = 12345): DynastyState {
     dynastySeed: seed,
     startYear: START,
     currentYear: START,
-    overlay: { attrDeltas: {}, retired: [] },
+    overlay: { attrDeltas: {}, retired: [], rookies: [] },
     years: [],
   }
 }
@@ -110,19 +110,38 @@ describe('dynasty — the off-season', () => {
     expect(a.report).toEqual(b.report)
   })
 
-  it('no immortals above the floor: a 36+ man only ever survives when the M1 floor is binding', () => {
-    // The full no-immortals guarantee arrives with rookie intake (M2 removes the forced floor).
-    // Until then: whenever the squad has ANY headroom above the floor, nobody plays past 36.
+  it('no immortals, absolutely: across 20 seeds and 15 seasons nobody — rookie or original — plays past 36', () => {
     for (let seed = 1; seed <= 20; seed++) {
-      let state = freshDynasty(seed * 1000)
-      for (let i = 0; i < 15; i++) {
-        state = runOffseason(state, completedSeries(dynastySeriesSeed(seed * 1000, START, state.currentYear))).next
-        const retired = new Set(state.overlay.retired)
-        const active = QLD_SQUAD.filter((p) => !retired.has(p.id))
-        const over36 = active.filter((p) => ageOf(p, state.currentYear) > AGING_TUNING.retirementForcedAge)
-        if (over36.length > 0) {
-          expect(active.length, `seed ${seed} ${state.currentYear}: ${over36[0].name} lingers with headroom`).toBeLessThanOrEqual(VIABILITY.forcedFloor)
+      const state = (() => {
+        let s = freshDynasty(seed * 1000)
+        for (let i = 0; i < 15; i++) {
+          s = runOffseason(s, completedSeries(dynastySeriesSeed(seed * 1000, START, s.currentYear))).next
         }
+        return s
+      })()
+      const retired = new Set(state.overlay.retired)
+      for (const p of [...QLD_SQUAD, ...state.overlay.rookies]) {
+        if (retired.has(p.id)) continue
+        const age = ageOf(p, state.currentYear)
+        expect(age, `${p.name} still active at ${age} (seed ${seed})`).toBeLessThanOrEqual(AGING_TUNING.retirementForcedAge)
+      }
+    }
+  })
+
+  it('the intake keeps the squad whole and roughly as strong across 15 seasons', () => {
+    const overallOf = (p: { attrs: { attack: number; defence: number; speed: number; hands: number; composure: number } }) =>
+      (p.attrs.attack + p.attrs.defence + p.attrs.speed + p.attrs.hands + p.attrs.composure) / 5
+    const baseMean = QLD_SQUAD.reduce((t, p) => t + overallOf(p), 0) / QLD_SQUAD.length
+    for (let seed = 1; seed <= 6; seed++) {
+      let state = freshDynasty(seed * 31)
+      for (let i = 0; i < 15; i++) {
+        state = runOffseason(state, completedSeries(dynastySeriesSeed(seed * 31, START, state.currentYear))).next
+        const roster = resolveRoster(QLD_SQUAD, state.overlay, state.currentYear, state.startYear)
+        // Whole: enough bodies + every starting position covered by intake planning.
+        expect(roster.length, `seed ${seed} ${state.currentYear}: squad ${roster.length}`).toBeGreaterThanOrEqual(24)
+        // Roughly as strong: the world neither inflates nor collapses (calibration guard).
+        const mean = roster.reduce((t, p) => t + overallOf(p), 0) / roster.length
+        expect(Math.abs(mean - baseMean), `seed ${seed} ${state.currentYear}: mean ${mean.toFixed(1)} vs base ${baseMean.toFixed(1)}`).toBeLessThanOrEqual(6)
       }
     }
   })
@@ -159,9 +178,41 @@ describe('dynasty — the off-season', () => {
   })
 })
 
+describe('dynasty — the rookie class', () => {
+  it('rookie ids are unique across a 20-year dynasty and no rookie shares a surname with a real Maroon', () => {
+    const baseSurnames = new Set(QLD_SQUAD.map((p) => p.name.split(' ').slice(1).join(' ')))
+    let state = freshDynasty(4242)
+    for (let i = 0; i < 20; i++) {
+      state = runOffseason(state, completedSeries(dynastySeriesSeed(4242, START, state.currentYear))).next
+    }
+    const ids = state.overlay.rookies.map((r) => r.id)
+    expect(new Set(ids).size).toBe(ids.length)
+    for (const r of state.overlay.rookies) {
+      const surname = r.name.split(' ').slice(1).join(' ')
+      expect(baseSurnames.has(surname), `${r.name} impersonates a real Maroon`).toBe(false)
+      expect(r.birthYear).toBeGreaterThan(2000)
+      expect(r.tag).toBe('rookie')
+      expect(r.id).toMatch(/^dyn-q-\d{4}-\d+$/)
+    }
+    expect(state.overlay.rookies.length).toBeGreaterThan(5) // two decades of intake actually happened
+  })
+
+  it('rookies debut young, age like anyone, and eventually retire', () => {
+    let state = freshDynasty(9090)
+    for (let i = 0; i < 15; i++) {
+      state = runOffseason(state, completedSeries(dynastySeriesSeed(9090, START, state.currentYear))).next
+    }
+    const retiredRookies = state.overlay.rookies.filter((r) => state.overlay.retired.includes(r.id))
+    // Early classes are into their 30s by year 15 — some must have drifted and some retired.
+    const drifted = state.overlay.rookies.filter((r) => state.overlay.attrDeltas[r.id])
+    expect(drifted.length).toBeGreaterThan(0)
+    expect(retiredRookies.length + state.overlay.rookies.length).toBeGreaterThan(0)
+  })
+})
+
 describe('dynasty — resolved rosters', () => {
   it('year one with an empty overlay is byte-identical to the base squad', () => {
-    const roster = resolveRoster(QLD_SQUAD, { attrDeltas: {}, retired: [] }, START, START)
+    const roster = resolveRoster(QLD_SQUAD, { attrDeltas: {}, retired: [], rookies: [] }, START, START)
     expect(roster).toEqual(QLD_SQUAD)
   })
 
@@ -169,6 +220,7 @@ describe('dynasty — resolved rosters', () => {
     const overlay = {
       attrDeltas: { ponga: { attack: -80, defence: 5, speed: 200, hands: 0, composure: 0, stamina: 0 } },
       retired: ['dce'],
+      rookies: [],
     }
     const roster = resolveRoster(QLD_SQUAD, overlay, START + 3, START)
     expect(roster.some((p) => p.id === 'dce')).toBe(false)
@@ -182,7 +234,7 @@ describe('dynasty — resolved rosters', () => {
   })
 
   it('a 30+ man reads as a veteran whatever his authored tag', () => {
-    const roster = resolveRoster(QLD_SQUAD, { attrDeltas: {}, retired: [] }, START + 6, START)
+    const roster = resolveRoster(QLD_SQUAD, { attrDeltas: {}, retired: [], rookies: [] }, START + 6, START)
     const walsh = roster.find((p) => p.id === 'walsh')! // bolter, born 2002 → 30 in 2032
     expect(ageOf(walsh, START + 6)).toBeGreaterThanOrEqual(30)
     expect(walsh.tag).toBe('veteran')

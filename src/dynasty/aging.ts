@@ -48,8 +48,10 @@ export const AGING_TUNING = {
   fallbackBaseYear: 2026,
 } as const
 
-/** A player's birth year: authored table first, then a stable tag-band fallback. */
+/** A player's birth year: carried on the object (generated rookies), else the authored table,
+ *  else a stable tag-band fallback. */
 export function birthYearOf(p: Player): number {
+  if (p.birthYear) return p.birthYear
   const authored = BIRTH_YEARS[p.id]
   if (authored) return authored
   const age = AGING_TUNING.fallbackAgeByTag[p.tag ?? 'workhorse'] ?? 26

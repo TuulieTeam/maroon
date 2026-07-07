@@ -23,13 +23,17 @@ const DIFFICULTY_VALUES = new Set<string>(DIFFICULTIES)
  * failure, schema-version mismatch, or stored player id that no longer resolves discards the save and
  * returns null (the caller then starts a fresh series). `finalScore`/`winner` are the immutable tally
  * source-of-truth, so a future engine/tuning change can never retroactively rewrite a finished series.
+ *
+ * `extraValidIds` widens the known-id set beyond the base squad — a dynasty year's saved lineups
+ * legitimately contain generated rookie ids, which must not read as "stale" and wipe the save.
  */
-export function loadSeries(): SeriesState | null {
+export function loadSeries(extraValidIds?: ReadonlySet<string>): SeriesState | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return null
     const parsed: unknown = JSON.parse(raw)
-    return isValidSeries(parsed) ? parsed : null
+    const validIds = extraValidIds ? new Set([...SQUAD_IDS, ...extraValidIds]) : SQUAD_IDS
+    return isValidSeries(parsed, validIds) ? parsed : null
   } catch {
     return null
   }
@@ -57,18 +61,18 @@ function isScore(v: unknown): v is Score {
   return typeof s.qld === 'number' && typeof s.nsw === 'number'
 }
 
-function isValidGameRecord(v: unknown): v is SeriesGameRecord {
+function isValidGameRecord(v: unknown, validIds: ReadonlySet<string>): v is SeriesGameRecord {
   if (!v || typeof v !== 'object') return false
   const r = v as Record<string, unknown>
   if (r.gameNumber !== 1 && r.gameNumber !== 2 && r.gameNumber !== 3) return false
   if (typeof r.venueId !== 'string' || !VENUE_IDS.has(r.venueId)) return false
   if (typeof r.seed !== 'number') return false
-  if (typeof r.qldKickerId !== 'string' || !SQUAD_IDS.has(r.qldKickerId)) return false
+  if (typeof r.qldKickerId !== 'string' || !validIds.has(r.qldKickerId)) return false
   if (!isScore(r.finalScore)) return false
   if (r.winner !== 'QLD' && r.winner !== 'NSW' && r.winner !== 'DRAW') return false
   if (!r.qldLineup || typeof r.qldLineup !== 'object') return false
   for (const id of Object.values(r.qldLineup as Record<string, unknown>)) {
-    if (typeof id !== 'string' || !SQUAD_IDS.has(id)) return false
+    if (typeof id !== 'string' || !validIds.has(id)) return false
   }
   return true
 }
@@ -89,7 +93,7 @@ function isValidConditionMap(v: unknown): boolean {
   return true
 }
 
-function isValidSeries(v: unknown): v is SeriesState {
+function isValidSeries(v: unknown, validIds: ReadonlySet<string> = SQUAD_IDS): v is SeriesState {
   if (!v || typeof v !== 'object') return false
   const s = v as Record<string, unknown>
   if (s.schemaVersion !== SCHEMA_VERSION) return false
@@ -104,5 +108,5 @@ function isValidSeries(v: unknown): v is SeriesState {
   if (!isScore(s.seriesScore)) return false
   if (!isValidConditionMap(s.playerConditions)) return false
   if (!Array.isArray(s.games)) return false
-  return s.games.every(isValidGameRecord)
+  return s.games.every((g) => isValidGameRecord(g, validIds))
 }

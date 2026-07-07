@@ -36,7 +36,7 @@ export function useDynasty(): UseDynasty {
       dynastySeed: (loadSeries()?.rootSeed ?? Date.now()) >>> 0,
       startYear: DYNASTY_START_YEAR,
       currentYear: DYNASTY_START_YEAR,
-      overlay: { attrDeltas: {}, retired: [] },
+      overlay: { attrDeltas: {}, retired: [], rookies: [] },
       years: [],
     }
     saveDynasty(adopted)

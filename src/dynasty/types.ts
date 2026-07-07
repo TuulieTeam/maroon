@@ -1,3 +1,4 @@
+import type { Player } from '../data/types'
 import type { Score, Side } from '../engine'
 
 /**
@@ -20,10 +21,14 @@ export interface AttrDelta {
 
 /** The generated-world state for the CURRENT year, cumulative since the dynasty began. */
 export interface YearOverlay {
-  /** Per-player cumulative drift, keyed by player id. */
+  /** Per-player cumulative drift, keyed by player id (base ids and generated rookie ids alike). */
   attrDeltas: Record<string, AttrDelta>
   /** Players who have retired — filtered out of every resolved roster, forever. */
   retired: string[]
+  /** Every generated rookie, stored VERBATIM (full Player + birthYear) — the save is their only
+   *  home, so a future generator/name-pool edit can never rewrite an existing class. Retired
+   *  rookies stay in the list (history) and are filtered at resolution like anyone else. */
+  rookies: Player[]
 }
 
 /** One archived season — immutable results + the names history remembers. */
@@ -58,6 +63,8 @@ export interface OffseasonReport {
   /** The biggest movers of the off-season, by net attribute drift. */
   risers: Array<{ name: string; note: string }>
   faders: Array<{ name: string; note: string }>
+  /** The summer's rookie class — the scouting report. */
+  rookieClass: Array<{ id: string; name: string; age: number; club: string; positions: string; note: string }>
   /** The era line, e.g. "Year 3 of the dynasty · 2 shields". */
   eraLine: string
 }

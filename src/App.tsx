@@ -4,7 +4,7 @@ import type { Position } from './data/types'
 import { originLabel, simulateMatch } from './engine'
 import type { IconicMoment, MatchResult, MatchSetup, PlayerOfMatch, SelectedTeam } from './engine'
 import { buildPressConference, deriveStorylines, postGameBackPage, preGameBackPage, pressureBand } from './coach'
-import type { BackPage, PressExchange, Storyline } from './coach'
+import type { BackPage, BoardOutcome, PressExchange, Storyline } from './coach'
 import { useCoach } from './coach/useCoach'
 import { dailyKey, recordDaily, summariseDaily } from './daily'
 import { useDaily } from './daily/useDaily'
@@ -169,7 +169,7 @@ export default function App() {
         priorLineup: state.games.at(-1)?.qldLineup,
       })
       setStories(derived)
-      setPrePage(preGameBackPage(derived[0], seed))
+      setPrePage(preGameBackPage(derived[0], seed, coach.coach))
       setPostPage(null)
       setPresser([])
       setResult(simulateMatch(setup, seed))
@@ -185,6 +185,7 @@ export default function App() {
       currentContext,
       usedSpeechTitles,
       dynasty.roster,
+      coach,
     ],
   )
 
@@ -219,8 +220,8 @@ export default function App() {
       if (prePage) {
         const won = result.winner === 'QLD'
         const seed = gameSeed(state.rootSeed, playingGame)
-        setPostPage(postGameBackPage(stories[0], prePage.stance, result, seed))
-        setPresser(buildPressConference(result, pressureBand(coach.state.pressure), stories[0], seed))
+        setPostPage(postGameBackPage(stories[0], prePage.stance, result, seed, coach.coach))
+        setPresser(buildPressConference(result, pressureBand(coach.state.pressure), stories[0], seed, coach.coach))
         coach.gameHeat(prePage.stance, won)
       }
       judgeCompletedSeries(applyGameResult(state, played))
@@ -289,14 +290,17 @@ export default function App() {
 
   // ---- The off-season: the completed year hardens into the dynasty, then the next campaign opens. ----
   const [offseasonReport, setOffseasonReport] = useState<OffseasonReport | null>(null)
+  const [boardOutcome, setBoardOutcome] = useState<BoardOutcome | null>(null)
 
   const handleRunOffseason = useCallback(() => {
     const report = dynasty.runOffseasonFor(state)
     if (report) {
+      // The board meets once the season is in the books — it may end the coaching era right here.
+      setBoardOutcome(coach.review(state, report.endedYear))
       setOffseasonReport(report)
       setPhase('offseason')
     }
-  }, [dynasty, state])
+  }, [dynasty, state, coach])
 
   const handleBeginYear = useCallback(() => {
     // Archive the finished series (labelled with the year it WAS) and open the new year's campaign
@@ -323,6 +327,7 @@ export default function App() {
         : undefined,
     })
     setOffseasonReport(null)
+    setBoardOutcome(null)
     setLockedTeam(null)
     setResult(null)
     setPotms([])
@@ -336,7 +341,7 @@ export default function App() {
   const prior = state.games.at(-1)
 
   if (phase === 'offseason' && offseasonReport) {
-    return <OffseasonScreen report={offseasonReport} onContinue={handleBeginYear} />
+    return <OffseasonScreen report={offseasonReport} board={boardOutcome} onContinue={handleBeginYear} />
   }
 
   if (phase === 'daily-select') {
@@ -442,6 +447,7 @@ export default function App() {
         featMints={recentMints}
         backPage={postPage}
         pressConference={presser}
+        coachSurname={coach.coach.surname}
         onContinue={() => setPhase('hub')}
       />
     )
@@ -463,6 +469,7 @@ export default function App() {
       featsLedger={feats.ledger}
       newFeatNames={recentMints.filter((m) => m.isFirst).map((m) => m.def.name)}
       coachPressure={coach.state.pressure}
+      coachName={coach.coach.name}
     />
   )
 }

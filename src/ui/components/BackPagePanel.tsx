@@ -18,17 +18,17 @@ export function BackPagePanel({ page }: { page: BackPage }) {
   )
 }
 
-/** Slater fronts the pack — rendered under the post-game back page. */
-export function PressConferencePanel({ exchanges }: { exchanges: PressExchange[] }) {
+/** The coach fronts the pack — rendered under the post-game back page. */
+export function PressConferencePanel({ exchanges, coachSurname = 'Slater' }: { exchanges: PressExchange[]; coachSurname?: string }) {
   if (exchanges.length === 0) return null
   return (
     <section className="press-conference" aria-label="Press conference">
-      <div className="press-conference-label">Slater fronts the press</div>
+      <div className="press-conference-label">{coachSurname} fronts the press</div>
       {exchanges.map((e, i) => (
         <div key={i} className="press-exchange">
           <p className="press-q">“{e.question}”</p>
           <p className="press-a">
-            <strong>SLATER:</strong> “{e.answer}”
+            <strong>{coachSurname.toUpperCase()}:</strong> “{e.answer}”
           </p>
         </div>
       ))}

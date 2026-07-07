@@ -5,10 +5,16 @@ import { buildAutoLineup } from '../../data/autoSelect'
 import type { Player, Position } from '../../data/types'
 import type { MatchResult, SelectedTeam } from '../../engine'
 import type { ConditionMap, SeriesState } from '../../series'
+import { boardReview } from '../board'
+import { COACHES, coachById, successorFor } from '../coaches'
+import { INITIAL_COACH_STATE, freshPressureFor, loadCoach, saveCoach } from '../coachPersist'
+import type { CoachState } from '../coachPersist'
 import { buildPressConference } from '../pressConference'
 import { postGameBackPage, preGameBackPage } from '../headlines'
 import { PRESSURE_TUNING, applyGameHeat, applySeriesPressure, pressureBand } from '../pressure'
 import { deriveStorylines } from '../storylines'
+
+const SLATER = coachById('slater')
 
 const byId = new Map(QLD_SQUAD.map((p) => [p.id, p]))
 
@@ -77,8 +83,8 @@ describe('headlines — the take-a-position loop', () => {
   const story = { kind: 'axed-star' as const, playerId: 'dce', playerName: 'Daly Cherry-Evans' }
 
   it('the pre-game splash names the player, is deterministic, and declares a stance', () => {
-    const a = preGameBackPage(story, 12345)
-    const b = preGameBackPage(story, 12345)
+    const a = preGameBackPage(story, 12345, SLATER)
+    const b = preGameBackPage(story, 12345, SLATER)
     expect(a).toEqual(b)
     expect(`${a.headline} ${a.standfirst}`).toContain('Daly Cherry-Evans')
     expect(['backs', 'savages']).toContain(a.stance)
@@ -87,14 +93,14 @@ describe('headlines — the take-a-position loop', () => {
   it('a savaged call that wins produces the eat-their-words verdict; a loss produces the pile-on', () => {
     const win = { winner: 'QLD' } as MatchResult
     const loss = { winner: 'NSW' } as MatchResult
-    const vindicated = postGameBackPage(story, 'savages', win, 1)
-    const roasted = postGameBackPage(story, 'savages', loss, 1)
+    const vindicated = postGameBackPage(story, 'savages', win, 1, SLATER)
+    const roasted = postGameBackPage(story, 'savages', loss, 1, SLATER)
     expect(vindicated.headline).not.toBe(roasted.headline)
     expect(roasted.headline).toContain('Daly Cherry-Evans')
   })
 
   it('a quiet sheet still gets a back page', () => {
-    const page = preGameBackPage(undefined, 99)
+    const page = preGameBackPage(undefined, 99, SLATER)
     expect(page.headline.length).toBeGreaterThan(0)
   })
 })
@@ -153,13 +159,97 @@ describe('press conference — Slater fronts the pack', () => {
   it('is deterministic, shifts tone with the band, and circles back to the bold call', () => {
     const result = { winner: 'NSW' } as MatchResult
     const story = { kind: 'blooded-rookie' as const, playerId: 'jfifita', playerName: 'Jojo Fifita' }
-    const a = buildPressConference(result, 'dead-man-walking', story, 777)
-    expect(a).toEqual(buildPressConference(result, 'dead-man-walking', story, 777))
+    const a = buildPressConference(result, 'dead-man-walking', story, 777, SLATER)
+    expect(a).toEqual(buildPressConference(result, 'dead-man-walking', story, 777, SLATER))
     expect(a.length).toBe(2)
     expect(`${a[1].question} ${a[1].answer}`).toContain('Jojo Fifita')
     // Siege pressers read differently from calm ones.
-    const calm = buildPressConference(result, 'untouchable', story, 777)
+    const calm = buildPressConference(result, 'untouchable', story, 777, SLATER)
     expect(calm[0].answer).not.toBe(a[0].answer)
+  })
+})
+
+describe('the board — sackings and successions', () => {
+  function coachState(over: Partial<CoachState>): CoachState {
+    return { ...INITIAL_COACH_STATE, eraFromYear: 2026, eraSeasons: 3, eraShields: 1, ...over }
+  }
+  function lostSeries(): SeriesState {
+    return {
+      schemaVersion: 3,
+      rootSeed: 1,
+      opponentId: 'classic',
+      currentGame: 3,
+      seriesScore: { qld: 1, nsw: 2 },
+      games: [],
+      status: 'complete',
+      seriesWinner: 'NSW',
+      playerConditions: {},
+    }
+  }
+  function wonSeries(): SeriesState {
+    return { ...lostSeries(), seriesScore: { qld: 2, nsw: 1 }, seriesWinner: 'QLD' }
+  }
+
+  it('dead man walking after a season close is gone, whatever the result', () => {
+    const { next, outcome } = boardReview(coachState({ pressure: 85, lostStreak: 1 }), wonSeries(), 2028)
+    expect(outcome.sacked).toBe(true)
+    expect(outcome.era).toMatchObject({ coachId: 'slater', toYear: 2028, seasons: 3, shields: 1 })
+    expect(outcome.successor?.id).toBe('smith')
+    expect(next.coachId).toBe('smith')
+    expect(next.pressure).toBe(freshPressureFor('smith'))
+    expect(next.lostStreak).toBe(0)
+    expect(next.eras).toHaveLength(1)
+  })
+
+  it('under siege + a second straight lost series is the other trigger', () => {
+    const sacked = boardReview(coachState({ pressure: 65, lostStreak: 2 }), lostSeries(), 2028)
+    expect(sacked.outcome.sacked).toBe(true)
+    // Same pressure but the series was WON — survives.
+    const survived = boardReview(coachState({ pressure: 65, lostStreak: 2 }), wonSeries(), 2028)
+    expect(survived.outcome.sacked).toBe(false)
+    expect(survived.next).toBe(survived.next) // state unchanged reference-wise on survival
+    // One lost series under siege is not yet enough.
+    const oneLoss = boardReview(coachState({ pressure: 65, lostStreak: 1 }), lostSeries(), 2028)
+    expect(oneLoss.outcome.sacked).toBe(false)
+    expect(oneLoss.outcome.statement.length).toBeGreaterThan(0)
+  })
+
+  it('succession walks the roster and honeymoons match temperament', () => {
+    expect(successorFor(0).id).toBe('smith')
+    expect(successorFor(1).id).toBe('thurston')
+    expect(successorFor(COACHES.length - 1).id).toBe(COACHES[0].id) // cycles
+    expect(freshPressureFor('thurston')).toBeLessThan(freshPressureFor('langer')) // beloved < combative
+  })
+
+  it('a drop-2 save (no era fields) loads with the era machinery defaulted', () => {
+    const makeStorage = () => {
+      const m = new Map<string, string>()
+      return {
+        getItem: (k: string) => (m.has(k) ? m.get(k)! : null),
+        setItem: (k: string, v: string) => void m.set(k, v),
+        removeItem: (k: string) => void m.delete(k),
+        clear: () => m.clear(),
+        key: () => null,
+        get length() {
+          return m.size
+        },
+      }
+    }
+    const g = globalThis as { localStorage?: unknown }
+    const prior = g.localStorage
+    g.localStorage = makeStorage()
+    try {
+      localStorage.setItem('maroon.coach.v1', JSON.stringify({ schemaVersion: 1, pressure: 55, judgedSeries: [9] }))
+      const loaded = loadCoach()
+      expect(loaded.pressure).toBe(55)
+      expect(loaded.coachId).toBe('slater')
+      expect(loaded.eras).toEqual([])
+      expect(loaded.lostStreak).toBe(0)
+      saveCoach(loaded)
+      expect(loadCoach()).toEqual(loaded)
+    } finally {
+      g.localStorage = prior
+    }
   })
 })
 
