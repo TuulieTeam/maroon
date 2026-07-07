@@ -1,4 +1,5 @@
 import type { PlayerOfMatch } from '../engine'
+import { GAME_URL } from '../gameUrl'
 import { DIFFICULTY_META } from './difficulty'
 import type { SeriesGameRecord, SeriesState } from './types'
 import { VENUES } from './venues'
@@ -36,5 +37,6 @@ export function buildShareCard(state: SeriesState, mvp: PlayerOfMatch | null): s
   if (state.difficulty && state.difficulty !== 'origin') {
     lines.push(`⚙️ Difficulty: ${DIFFICULTY_META[state.difficulty].label}`)
   }
+  lines.push(GAME_URL)
   return lines.join('\n')
 }
