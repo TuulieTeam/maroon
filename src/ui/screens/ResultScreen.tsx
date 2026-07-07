@@ -1,8 +1,10 @@
 import type { Channel } from '../../data/types'
 import type { MatchResult, PlayerStatLine, Side } from '../../engine'
 import { yourEdgeFor, yourEdgePhrase } from '../../engine'
+import type { FeatMint } from '../../feats'
 import type { SeriesState } from '../../series'
 import { BroadcastPanel } from '../components/BroadcastPanel'
+import { FeatToast } from '../components/FeatToast'
 import { SeriesScoreboard } from '../components/SeriesScoreboard'
 import './ResultScreen.css'
 
@@ -11,6 +13,8 @@ interface ResultScreenProps {
   gameLabel: string
   /** Series state AFTER this game has been folded in — drives the standings + the continue button. */
   seriesState: SeriesState
+  /** Feats earned by this game (and, on a series-ending game, the series) — the toast moment. */
+  featMints?: FeatMint[]
   onContinue: () => void
 }
 
@@ -136,7 +140,7 @@ function PlayerTable({ side, lines }: { side: Side; lines: PlayerStatLine[] }) {
   )
 }
 
-export function ResultScreen({ result, gameLabel, seriesState, onContinue }: ResultScreenProps) {
+export function ResultScreen({ result, gameLabel, seriesState, featMints = [], onContinue }: ResultScreenProps) {
   const v = verdict(result, gameLabel)
   const callout = channelCallout(result)
   const { stats, playerOfMatch: potm } = result
@@ -165,6 +169,8 @@ export function ResultScreen({ result, gameLabel, seriesState, onContinue }: Res
         {fgNote && <div className="result-fg-note">{fgNote}</div>}
         <div className="result-flavour">{v.flavour}</div>
       </div>
+
+      <FeatToast mints={featMints} />
 
       <SeriesScoreboard state={seriesState} />
 

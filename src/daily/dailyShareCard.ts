@@ -23,7 +23,12 @@ function square(r: DailyRecord): string {
  * is the STREAK: the score proves the day, the fire proves the habit. The twist is named so a mate
  * seeing the card knows a win was earned under the day's conditions, not on a flat track.
  */
-export function buildDailyShareCard(record: DailyRecord, summary: DailySummary): string {
+export function buildDailyShareCard(
+  record: DailyRecord,
+  summary: DailySummary,
+  /** Feats FIRST-earned by this daily — cards brag about this run, never the back catalog. */
+  newFeatNames: string[] = [],
+): string {
   const twist = twistById(record.twistId)
   const lines = [
     'MAROON · The Daily Origin',
@@ -32,6 +37,7 @@ export function buildDailyShareCard(record: DailyRecord, summary: DailySummary):
   ]
   if (summary.streak > 0) lines.push(`🔥 Streak ${summary.streak} · Best ${summary.bestStreak} · Won ${summary.wins}/${summary.played}`)
   else lines.push(`Best streak ${summary.bestStreak} · Won ${summary.wins}/${summary.played}`)
+  if (newFeatNames.length > 0) lines.push(`🏅 First: ${newFeatNames.join(' · ')}`)
   lines.push(GAME_URL)
   return lines.join('\n')
 }

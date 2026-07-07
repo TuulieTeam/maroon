@@ -4,11 +4,13 @@ import { bluesById } from '../../data/bluesVariants'
 import { buildShareCard } from '../../series'
 import type { CareerSummary, SeriesState } from '../../series'
 import type { UseDaily } from '../../daily/useDaily'
+import type { FeatsLedger } from '../../feats'
 import { SeriesScoreboard } from '../components/SeriesScoreboard'
 import { ClubFormReport } from '../components/ClubFormReport'
 import { ShareCard } from '../components/ShareCard'
 import { CareerLedger } from '../components/CareerLedger'
 import { DailyPanel } from '../components/DailyPanel'
+import { FeatCabinet } from '../components/FeatCabinet'
 import { STAKES_SHORT } from '../seriesStakes'
 import './SeriesHubScreen.css'
 
@@ -28,6 +30,10 @@ interface SeriesHubScreenProps {
   /** The Daily Origin — today's challenge, today's result (if played), and the streak read. */
   daily: UseDaily
   onPlayDaily: () => void
+  /** The trophy cabinet. */
+  featsLedger: FeatsLedger
+  /** Feats FIRST-earned by the just-finished series — bragged on the share card. */
+  newFeatNames: string[]
 }
 
 function shieldHeadline(state: SeriesState): string {
@@ -47,6 +53,8 @@ export function SeriesHubScreen({
   onNewSeries,
   daily,
   onPlayDaily,
+  featsLedger,
+  newFeatNames,
 }: SeriesHubScreenProps) {
   const complete = state.status === 'complete'
   const deadRubberPending = !complete && state.seriesWinner != null
@@ -91,7 +99,7 @@ export function SeriesHubScreen({
               <div className="hub-mvp-side">{seriesMvp.side === 'QLD' ? 'Queensland' : 'New South Wales'}</div>
             </div>
           )}
-          <ShareCard text={buildShareCard(state, seriesMvp)} />
+          <ShareCard text={buildShareCard(state, seriesMvp, newFeatNames)} />
           <div className="hub-actions">
             <button className="btn-primary" onClick={onNewSeries}>
               Start a new series
@@ -121,6 +129,8 @@ export function SeriesHubScreen({
         summary={daily.summary}
         onPlay={onPlayDaily}
       />
+
+      <FeatCabinet ledger={featsLedger} />
 
       <CareerLedger summary={careerSummary} />
     </div>

@@ -1,4 +1,5 @@
 import type { PlayerOfMatch, Score, Side, VenueId } from '../engine'
+import type { Difficulty } from './difficulty'
 import type { GameNo, SeriesState } from './types'
 
 /** The series MVP as an archived label — a result, never a squad attribute. */
@@ -17,10 +18,34 @@ export interface LedgerGame {
   winner: Side | 'DRAW'
 }
 
+/** An archived defining play — a frozen result string, never re-renderable (see the MVP-label rule). */
+export interface LedgerIconicMoment {
+  playerId: string
+  playerName: string
+  side: Side
+  gameNumber: GameNo
+  minute: number
+  kind: string
+  line: string
+}
+
+/** The Blues danger man who owned a series — an immutable damage tally, crowned at series end. */
+export interface LedgerNemesis {
+  id: string
+  name: string
+  tries: number
+  lineBreaks: number
+  damage: number
+}
+
 /**
  * One archived COMPLETED series — immutable results only (score tally + venue + the MVP label), keyed
  * by its unique `rootSeed`. No squad attributes and no lineups are stored, mirroring the ID-only
  * discipline of the live save, so a later squad/tuning change can never retroactively rewrite history.
+ *
+ * v2 additions are all OPTIONAL (a v1 entry upgrades by simply lacking them): the series' difficulty
+ * and drawn opponent (for the feats system), plus reserved slots the chase layer fills as it ships —
+ * the iconic moment, the nemesis, and the dynasty year label.
  */
 export interface LedgerEntry {
   rootSeed: number
@@ -30,9 +55,14 @@ export interface LedgerEntry {
   retained: boolean
   games: LedgerGame[]
   mvp: LedgerMvp | null
+  difficulty?: Difficulty
+  opponentId?: string
+  year?: number
+  iconicMoment?: LedgerIconicMoment
+  nemesis?: LedgerNemesis
 }
 
-export const CAREER_SCHEMA_VERSION = 1
+export const CAREER_SCHEMA_VERSION = 2
 
 /** The whole career: every completed series the player has finished, oldest first. */
 export interface CareerLedger {
@@ -93,6 +123,9 @@ export function addCompletedSeries(
       winner: g.winner,
     })),
     mvp: toMvp(mvp),
+    // v2: how it was won matters to the record — the dial and the drawn Blues side are results too.
+    difficulty: state.difficulty ?? 'origin',
+    opponentId: state.opponentId,
   }
   return { ...ledger, entries: [...ledger.entries, entry] }
 }

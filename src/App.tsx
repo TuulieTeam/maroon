@@ -3,9 +3,21 @@ import { bluesById } from './data/bluesVariants'
 import type { Position } from './data/types'
 import { originLabel, simulateMatch } from './engine'
 import type { MatchResult, MatchSetup, PlayerOfMatch, SelectedTeam } from './engine'
-import { dailyKey } from './daily'
+import { dailyKey, recordDaily, summariseDaily } from './daily'
 import { useDaily } from './daily/useDaily'
-import { conditionFormDelta, gameSeed, nswDifficultyDelta, pickSeriesMvp, reinjuryMult } from './series'
+import type { FeatMint } from './feats'
+import { useFeats } from './feats/useFeats'
+import {
+  applyGameResult,
+  concludeSeries,
+  conditionFormDelta,
+  gameSeed,
+  loadCareer,
+  nswDifficultyDelta,
+  pickSeriesMvp,
+  reinjuryMult,
+} from './series'
+import type { SeriesState } from './series'
 import { useSeries } from './series/useSeries'
 import { SelectionScreen } from './ui/screens/SelectionScreen'
 import { PreGameScreen } from './ui/screens/PreGameScreen'
@@ -72,6 +84,24 @@ export default function App() {
   // Guards against folding the same daily into the ledger twice (mirror of recordedGameRef).
   const recordedDailyRef = useRef<string | null>(null)
 
+  // ---- Feats — judged at the App boundary the moment each result exists. ----
+  const feats = useFeats(todayKey)
+  // What THIS run has just earned: shown as toasts on the result screen and, for first earns,
+  // bragged on the share card. Cleared at the next kickoff; a reload clears it too (the cabinet
+  // remembers forever; the toast is a moment).
+  const [recentMints, setRecentMints] = useState<FeatMint[]>([])
+
+  // Judge the series feats against a COMPLETED state. The reducers are pure, so callers compute the
+  // post-fold state themselves — no effect, no double-judgement (one-shot feats no-op anyway).
+  const judgeCompletedSeries = useCallback(
+    (completed: SeriesState) => {
+      if (completed.status !== 'complete' || !completed.seriesWinner) return
+      const mints = feats.evaluate({ kind: 'series', completed, career: loadCareer() }, todayKey)
+      if (mints.length > 0) setRecentMints((prev) => [...prev, ...mints])
+    },
+    [feats, todayKey],
+  )
+
   // Lock in the picked XVII and simulate this game — series context drives venue/stakes commentary.
   const handleKickOff = useCallback(
     (team: SelectedTeam) => {
@@ -102,6 +132,7 @@ export default function App() {
       setLockedTeam(team)
       setPlayingGame(game)
       recordedGameRef.current = null
+      setRecentMints([])
       setResult(simulateMatch(setup, gameSeed(state.rootSeed, game)))
       setPhase('pregame')
     },
@@ -120,19 +151,28 @@ export default function App() {
   const handleMatchComplete = useCallback(() => {
     if (result && lockedTeam && recordedGameRef.current !== playingGame) {
       recordedGameRef.current = playingGame
-      recordResult({
+      const played = {
         qldLineup: lineupIds(lockedTeam),
         qldKickerId: lockedTeam.kickerId,
         finalScore: result.finalScore,
         winner: result.winner,
         events: result.events,
         stats: result.stats,
-      })
+      }
+      recordResult(played)
       setPotms((prev) => [...prev, result.playerOfMatch])
       setUsedSpeechTitles((prev) => [...prev, result.broadcast.preMatchSpeech.title])
+      // Judge the single-match feats while the stats + the locked 19 are in hand, then — because
+      // applyGameResult is pure — fold the game locally to see if this one ended the series.
+      const mints = feats.evaluate(
+        { kind: 'match', result, team: lockedTeam, difficulty: state.difficulty ?? 'origin' },
+        todayKey,
+      )
+      if (mints.length > 0) setRecentMints((prev) => [...prev, ...mints])
+      judgeCompletedSeries(applyGameResult(state, played))
     }
     setPhase('result')
-  }, [result, lockedTeam, playingGame, recordResult])
+  }, [result, lockedTeam, playingGame, recordResult, feats, state, todayKey, judgeCompletedSeries])
 
   // Lock in the daily XVII and simulate — the twist composes at this boundary exactly like the
   // difficulty dial (uniform form-map deltas + a venue), so the engine never learns "daily".
@@ -155,6 +195,7 @@ export default function App() {
       }
       setDailyTeam(team)
       recordedDailyRef.current = null
+      setRecentMints([])
       setDailyResult(simulateMatch(setup, seed))
       setPhase('daily-pregame')
     },
@@ -165,17 +206,32 @@ export default function App() {
   const handleDailyComplete = useCallback(() => {
     if (dailyResult && recordedDailyRef.current !== daily.challenge.dateKey) {
       recordedDailyRef.current = daily.challenge.dateKey
-      daily.record({
+      const record = {
         dateKey: daily.challenge.dateKey,
         twistId: daily.challenge.twist.id,
         opponentId: daily.challenge.opponent.id,
         venueId: daily.challenge.venue.id,
         finalScore: dailyResult.finalScore,
         winner: dailyResult.winner,
-      })
+      }
+      daily.record(record)
+      // Judge the daily feats against the ledger AS IT WILL BE once the record lands (the hook's
+      // state update is async, so fold it locally for the judgement).
+      const nextLedger = recordDaily(daily.ledger, record)
+      const mints = feats.evaluate(
+        { kind: 'daily', record, summary: summariseDaily(nextLedger, todayKey), ledger: nextLedger },
+        record.dateKey,
+      )
+      if (mints.length > 0) setRecentMints((prev) => [...prev, ...mints])
     }
     setPhase('daily-result')
-  }, [dailyResult, daily])
+  }, [dailyResult, daily, feats, todayKey])
+
+  // Skipping the dead rubber concludes the series — judge the concluded state it will become.
+  const handleSkipDeadRubber = useCallback(() => {
+    judgeCompletedSeries(concludeSeries(state))
+    skipDeadRubber()
+  }, [state, skipDeadRubber, judgeCompletedSeries])
 
   const handleNewSeries = useCallback(() => {
     // Capture this series' MVP (in-memory POTMs) so it lands in the career ledger before the wipe.
@@ -235,6 +291,7 @@ export default function App() {
         result={dailyResult}
         record={daily.todayRecord}
         summary={daily.summary}
+        featMints={recentMints}
         onContinue={() => setPhase('hub')}
       />
     )
@@ -289,6 +346,7 @@ export default function App() {
         result={result}
         gameLabel={originLabel(playingGame)}
         seriesState={state}
+        featMints={recentMints}
         onContinue={() => setPhase('hub')}
       />
     )
@@ -301,10 +359,12 @@ export default function App() {
       careerSummary={careerSummary}
       seriesMvp={state.status === 'complete' && potms.length > 0 ? pickSeriesMvp(potms) : null}
       onPick={() => setPhase('select')}
-      onSkipDeadRubber={skipDeadRubber}
+      onSkipDeadRubber={handleSkipDeadRubber}
       onNewSeries={handleNewSeries}
       daily={daily}
       onPlayDaily={() => setPhase('daily-select')}
+      featsLedger={feats.ledger}
+      newFeatNames={recentMints.filter((m) => m.isFirst).map((m) => m.def.name)}
     />
   )
 }

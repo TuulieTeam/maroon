@@ -84,6 +84,39 @@ describe('careerPersist — round trip', () => {
   })
 })
 
+describe('careerPersist — v1 → v2 upgrade', () => {
+  it('a stored v1 archive upgrades in place instead of being wiped', () => {
+    const v1Entry = {
+      rootSeed: 42,
+      seriesScore: { qld: 2, nsw: 1 },
+      seriesWinner: 'QLD',
+      retained: false,
+      games: [{ gameNumber: 1, venueId: 'SUNCORP', finalScore: { qld: 20, nsw: 10 }, winner: 'QLD' }],
+      mvp: null,
+    }
+    localStorage.setItem(CAREER_KEY, JSON.stringify({ schemaVersion: 1, entries: [v1Entry] }))
+    const loaded = loadCareer()
+    expect(loaded.schemaVersion).toBe(2)
+    expect(loaded.entries).toHaveLength(1)
+    expect(loaded.entries[0].rootSeed).toBe(42)
+    // v2 fields are simply absent on an upgraded v1 entry — never fabricated.
+    expect(loaded.entries[0].difficulty).toBeUndefined()
+    expect(loaded.entries[0].opponentId).toBeUndefined()
+  })
+
+  it('new archives record how the series was won (difficulty + opponent)', () => {
+    const led = sampleLedger()
+    expect(led.entries[0].difficulty).toBe('origin')
+    expect(led.entries[0].opponentId).toBe('classic')
+  })
+
+  it('rejects a present-but-bad v2 field', () => {
+    const bad = { ...sampleLedger().entries[0], nemesis: { id: 1 } }
+    localStorage.setItem(CAREER_KEY, JSON.stringify({ schemaVersion: 2, entries: [bad] }))
+    expect(loadCareer()).toEqual(EMPTY_LEDGER)
+  })
+})
+
 describe('careerPersist — defensive discard', () => {
   it('discards a wrong schema version', () => {
     localStorage.setItem(CAREER_KEY, JSON.stringify({ schemaVersion: 99, entries: [] }))

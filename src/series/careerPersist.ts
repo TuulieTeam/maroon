@@ -10,18 +10,28 @@ const VENUE_IDS = new Set<VenueId>(['SUNCORP', 'ACCOR_SYD', 'MCG'])
 
 /**
  * Load the career ledger, or an empty one if there is none / it is unreadable. Defensive by design:
- * any parse failure, schema mismatch, or malformed entry discards the whole archive and returns an
- * empty ledger rather than crashing the hub.
+ * any parse failure or malformed entry discards the whole archive rather than crashing the hub —
+ * EXCEPT a v1 archive, which UPGRADES in place (v2 only added optional fields, so a valid v1 entry
+ * is already a valid v2 entry). A career must never be wiped by a schema bump.
  */
 export function loadCareer(): CareerLedger {
   try {
     const raw = localStorage.getItem(CAREER_KEY)
     if (!raw) return EMPTY_LEDGER
     const parsed: unknown = JSON.parse(raw)
-    return isValidLedger(parsed) ? parsed : EMPTY_LEDGER
+    const upgraded = upgradeLedger(parsed)
+    return isValidLedger(upgraded) ? upgraded : EMPTY_LEDGER
   } catch {
     return EMPTY_LEDGER
   }
+}
+
+/** v1 → v2: entries carry over verbatim (every v2 addition is optional). Anything else passes through. */
+function upgradeLedger(v: unknown): unknown {
+  if (!v || typeof v !== 'object') return v
+  const l = v as Record<string, unknown>
+  if (l.schemaVersion === 1 && Array.isArray(l.entries)) return { ...l, schemaVersion: CAREER_SCHEMA_VERSION }
+  return v
 }
 
 export function saveCareer(ledger: CareerLedger): void {
@@ -74,7 +84,41 @@ function isLedgerEntry(v: unknown): v is LedgerEntry {
   if (!isSide(e.seriesWinner)) return false
   if (typeof e.retained !== 'boolean') return false
   if (!Array.isArray(e.games) || !e.games.every(isLedgerGame)) return false
-  return isMvp(e.mvp)
+  if (!isMvp(e.mvp)) return false
+  // v2 optionals: reject only a present-but-bad value (the difficulty-field pattern). Ids are checked
+  // for TYPE only — resolution falls back gracefully, so retiring a variant never invalidates history.
+  if (e.difficulty !== undefined && typeof e.difficulty !== 'string') return false
+  if (e.opponentId !== undefined && typeof e.opponentId !== 'string') return false
+  if (e.year !== undefined && typeof e.year !== 'number') return false
+  if (e.iconicMoment !== undefined && !isIconicMoment(e.iconicMoment)) return false
+  if (e.nemesis !== undefined && !isNemesis(e.nemesis)) return false
+  return true
+}
+
+function isIconicMoment(v: unknown): boolean {
+  if (!v || typeof v !== 'object') return false
+  const m = v as Record<string, unknown>
+  return (
+    typeof m.playerId === 'string' &&
+    typeof m.playerName === 'string' &&
+    isSide(m.side) &&
+    (m.gameNumber === 1 || m.gameNumber === 2 || m.gameNumber === 3) &&
+    typeof m.minute === 'number' &&
+    typeof m.kind === 'string' &&
+    typeof m.line === 'string'
+  )
+}
+
+function isNemesis(v: unknown): boolean {
+  if (!v || typeof v !== 'object') return false
+  const n = v as Record<string, unknown>
+  return (
+    typeof n.id === 'string' &&
+    typeof n.name === 'string' &&
+    typeof n.tries === 'number' &&
+    typeof n.lineBreaks === 'number' &&
+    typeof n.damage === 'number'
+  )
 }
 
 function isValidLedger(v: unknown): v is CareerLedger {

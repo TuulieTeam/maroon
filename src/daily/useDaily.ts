@@ -2,10 +2,12 @@ import { useCallback, useMemo, useState } from 'react'
 import { buildDailyChallenge } from './dailyChallenge'
 import type { DailyChallenge } from './dailyChallenge'
 import { recordDaily, recordForDay, summariseDaily } from './dailyLedger'
-import type { DailyRecord, DailySummary } from './dailyLedger'
+import type { DailyLedger, DailyRecord, DailySummary } from './dailyLedger'
 import { loadDaily, saveDaily } from './dailyPersist'
 
 export interface UseDaily {
+  /** The whole persisted daily history — career-scope consumers (feats) read across it. */
+  ledger: DailyLedger
   /** Today's deterministic challenge — same date, same match, always re-derivable. */
   challenge: DailyChallenge
   /** Today's result, once played — the one-attempt lock the UI renders around. */
@@ -36,5 +38,5 @@ export function useDaily(todayKey: string): UseDaily {
     })
   }, [])
 
-  return { challenge, todayRecord, summary, record }
+  return { ledger, challenge, todayRecord, summary, record }
 }

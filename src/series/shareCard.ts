@@ -26,7 +26,12 @@ function headline(state: SeriesState): string {
  * and the engine/UI split holds. One game per square, QLD–NSW scores, the ground, and the series MVP if
  * it was seen this session. Precondition: the series is complete (3 games played).
  */
-export function buildShareCard(state: SeriesState, mvp: PlayerOfMatch | null): string {
+export function buildShareCard(
+  state: SeriesState,
+  mvp: PlayerOfMatch | null,
+  /** Feats FIRST-earned during this series — cards brag about this run, never the back catalog. */
+  newFeatNames: string[] = [],
+): string {
   const lines = ['MAROON · State of Origin 2026', headline(state)]
   const games = state.games
     .map((g) => `${square(g)} ${VENUES[g.venueId].groundShort} ${g.finalScore.qld}–${g.finalScore.nsw}`)
@@ -37,6 +42,7 @@ export function buildShareCard(state: SeriesState, mvp: PlayerOfMatch | null): s
   if (state.difficulty && state.difficulty !== 'origin') {
     lines.push(`⚙️ Difficulty: ${DIFFICULTY_META[state.difficulty].label}`)
   }
+  if (newFeatNames.length > 0) lines.push(`🏅 First: ${newFeatNames.join(' · ')}`)
   lines.push(GAME_URL)
   return lines.join('\n')
 }

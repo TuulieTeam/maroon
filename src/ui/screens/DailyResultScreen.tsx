@@ -1,7 +1,9 @@
 import type { MatchResult } from '../../engine'
 import { buildDailyShareCard, formatDateKey, twistById } from '../../daily'
 import type { DailyRecord, DailySummary } from '../../daily'
+import type { FeatMint } from '../../feats'
 import { BroadcastPanel } from '../components/BroadcastPanel'
+import { FeatToast } from '../components/FeatToast'
 import { ShareCard } from '../components/ShareCard'
 import './ResultScreen.css'
 import './DailyScreens.css'
@@ -12,6 +14,8 @@ interface DailyResultScreenProps {
   record: DailyRecord
   /** Streak read AFTER today's result — the number this screen exists to reveal. */
   summary: DailySummary
+  /** Feats earned by this daily — the toast moment; first earns also land on the share card. */
+  featMints?: FeatMint[]
   onContinue: () => void
 }
 
@@ -46,11 +50,12 @@ function streakLine(summary: DailySummary, won: boolean): string {
  * that brings you back: today's verdict, what it did to the streak, the copyable brag, and the door
  * back to the hub (where the countdown to tomorrow's Daily is already running).
  */
-export function DailyResultScreen({ result, record, summary, onContinue }: DailyResultScreenProps) {
+export function DailyResultScreen({ result, record, summary, featMints = [], onContinue }: DailyResultScreenProps) {
   const v = verdict(result)
   const twist = twistById(record.twistId)
   const potm = result.playerOfMatch
   const won = result.winner === 'QLD'
+  const newFeatNames = featMints.filter((m) => m.isFirst).map((m) => m.def.name)
 
   return (
     <div className="app-shell result-screen">
@@ -74,6 +79,8 @@ export function DailyResultScreen({ result, record, summary, onContinue }: Daily
         </div>
       </div>
 
+      <FeatToast mints={featMints} />
+
       <div className="result-broadcast">
         <BroadcastPanel slot="postGame" segments={result.broadcast.postGame} />
       </div>
@@ -90,7 +97,7 @@ export function DailyResultScreen({ result, record, summary, onContinue }: Daily
         </div>
       </div>
 
-      <ShareCard text={buildDailyShareCard(record, summary)} />
+      <ShareCard text={buildDailyShareCard(record, summary, newFeatNames)} />
 
       <div className="result-actions">
         <button className="btn-primary" onClick={onContinue}>

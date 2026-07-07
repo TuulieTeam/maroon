@@ -1,0 +1,123 @@
+/* Trophy cabinet + earn toasts — gold is earned, silhouette is a dare. */
+
+.feat-cabinet {
+  border: 1px solid var(--surface-line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--pixel-shadow);
+  padding: 14px 16px;
+}
+
+.feat-cabinet-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.feat-cabinet-head h2 {
+  font-size: 1.05rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.feat-cabinet-tally {
+  color: var(--gold);
+  font-weight: 800;
+}
+
+.feat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 10px;
+}
+
+.feat-card {
+  border: 1px solid var(--surface-line);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  background: var(--surface-2);
+}
+
+.feat-card.earned {
+  border-color: var(--gold);
+}
+
+.feat-card.locked {
+  opacity: 0.65;
+}
+
+.feat-name {
+  font-weight: 800;
+  letter-spacing: 0.03em;
+}
+
+.feat-card.earned .feat-name {
+  color: var(--gold);
+}
+
+.feat-count {
+  color: var(--text);
+}
+
+.feat-line {
+  margin-top: 3px;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--text-dim);
+}
+
+.feat-date {
+  margin-top: 4px;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-faint);
+}
+
+/* Earn toasts on the result screens. */
+.feat-toasts {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.feat-toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--gold);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--pixel-shadow);
+  padding: 10px 14px;
+}
+
+.feat-toast.repeat {
+  border-color: var(--surface-line);
+  opacity: 0.85;
+}
+
+.feat-toast-badge {
+  font-size: 1.4rem;
+}
+
+.feat-toast-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.feat-toast-body strong {
+  color: var(--gold);
+  letter-spacing: 0.04em;
+}
+
+.feat-toast.repeat .feat-toast-body strong {
+  color: var(--text-dim);
+}
+
+.feat-toast-body em {
+  font-style: normal;
+  font-size: 0.88rem;
+  color: var(--text-dim);
+}
