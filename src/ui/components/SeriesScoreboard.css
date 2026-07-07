@@ -24,14 +24,14 @@
 }
 
 .series-venue {
-  font-size: 0.82rem;
+  font-size: var(--fs-sub);
   color: var(--text-dim);
 }
 
 .series-stakes {
-  font-size: 0.74rem;
+  font-size: var(--fs-label);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: var(--track-1);
   color: var(--gold);
   font-weight: 700;
 }
@@ -55,14 +55,14 @@
 
 .series-pip .pip-game {
   font-family: var(--font-pixel);
-  font-size: 0.62rem;
+  font-size: var(--fs-label);
   letter-spacing: 0;
   color: var(--text-dim);
 }
 
 .series-pip .pip-score {
   font-family: var(--font-pixel);
-  font-size: 0.9rem;
+  font-size: var(--fs-body);
   font-variant-numeric: tabular-nums;
   min-height: 1.1em;
 }
@@ -102,7 +102,7 @@
 
 .series-line {
   text-align: center;
-  font-size: 0.88rem;
+  font-size: var(--fs-sub);
   font-weight: 700;
   color: var(--text);
 }

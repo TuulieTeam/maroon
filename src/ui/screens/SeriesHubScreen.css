@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   gap: 18px;
-  max-width: 640px;
+  max-width: var(--content-narrow);
 }
 
 .hub-header {
@@ -10,9 +10,9 @@
 }
 
 .hub-kicker {
-  font-size: 0.78rem;
+  font-size: var(--fs-label);
   text-transform: uppercase;
-  letter-spacing: 0.14em;
+  letter-spacing: var(--track-2);
   color: var(--text-dim);
 }
 
@@ -41,7 +41,7 @@
 /* Who the drawn Blues side is this series — a muted caption with the enemy named in Blues colour. */
 .hub-opponent {
   text-align: center;
-  font-size: 0.95rem;
+  font-size: var(--fs-body);
   line-height: 1.45;
   color: var(--text-dim);
   max-width: 52ch;
@@ -54,17 +54,17 @@
 }
 
 /* The build stamp — service workers auto-update, and this answers "are we on the same drop?". */
+/* Deliberate whisper-level chrome: mixed case at the fine-print floor, no tracking. */
 .hub-build-stamp {
   text-align: center;
-  font-size: 0.7rem;
-  letter-spacing: 0.08em;
+  font-size: var(--fs-fine);
   color: var(--text-faint);
 }
 
 /* The grudge — a returning nemesis called out under the opponent line. Reads like a threat. */
 .hub-grudge {
   text-align: center;
-  font-size: 0.92rem;
+  font-size: var(--fs-body);
   font-weight: 700;
   color: var(--bad);
   margin: -8px auto 0;
@@ -87,9 +87,9 @@
 }
 
 .hub-mvp-label {
-  font-size: 0.72rem;
+  font-size: var(--fs-label);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: var(--track-2);
   color: var(--text-dim);
 }
 
@@ -100,7 +100,7 @@
 }
 
 .hub-mvp-side {
-  font-size: 0.85rem;
+  font-size: var(--fs-sub);
   color: var(--text-dim);
 }
 

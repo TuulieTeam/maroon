@@ -25,23 +25,23 @@
   font-size: 1.05rem;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: var(--track-1);
   color: var(--gold);
 }
 
 .daily-challenge-where {
-  font-size: 0.9rem;
+  font-size: var(--fs-sub);
   color: var(--blue-text);
 }
 
 .daily-challenge-blurb {
-  font-size: 0.95rem;
+  font-size: var(--fs-body);
   line-height: 1.5;
   color: var(--text-dim);
 }
 
 .daily-challenge-stakes {
-  font-size: 0.9rem;
+  font-size: var(--fs-sub);
   color: var(--text-dim);
 }
 
@@ -61,7 +61,7 @@
   background: var(--surface);
   padding: 8px 12px;
   margin-bottom: 14px;
-  font-size: 0.9rem;
+  font-size: var(--fs-sub);
   color: var(--text-dim);
 }
 
@@ -70,9 +70,9 @@
   display: flex;
   justify-content: center;
   gap: 18px;
-  font-size: 0.9rem;
+  font-size: var(--fs-sub);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: var(--track-2);
   color: var(--text-dim);
 }
 
@@ -90,9 +90,9 @@
 }
 
 .iconic-moment-label {
-  font-size: 0.75rem;
+  font-size: var(--fs-label);
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: var(--track-2);
   font-weight: 800;
   color: var(--gold);
 }
@@ -103,7 +103,7 @@
 
 .iconic-moment-line {
   margin-top: 4px;
-  font-size: 1rem;
+  font-size: var(--fs-body);
   line-height: 1.45;
 }
 
@@ -132,6 +132,6 @@
 
 .daily-streak-record {
   margin-top: 4px;
-  font-size: 0.85rem;
+  font-size: var(--fs-sub);
   color: var(--text-dim);
 }

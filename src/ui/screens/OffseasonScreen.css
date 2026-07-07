@@ -3,8 +3,8 @@
 .offseason-screen {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  max-width: 640px;
+  gap: 20px;
+  max-width: var(--content-narrow);
 }
 
 .offseason-header {
@@ -12,9 +12,9 @@
 }
 
 .offseason-kicker {
-  font-size: 0.78rem;
+  font-size: var(--fs-label);
   text-transform: uppercase;
-  letter-spacing: 0.14em;
+  letter-spacing: var(--track-2);
   color: var(--text-dim);
 }
 
@@ -44,9 +44,9 @@
 }
 
 .board-verdict-label {
-  font-size: 0.75rem;
+  font-size: var(--fs-label);
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: var(--track-2);
   font-weight: 800;
   color: var(--text-dim);
 }
@@ -57,19 +57,19 @@
 
 .board-verdict-line {
   margin-top: 6px;
-  font-size: 0.98rem;
+  font-size: var(--fs-body);
   line-height: 1.5;
 }
 
 .board-era-line {
   margin-top: 8px;
-  font-size: 0.88rem;
+  font-size: var(--fs-sub);
   color: var(--text-dim);
 }
 
 .board-successor {
   margin-top: 4px;
-  font-size: 0.95rem;
+  font-size: var(--fs-body);
 }
 
 .board-successor strong {
@@ -80,7 +80,7 @@
 .offseason-movers h2 {
   font-size: 1rem;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: var(--track-2);
   margin-bottom: 10px;
 }
 
@@ -89,7 +89,7 @@
   border-left: 4px solid var(--gold);
   border-radius: var(--radius);
   background: var(--surface);
-  padding: 12px 14px;
+  padding: 14px 16px;
 }
 
 .retirement-card + .retirement-card {
@@ -104,13 +104,13 @@
 .retirement-meta {
   color: var(--text-dim);
   font-weight: 400;
-  font-size: 0.85rem;
+  font-size: var(--fs-sub);
 }
 
 .retirement-farewell {
   margin-top: 4px;
   color: var(--text-dim);
-  font-size: 0.92rem;
+  font-size: var(--fs-body);
   line-height: 1.45;
 }
 
@@ -123,14 +123,14 @@
 .offseason-nsw h2 {
   font-size: 1rem;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: var(--track-2);
   margin-bottom: 10px;
 }
 
 .nsw-change {
   border-left: 3px solid var(--blue-deep);
   padding: 6px 12px;
-  font-size: 0.9rem;
+  font-size: var(--fs-sub);
   color: var(--text-dim);
 }
 
@@ -151,7 +151,7 @@
 .offseason-rookies h2 {
   font-size: 1rem;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: var(--track-2);
   margin-bottom: 10px;
 }
 
@@ -174,27 +174,27 @@
 .rookie-meta {
   color: var(--text-dim);
   font-weight: 400;
-  font-size: 0.85rem;
+  font-size: var(--fs-sub);
 }
 
 .rookie-note {
   margin-top: 3px;
   color: var(--text-dim);
-  font-size: 0.88rem;
+  font-size: var(--fs-sub);
 }
 
 .movers-cols {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
 }
 
 .movers-col {
   border: 1px solid var(--surface-line);
   border-radius: var(--radius);
   background: var(--surface);
-  padding: 10px 12px;
-  font-size: 0.9rem;
+  padding: 12px 14px;
+  font-size: var(--fs-sub);
 }
 
 .movers-col p {
@@ -207,9 +207,9 @@
 }
 
 .movers-label {
-  font-size: 0.72rem;
+  font-size: var(--fs-label);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: var(--track-2);
   font-weight: 800;
 }
 
@@ -237,7 +237,7 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  font-size: 0.85rem;
+  font-size: var(--fs-sub);
   color: var(--text-dim);
 }
 
