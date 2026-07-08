@@ -30,9 +30,9 @@ export const CONDITIONS_TUNING = {
   // the Great Rebalance (parity squads); if the authored squads move again, re-derive (mirror
   // originPerformanceDelta's gate + per-80 scaling over ~120 neutral sims) or every game reads biased.
   roleBaseline: {
-    back: { mean: 1015, sd: 550 },
-    forward: { mean: 848, sd: 290 },
-    half: { mean: 842, sd: 341 },
+    back: { mean: 858, sd: 437 },
+    forward: { mean: 807, sd: 252 },
+    half: { mean: 790, sd: 283 },
   } as Record<PlayerRole, { mean: number; sd: number }>,
 } as const
 

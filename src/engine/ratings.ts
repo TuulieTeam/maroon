@@ -26,10 +26,18 @@ export const TUNING = {
    */
   channelBase: { LEFT: 0.225, MIDDLE: 0.55, RIGHT: 0.225 } as Record<Channel, number>,
 
-  /** Break contest: pBreak = sigmoid(k * (effAttack + edgeSupport - effDefence) - bias). */
+  /**
+   * Break contest: pBreak = sigmoid(k * (effAttack + edgeSupport - effDefence) - bias).
+   * edgeSupport = (unit attackRating - edgeSupportAnchor) * edgeSupportScale — support is relative
+   * to a TYPICAL Origin unit, not absolute, so re-levelling the authored squads doesn't inflate
+   * scoring volume. Anchor + bias were re-calibrated after the Great Rebalance when parity squads
+   * produced 45+ point games (scoreVolume target: ~34 avg total, 60+ totals rare — Origin, not
+   * basketball). Volume guard: realBalance.test.ts total-points pins.
+   */
   breakK: 0.055,
-  breakBias: 2.45,
+  breakBias: 2.8,
   edgeSupportScale: 0.18,
+  edgeSupportAnchor: 75,
 
   /** Clean-break (vs half-break) speed contest vs fullback cover. */
   cleanBreakK: 0.05,
@@ -449,7 +457,7 @@ export function resolveContest(rng: Rng, input: ContestInput): ContestOutcome {
   // A short-handed defence (sin-bin / send-off) defends measurably worse — wire the uniform debuff
   // into the actual break contest (it already feeds channel-selection but cancels in the softmax).
   const effDefence = effectiveAttr(input.defender.attrs.defence, input.defenceFatigue, dForm) - (input.defenceDebuff ?? 0)
-  const edgeSupport = (input.attackUnit.attackRating - 60) * TUNING.edgeSupportScale
+  const edgeSupport = (input.attackUnit.attackRating - TUNING.edgeSupportAnchor) * TUNING.edgeSupportScale
 
   const pBreak = sigmoid(
     TUNING.breakK * (effAttack + edgeSupport - effDefence) - TUNING.breakBias,

@@ -91,12 +91,14 @@ describe('real-squad balance — the Maroon-tinted target', () => {
   const qld = qldRealSide()
 
   const originByVenue = new Map<VenueId, number[]>()
+  const originTotals: number[] = []
   for (const venueId of VENUE_IDS) {
     const margins: number[] = []
     for (const variantId of BLUES_IDS) {
       for (let seed = 1; seed <= ORIGIN_SEEDS; seed++) {
         const r = simulateMatch(setupFor(qld, variantId, venueId, 'origin'), seed)
         margins.push(r.finalScore.qld - r.finalScore.nsw)
+        originTotals.push(r.finalScore.qld + r.finalScore.nsw)
       }
     }
     originByVenue.set(venueId, margins)
@@ -125,30 +127,41 @@ describe('real-squad balance — the Maroon-tinted target', () => {
     const suncorp = statsOf(originByVenue.get('SUNCORP')!)
     const accor = statsOf(originByVenue.get('ACCOR_SYD')!)
     const mcg = statsOf(originByVenue.get('MCG')!)
-    // Tightened around the tuned numbers (61% / 43% / 47% at ship): a drift outside these bands
-    // means the FEEL moved — retune the data, don't loosen the pins.
-    expect(suncorp.winRate).toBeGreaterThanOrEqual(0.55)
-    expect(suncorp.winRate).toBeLessThanOrEqual(0.67)
-    expect(accor.winRate).toBeGreaterThanOrEqual(0.4)
-    expect(accor.winRate).toBeLessThanOrEqual(0.52)
-    expect(mcg.winRate).toBeGreaterThanOrEqual(0.42)
-    expect(mcg.winRate).toBeLessThanOrEqual(0.54)
+    // Tightened around the tuned numbers (65% / 41% / 57% after the score-volume recalibration):
+    // a drift outside these bands means the FEEL moved — retune the data, don't loosen the pins.
+    expect(suncorp.winRate).toBeGreaterThanOrEqual(0.58)
+    expect(suncorp.winRate).toBeLessThanOrEqual(0.7)
+    expect(accor.winRate).toBeGreaterThanOrEqual(0.36)
+    expect(accor.winRate).toBeLessThanOrEqual(0.5)
+    expect(mcg.winRate).toBeGreaterThanOrEqual(0.48)
+    expect(mcg.winRate).toBeLessThanOrEqual(0.62)
     expect(suncorp.avgMargin).toBeGreaterThanOrEqual(2)
-    expect(suncorp.avgMargin).toBeLessThanOrEqual(8)
-    expect(accor.avgMargin).toBeGreaterThanOrEqual(-5)
-    expect(accor.avgMargin).toBeLessThanOrEqual(2)
+    expect(suncorp.avgMargin).toBeLessThanOrEqual(9)
+    expect(accor.avgMargin).toBeGreaterThanOrEqual(-4)
+    expect(accor.avgMargin).toBeLessThanOrEqual(4)
   })
 
   it('losses are mostly close — the game is contested, not a procession', () => {
     const all = VENUE_IDS.flatMap((v) => originByVenue.get(v)!)
     const pooled = statsOf(all)
-    expect(pooled.medianAbs).toBeLessThanOrEqual(14)
-    expect(pooled.blowoutRate).toBeLessThanOrEqual(0.2)
+    expect(pooled.medianAbs).toBeLessThanOrEqual(12)
+    expect(pooled.blowoutRate).toBeLessThanOrEqual(0.15)
+  })
+
+  it('scores are Origin scores, not basketball (the 70-24 guard)', () => {
+    // Total points, pooled across all origin cells. Real Origin: ~34 total on average, 60+ is a
+    // freak. This is the dimension the first rebalance shipped without.
+    const avgTotal = originTotals.reduce((a, b) => a + b, 0) / originTotals.length
+    const over60 = originTotals.filter((t) => t > 60).length / originTotals.length
+    console.log(`origin totals: avg ${avgTotal.toFixed(1)} · >60pts ${(over60 * 100).toFixed(1)}%`)
+    expect(avgTotal).toBeGreaterThanOrEqual(26)
+    expect(avgTotal).toBeLessThanOrEqual(40)
+    expect(over60).toBeLessThanOrEqual(0.05)
   })
 
   it('the difficulty dial means what it says against the real squad', () => {
-    expect(statsOf(hardMargins).winRate).toBeGreaterThanOrEqual(0.24)
-    expect(statsOf(hardMargins).winRate).toBeLessThanOrEqual(0.38)
+    expect(statsOf(hardMargins).winRate).toBeGreaterThanOrEqual(0.28)
+    expect(statsOf(hardMargins).winRate).toBeLessThanOrEqual(0.44)
     expect(statsOf(casualMargins).winRate).toBeGreaterThanOrEqual(0.8)
   })
 
@@ -173,7 +186,6 @@ describe('real-squad balance — the Maroon-tinted target', () => {
       })
       if (q > n) seriesWins++
     }
-    // eslint-disable-next-line no-console
     console.log(`series diagnostic: QLD wins ${seriesWins}/${roots} (${((seriesWins / roots) * 100).toFixed(0)}%)`)
     // Very loose — the per-venue pins above are the real guard; this catches gross series-level drift.
     expect(seriesWins / roots).toBeGreaterThanOrEqual(0.4)
