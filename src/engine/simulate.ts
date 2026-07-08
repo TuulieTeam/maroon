@@ -30,6 +30,7 @@ import {
   effectiveAttr,
   homeEdgeBySide,
   kickSkill,
+  gameManagementDampen,
   offloadChance,
   pickCarrier,
   pickChannel,
@@ -717,7 +718,10 @@ export function simulateMatch(setup: MatchSetup, seed: number): MatchResult {
       continue
     }
 
-    // 3) Contest resolution.
+    // 3) Contest resolution. A comfortably-ahead side late in the game manages the clock and stops
+    // chasing tries — the game-management dampener flattens a runaway score (only the LEADING side;
+    // the chasing side stays full-noise, so comebacks are untouched).
+    const attackerLead = possession === 'QLD' ? score.qld - score.nsw : score.nsw - score.qld
     const outcome = resolveContest(rng, {
       attacker,
       defender,
@@ -728,6 +732,7 @@ export function simulateMatch(setup: MatchSetup, seed: number): MatchResult {
       defenceDebuff: defDebuff,
       attackerForm: fdelta(attacker.id),
       defenderForm: fdelta(defender.id),
+      breakDampen: gameManagementDampen(attackerLead, clock),
     })
 
     if (outcome.kind === 'TRY') {

@@ -39,6 +39,24 @@ export const TUNING = {
   edgeSupportScale: 0.18,
   edgeSupportAnchor: 75,
 
+  /**
+   * Game management — the "you don't win by 70" dampener. Real blowouts PLATEAU: once a side is
+   * comfortably ahead late, they take the safe option, kill the clock, and stop chasing tries, so
+   * the scoreline flattens instead of snowballing. Modelled as a pure negative bias on ONLY the
+   * LEADING side's break contest (the trailing side keeps throwing everything — comebacks stay
+   * fully live), scaling with the lead beyond `leadThreshold` once past `fromMinute`. Zero rng: it
+   * shifts pBreak, the contest still draws its one roll, so replays stay byte-identical. Close games
+   * and the first ~hour never see it. Tuned against realBalance's max-total pin + distribution probe:
+   * it clips the 80-12 tail to ~40-12 WITHOUT touching the healthy ~12% 25+-margin blowout rate.
+   */
+  gameManagement: {
+    leadThreshold: 24, // only once a side leads by ~4 converted tries — a genuine blowout, not a 3-try game
+    fromMinute: 42, // from ~half-time on (FULL_MINUTE 80): a side 24+ up at the break already game-manages
+    perPointOverLead: 0.07, // added sigmoid bias per lead-point beyond the threshold
+    baseDampen: 0.7, // the immediate foot-off-the-gas step on crossing the threshold
+    maxDampen: 2.4, // cap (with breakBias 2.8 → effective bias 5.2, break rate collapses)
+  },
+
   /** Clean-break (vs half-break) speed contest vs fullback cover. */
   cleanBreakK: 0.05,
   /** Try conversion from a clean line break, modulated by cover speed. */
@@ -442,6 +460,21 @@ export interface ContestInput {
   /** Form deltas for the ball-runner / the defender (signed effective-attr points). 0 = form-free. */
   attackerForm?: number
   defenderForm?: number
+  /** Game-management dampener on the LEADING side's break (see gameManagementDampen). 0 = full noise. */
+  breakDampen?: number
+}
+
+/**
+ * The game-management break dampener (pure). When the ATTACKING side is comfortably ahead late, they
+ * game-manage and the try tap slows — so a runaway score flattens instead of hitting 80. Returns a
+ * positive sigmoid-bias addend for `resolveContest`; 0 for the trailing side, close games, or the
+ * first `fromMinute`. `attackerLead` is signed (attacker score − defender score), so only a genuine
+ * lead triggers it. Draws no rng.
+ */
+export function gameManagementDampen(attackerLead: number, clock: number): number {
+  const gm = TUNING.gameManagement
+  if (clock < gm.fromMinute || attackerLead < gm.leadThreshold) return 0
+  return Math.min(gm.maxDampen, gm.baseDampen + (attackerLead - gm.leadThreshold) * gm.perPointOverLead)
 }
 
 export type ContestOutcome =
@@ -460,7 +493,7 @@ export function resolveContest(rng: Rng, input: ContestInput): ContestOutcome {
   const edgeSupport = (input.attackUnit.attackRating - TUNING.edgeSupportAnchor) * TUNING.edgeSupportScale
 
   const pBreak = sigmoid(
-    TUNING.breakK * (effAttack + edgeSupport - effDefence) - TUNING.breakBias,
+    TUNING.breakK * (effAttack + edgeSupport - effDefence) - TUNING.breakBias - (input.breakDampen ?? 0),
   )
   if (!chance(rng, pBreak)) return { kind: 'HELD' }
 
